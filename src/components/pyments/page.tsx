@@ -1,7 +1,7 @@
 import { columns, type Payment } from "./columns"
 import { DataTable } from "./data-table"
  
-async function getData(): Promise<Payment[]> {
+function getData(): Payment[] {
   // Fetch data from your API here.
   return [
     { id: '1', empresa: 'PortoMar Logística', situacao: 'Ativo', emissao: '03/12/2018', local: 'Curitiba', valor: 7320},
@@ -37,8 +37,8 @@ async function getData(): Promise<Payment[]> {
   ]
 }
 
-export default async function DemoPage() {
-  const data = await getData()
+export default function DemoPage() {
+  const data = getData()
 
   return (
     <div className="container mx-auto">

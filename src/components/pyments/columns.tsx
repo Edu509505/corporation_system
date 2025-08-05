@@ -1,4 +1,3 @@
-'use client'
 import type { ColumnDef } from "@tanstack/react-table";
 import { CircleAlertIcon, CircleCheck, CircleX } from "lucide-react";
 
