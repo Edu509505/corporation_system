@@ -2,13 +2,15 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { useEffect, useState } from "react";
 import type { Cliente, Contrato } from "../../Tipagens";
 
+const url = import.meta.env.VITE_API_URL;
+
 function AddMedicao() {
 
     const [clientes, setClientes] = useState<Cliente[]>([]);
 
     useEffect(() => {
         async function buscarClientes() {
-            const empresas = await fetch("http://localhost:3000/clientes");
+            const empresas = await fetch(`${url}/clientes`);
             const body = await empresas.json();
             setClientes(body);
         }
@@ -19,7 +21,7 @@ function AddMedicao() {
 
     useEffect(() => {
         async function buscarContratos() {
-            const contratos = await fetch("http://localhost:3000/contratos");
+            const contratos = await fetch(`${url}/contratos`);
             const body = await contratos.json();
             setContratos(body);
         }
