@@ -1,20 +1,18 @@
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { use, useEffect, useState } from "react";
 
 function AddMedicao() {
 
-    const empresas = [
-        {id: 1, empresa: 'Ecoporto', cnpj: '00.000.000/0000-00'},
-        {id: 2, empresa: 'Ecopátio', cnpj: '00.000.000/0000-00'},
-        {id: 3, empresa: 'RGLOG', cnpj: '00.000.000/0000-00'},
-        {id: 4, empresa: 'Rumo', cnpj: '00.000.000/0000-00'}
-    ]
-
-    const contratos = [
-        {id: 1, contrato:'00037/2025', nome: 'Limpeza De Canaletas'},
-        {id: 2, contrato:'00038/2025', nome: 'Pavimentação'},
-        {id: 3, contrato:'00087/2025', nome: 'Pavimentação'}
-    ]
-
+    const [clientes, setClientes] = useState();
+    useEffect(() => {
+        async function clientes() {
+            const empresas = await fetch("http://localhost:3000/clientes");
+            const body = await empresas.json();
+            setClientes(body);
+        }
+        clientes();
+    })
+    
     return (
         <div className="bg-gray-50 h-full w-full">
             <h1 className="font-bold text-3xl text-center">Criar Nova Medição</h1>
@@ -44,7 +42,7 @@ function AddMedicao() {
                     <SelectContent className="w-[200px]">
                         <SelectGroup>
                             <SelectLabel>Cliente</SelectLabel>
-                            {empresas.map((contratos) => (
+                            {clientes.map((contratos) => (
                             <SelectItem key={contratos.id} value={contratos.empresa}>
                                 {contratos.empresa}
                             </SelectItem>
