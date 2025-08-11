@@ -1,4 +1,4 @@
-import { CircleDollarSignIcon, Inbox, LucideLayoutDashboard, PencilRuler } from "lucide-react";
+import { Building2Icon, CircleDollarSignIcon, Inbox, LucideLayoutDashboard, PanelTopOpenIcon, PencilRuler } from "lucide-react";
 
 import {
   Sidebar,
@@ -9,6 +9,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   // SidebarMenuSub,
   // SidebarMenuSubButton,
   // SidebarMenuSubItem,
@@ -25,9 +28,13 @@ const items = [
     icon: LucideLayoutDashboard,
   },
   {
-    title: "Blog",
+    title: "Administração",
     url: "blog",
     icon: Inbox,
+    subMenu: [
+      { title: 'Clientes', url: '/oi2', icon: Building2Icon },
+      { title: 'Contratos', url: '/oi', icon: PanelTopOpenIcon }
+    ]
   },
   {
     title: "Medição",
@@ -70,7 +77,7 @@ export function AppSidebar() {
                     </Link>
                   </SidebarMenuButton>
 
-                  {/* {item.subMenu?.map((tituloSub, index) => (
+                  {item.subMenu?.map((tituloSub, index) => (
                     <SidebarMenuSub>
                       <SidebarMenuSubItem key={index}>
                         <SidebarMenuSubButton asChild>
@@ -81,7 +88,7 @@ export function AppSidebar() {
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     </SidebarMenuSub>
-                  ))} */}
+                  ))}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

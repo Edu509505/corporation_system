@@ -15,8 +15,8 @@ function AddMedicao() {
             setClientes(body);
         }
         buscarClientes();
-    },[])
-    
+    }, [])
+
     const [contratos, setContratos] = useState<Contrato[]>([]);
 
     useEffect(() => {
@@ -27,6 +27,10 @@ function AddMedicao() {
         }
         buscarContratos();
     }, [])
+
+    const [clienteSelecionado, setClienteSelecionado] = useState()
+
+    let idCliente = []
 
     return (
         <div className="bg-gray-50 h-full w-full">
@@ -50,18 +54,18 @@ function AddMedicao() {
             </div>
             <div className="w-full flex flex-col p-1 pb-5 pt-5 gap-2 items-start justify-center border-b-1 border-solid border-gray-500">
                 <h1 className="text-3xl">Selecione a Empresa</h1>
-                <Select>
+                <Select onValueChange={}>
                     <SelectTrigger className="w-[300px]">
-                        <SelectValue placeholder="Selecione o contrato"/>
+                        <SelectValue placeholder="Selecione o contrato" />
                     </SelectTrigger>
                     <SelectContent className="w-[300px]">
                         <SelectGroup>
                             <SelectLabel>Cliente</SelectLabel>
                             {clientes.map((clientes) => (
-                            <SelectItem key={clientes.id} value={clientes.cliente}>
-                                {clientes.cliente}
-                            </SelectItem>
-                        ))}
+                                <SelectItem key={clientes.id} value={clientes.id.toString()}>
+                                    {clientes.cliente}
+                                </SelectItem>
+                            ))}
                         </SelectGroup>
                     </SelectContent>
                 </Select>
@@ -70,20 +74,20 @@ function AddMedicao() {
                 <h1 className="text-3xl">Selecione o contrato referente a essa medição</h1>
                 <Select>
                     <SelectTrigger className="w-[300px]">
-                        <SelectValue placeholder="Selecione o contrato"/>
+                        <SelectValue placeholder="Selecione o contrato" />
                     </SelectTrigger>
                     <SelectContent className="w-[300px]">
                         <SelectGroup>
                             <SelectLabel>Contrato Referente a essa Medição</SelectLabel>
                             {contratos.map((contratos) => (
-                            <SelectItem key={contratos.id} value={contratos.contrato}>
-                                {contratos.contrato}
-                            </SelectItem>
-                        ))}
+                                <SelectItem key={contratos.id} value={contratos.contrato}>
+                                    {contratos.contrato}
+                                </SelectItem>
+                            ))}
                         </SelectGroup>
                     </SelectContent>
                 </Select>
-                </div>
+            </div>
         </div>
     )
 }
