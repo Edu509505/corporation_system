@@ -18,6 +18,7 @@ function AddMedicao() {
     }, [])
 
     const [contratos, setContratos] = useState<Contrato[]>([]);
+    const [clienteSelecionado, setClienteSelecionado] = useState()
 
     useEffect(() => {
         async function buscarContratos() {
@@ -27,10 +28,6 @@ function AddMedicao() {
         }
         buscarContratos();
     }, [])
-
-    const [clienteSelecionado, setClienteSelecionado] = useState()
-
-    let idCliente = []
 
     return (
         <div className="bg-gray-50 h-full w-full">
@@ -54,7 +51,7 @@ function AddMedicao() {
             </div>
             <div className="w-full flex flex-col p-1 pb-5 pt-5 gap-2 items-start justify-center border-b-1 border-solid border-gray-500">
                 <h1 className="text-3xl">Selecione a Empresa</h1>
-                <Select onValueChange={}>
+                <Select>
                     <SelectTrigger className="w-[300px]">
                         <SelectValue placeholder="Selecione o contrato" />
                     </SelectTrigger>
@@ -62,8 +59,15 @@ function AddMedicao() {
                         <SelectGroup>
                             <SelectLabel>Cliente</SelectLabel>
                             {clientes.map((clientes) => (
-                                <SelectItem key={clientes.id} value={clientes.id.toString()}>
+                                <SelectItem key={clientes.id} 
+                                value={clientes.id.toString()} 
+                                onChange={(clientes) => {setClienteSelecionado({
+                                    ...clienteSelecionado, 
+                                    clientes})}
+                                    }>
+
                                     {clientes.cliente}
+                                    
                                 </SelectItem>
                             ))}
                         </SelectGroup>
