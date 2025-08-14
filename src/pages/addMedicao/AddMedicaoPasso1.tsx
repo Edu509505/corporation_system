@@ -18,7 +18,11 @@ function AddMedicao() {
     }, [])
 
     const [contratos, setContratos] = useState<Contrato[]>([]);
-    const [clienteSelecionado, setClienteSelecionado] = useState()
+    const [clienteSelecionado, setClienteSelecionado] = useState({
+        id:''
+    })
+
+    console.log(clienteSelecionado)
 
     useEffect(() => {
         async function buscarContratos() {
@@ -60,12 +64,14 @@ function AddMedicao() {
                             <SelectLabel>Cliente</SelectLabel>
                             {clientes.map((clientes) => (
                                 <SelectItem key={clientes.id} 
-                                value={clientes.id.toString()} 
-                                onChange={(clientes) => {setClienteSelecionado({
-                                    ...clienteSelecionado, 
-                                    clientes})}
-                                    }>
-
+                                value={clientes.id.toString()}
+                                onVolumeChange={(event) => {
+                                    setClienteSelecionado({
+                                        ...clienteSelecionado,
+                                        id: event.target.toString()
+                                    })
+                                }}
+                                >
                                     {clientes.cliente}
                                     
                                 </SelectItem>
