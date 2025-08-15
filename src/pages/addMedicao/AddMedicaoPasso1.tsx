@@ -61,26 +61,25 @@ function AddMedicao() {
       </div>
       <div className="w-full flex flex-col p-1 pb-5 pt-5 gap-2 items-start justify-center border-b-1 border-solid border-gray-500">
         <h1 className="text-3xl">Selecione a Empresa</h1>
-        <Select>
+        <Select value={clienteSelecionado.id} onValueChange={(value) => {
+          console.log('value', value);
+          setClienteSelecionado({
+            ...clienteSelecionado,
+            id: value.toString()
+          });
+        }}>
           <SelectTrigger className="w-[300px]">
             <SelectValue placeholder="Selecione o contrato" />
           </SelectTrigger>
           <SelectContent className="w-[300px]">
             <SelectGroup>
               <SelectLabel>Cliente</SelectLabel>
-              {clientes.map((clientes) => (
+              {clientes.map((cliente) => (
                 <SelectItem
-                  key={clientes.id}
-                  value={clientes.id.toString()}
-                  onChange={(event) => {
-                    setClienteSelecionado({
-                      ...clienteSelecionado,
-                      id: event.target.toString()
-                    });
-                    console.log("OIOI", event);
-                  }}
+                  key={cliente.id}
+                  value={cliente.id.toString()}
                 >
-                  {clientes.cliente}
+                  {cliente.cliente}
                 </SelectItem>
               ))}
             </SelectGroup>

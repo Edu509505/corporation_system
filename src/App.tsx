@@ -7,17 +7,21 @@ import NoPage from "./pages/NoPage";
 import NotasFiscais from "./pages/NotasFiscais";
 import Medicao from "./pages/Medicao";
 import AddMedicao from "./pages/addMedicao/AddMedicaoPasso1";
+import Login from "./pages/Login";
+
 function App() {
   return (
     <>
       <BrowserRouter>
         <Routes>
+          <Route path="/login" element={<Login />} />
           <Route path="/" element={<Layout children={undefined} />}>
             <Route index element={<Home />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/notasFiscais" element={<NotasFiscais />} />
             <Route path="/medicao" element={<Medicao />} />
-            <Route path="/adicionarMedicao" element={<AddMedicao />}/>
+            <Route path="/adicionarMedicao" element={<AddMedicao />} />
+
             <Route path="*" element={<NoPage />} />
           </Route>
         </Routes>
