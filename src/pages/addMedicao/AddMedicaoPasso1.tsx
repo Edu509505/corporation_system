@@ -32,9 +32,12 @@ function AddMedicao() {
 
   useEffect(() => {
     async function buscarContratos() {
-      const contratos = await fetch(`${url}/contratos`);
+      const contratos = await fetch(
+        `${url}/contratos/${clienteSelecionado.id}`
+      );
       const body = await contratos.json();
       setContratos(body);
+      console.log(clienteSelecionado.id);
     }
     buscarContratos();
   }, []);
@@ -61,13 +64,16 @@ function AddMedicao() {
       </div>
       <div className="w-full flex flex-col p-1 pb-5 pt-5 gap-2 items-start justify-center border-b-1 border-solid border-gray-500">
         <h1 className="text-3xl">Selecione a Empresa</h1>
-        <Select value={clienteSelecionado.id} onValueChange={(value) => {
-          console.log('value', value);
-          setClienteSelecionado({
-            ...clienteSelecionado,
-            id: value.toString()
-          });
-        }}>
+        <Select
+          value={clienteSelecionado.id}
+          onValueChange={(value) => {
+            console.log("value", value);
+            setClienteSelecionado({
+              ...clienteSelecionado,
+              id: value.toString(),
+            });
+          }}
+        >
           <SelectTrigger className="w-[300px]">
             <SelectValue placeholder="Selecione o contrato" />
           </SelectTrigger>
@@ -75,10 +81,7 @@ function AddMedicao() {
             <SelectGroup>
               <SelectLabel>Cliente</SelectLabel>
               {clientes.map((cliente) => (
-                <SelectItem
-                  key={cliente.id}
-                  value={cliente.id.toString()}
-                >
+                <SelectItem key={cliente.id} value={cliente.id.toString()}>
                   {cliente.cliente}
                 </SelectItem>
               ))}
