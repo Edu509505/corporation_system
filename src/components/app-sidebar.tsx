@@ -1,4 +1,11 @@
-import { Building2Icon, CircleDollarSignIcon, Inbox, LucideLayoutDashboard, PanelTopOpenIcon, PencilRuler } from "lucide-react";
+import {
+  Building2Icon,
+  CircleDollarSignIcon,
+  Inbox,
+  LucideLayoutDashboard,
+  PanelTopOpenIcon,
+  PencilRuler,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -15,7 +22,6 @@ import {
   // SidebarMenuSub,
   // SidebarMenuSubButton,
   // SidebarMenuSubItem,
-
 } from "@/components/ui/sidebar";
 
 import { Link } from "react-router-dom";
@@ -32,24 +38,24 @@ const items = [
     url: "blog",
     icon: Inbox,
     subMenu: [
-      { title: 'Clientes', url: '/oi2', icon: Building2Icon },
-      { title: 'Contratos', url: '/oi', icon: PanelTopOpenIcon }
-    ]
+      { title: "Clientes", url: "/oi2", icon: Building2Icon },
+      { title: "Contratos", url: "/oi", icon: PanelTopOpenIcon },
+    ],
   },
   {
     title: "Medição",
     url: "medicao",
     icon: PencilRuler,
     // subMenu: [
-    //   { title: 'Cadastrar nova Medição', url: '/oi2', icon: CirclePlus },
-    //   { title: 'Consultar medição', url: '/oi', icon: Search },
-    //   { title: 'Alterar Medição', url: '/oi3', icon: PencilLine },
-    //   { title: 'Cancelar Medição', url: '/oi4', icon: CircleXIcon }
-    // ]
+    //   { title: "Cadastrar nova Medição", url: "/oi2", icon: CirclePlus },
+    //   { title: "Consultar medição", url: "/oi", icon: Search },
+    //   { title: "Alterar Medição", url: "/oi3", icon: PencilLine },
+    //   { title: "Cancelar Medição", url: "/oi4", icon: CircleXIcon },
+    // ],
   },
   {
-    title: 'Nota Fiscal',
-    url:'notasFiscais',
+    title: "Nota Fiscal",
+    url: "notasFiscais",
     icon: CircleDollarSignIcon,
     // subMenu: [
     //   { title: 'Registrar Nota Fiscal', url: '/oi2', icon: CirclePlus },
@@ -57,7 +63,7 @@ const items = [
     //   { title: 'Alterar Nota Fiscal', url: '/oi3', icon: PencilLine },
     //   { title: 'Cancelar Nota Fiscal', url: '/oi4', icon: CircleXIcon }
     // ]
-  }
+  },
 ];
 
 export function AppSidebar() {
@@ -83,7 +89,9 @@ export function AppSidebar() {
                         <SidebarMenuSubButton asChild>
                           <Link to={tituloSub.url}>
                             <tituloSub.icon />
-                            <span className="cursor-pointer">{tituloSub.title}</span>
+                            <span className="cursor-pointer">
+                              {tituloSub.title}
+                            </span>
                           </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
