@@ -21,7 +21,6 @@ function App() {
             <Route path="/notasFiscais" element={<NotasFiscais />} />
             <Route path="/medicao" element={<Medicao />} />
             <Route path="/adicionarMedicao" element={<AddMedicao />} />
-
             <Route path="*" element={<NoPage />} />
           </Route>
         </Routes>
