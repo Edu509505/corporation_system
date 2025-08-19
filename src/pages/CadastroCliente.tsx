@@ -49,7 +49,7 @@ export default function CriarCliente (){
                 <input 
                 type="text" 
                 name="cnpj" 
-                placeholder="Nome do cliente" 
+                placeholder="Cnpj do cliente" 
                 value={novoCliente.cnpj} 
                 onChange={(event) => setNovoCliente({
                     ...novoCliente,
@@ -58,8 +58,8 @@ export default function CriarCliente (){
                 />
                 <input 
                 type="text" 
-                name="cnpj" 
-                placeholder="Nome do cliente" 
+                name="local" 
+                placeholder="local do cliente" 
                 value={novoCliente.local} 
                 onChange={(event) => setNovoCliente({
                     ...novoCliente,
@@ -68,8 +68,8 @@ export default function CriarCliente (){
                 />
                 <input 
                 type="text" 
-                name="cnpj" 
-                placeholder="Nome do cliente" 
+                name="status" 
+                placeholder="Status do cliente" 
                 value={novoCliente.status} 
                 onChange={(event) => setNovoCliente({
                     ...novoCliente,

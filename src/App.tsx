@@ -8,6 +8,8 @@ import NotasFiscais from "./pages/NotasFiscais";
 import Medicao from "./pages/Medicao";
 import AddMedicao from "./pages/addMedicao/AddMedicaoPasso1";
 import Login from "./pages/Login";
+import CadastroCliente from "./pages/CadastroCliente"
+import Clientes from "./pages/Clientes"
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
             <Route path="/notasFiscais" element={<NotasFiscais />} />
             <Route path="/medicao" element={<Medicao />} />
             <Route path="/adicionarMedicao" element={<AddMedicao />} />
+            <Route path="/cadastro" element={<CadastroCliente />} />
+            <Route path="/clientes" element={<Clientes />} />
             <Route path="*" element={<NoPage />} />
           </Route>
         </Routes>
