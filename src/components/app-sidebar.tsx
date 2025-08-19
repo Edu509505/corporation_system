@@ -38,7 +38,7 @@ const items = [
     url: "blog",
     icon: Inbox,
     subMenu: [
-      { title: "Clientes", url: "/oi2", icon: Building2Icon },
+      { title: "Clientes", url: "/clientes", icon: Building2Icon },
       { title: "Contratos", url: "/oi", icon: PanelTopOpenIcon },
     ],
   },

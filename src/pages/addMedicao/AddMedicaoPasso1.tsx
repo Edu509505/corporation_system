@@ -26,7 +26,7 @@ function AddMedicao() {
 
   const [contratos, setContratos] = useState<Contrato[]>([]);
   const [clienteSelecionado, setClienteSelecionado] = useState({
-    id: "",
+    id: "1",
   });
 
   useEffect(() => {
@@ -36,6 +36,9 @@ function AddMedicao() {
       );
       const body = await contratos.json();
       setContratos(body);
+
+      console.log(body)
+
     }
     buscarContratos();
   }, []);
@@ -97,11 +100,11 @@ function AddMedicao() {
           <SelectContent className="w-[300px]">
             <SelectGroup>
               <SelectLabel>Contrato Referente a essa Medição</SelectLabel>
-              {contratos.map((contratos) => (
+              {/* {contratos.map((contratos) => (
                 <SelectItem key={contratos.id} value={contratos.contrato}>
                   {contratos.contrato}
                 </SelectItem>
-              ))}
+              ))} */}
             </SelectGroup>
           </SelectContent>
         </Select>
