@@ -25,7 +25,6 @@ function AddMedicao() {
   }, []);
 
   const [contratos, setContratos] = useState<Contrato[]>([]);
-
   const [clienteSelecionado, setClienteSelecionado] = useState({
     id: "",
   });
@@ -33,11 +32,10 @@ function AddMedicao() {
   useEffect(() => {
     async function buscarContratos() {
       const contratos = await fetch(
-        `${url}/contratos/${clienteSelecionado.id}`
+        `${url}/clientes/${Number(clienteSelecionado.id)}/contratos`
       );
       const body = await contratos.json();
       setContratos(body);
-      console.log(clienteSelecionado.id);
     }
     buscarContratos();
   }, []);
@@ -67,7 +65,6 @@ function AddMedicao() {
         <Select
           value={clienteSelecionado.id}
           onValueChange={(value) => {
-            console.log("value", value);
             setClienteSelecionado({
               ...clienteSelecionado,
               id: value.toString(),
