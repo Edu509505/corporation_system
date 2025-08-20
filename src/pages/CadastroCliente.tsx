@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 //import type { Cliente } from "../Tipagens"
@@ -13,7 +14,7 @@ interface Cliente {
 
 
 const url = import.meta.env.VITE_API_URL;
-    //Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática 
+//Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática 
 
 export default function CriarCliente() {
 
@@ -26,7 +27,7 @@ export default function CriarCliente() {
     const [novoCliente, setNovoCliente] = useState<Cliente>({
         cliente: '',
         cnpj: '',
-        local: '',  
+        local: '',
         status: 'Ativo',
         path: '',
     });
@@ -51,11 +52,11 @@ export default function CriarCliente() {
         const body = await response.json();
     }
     return (
-        <div>
-            <form onSubmit={criarCliente}>
+        <div className="bg-gray-50">
+            <form onSubmit={criarCliente} className="flex gap-3 flex-col p-5">
                 <h1>Cadastrar Cliente</h1>
 
-                <input
+                <Input
                     type="text"
                     name="cliente"
                     placeholder="Nome do cliente"
@@ -64,8 +65,9 @@ export default function CriarCliente() {
                         ...novoCliente,
                         cliente: event.target.value
                     })}
+                    className="bg-white"
                 />
-                <input
+                <Input
                     type="text"
                     name="cnpj"
                     placeholder="Cnpj do cliente"
@@ -74,8 +76,9 @@ export default function CriarCliente() {
                         ...novoCliente,
                         cnpj: event.target.value
                     })}
+                    className="bg-white"
                 />
-                <input
+                <Input
                     type="text"
                     name="local"
                     placeholder="local do cliente"
@@ -84,14 +87,15 @@ export default function CriarCliente() {
                         ...novoCliente,
                         local: event.target.value
                     })}
+                    className="bg-white"
                 />
                 <select
-                name="select"
+                    name="select"
                     onChange={(event) => setNovoCliente({
                         ...novoCliente,
                         status: event.target.value as "Ativo" | "Pendente" | "Inativo"
                     })}
-                    
+
                 >
                     <option value="Ativo" >
                         Ativo
