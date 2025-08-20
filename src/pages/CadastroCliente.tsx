@@ -16,7 +16,8 @@ export default function CriarCliente (){
         status: '',
     });
 
-    async function criarCliente() {
+    async function criarCliente(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
         const response = await fetch("http://localhost:3000/clientes", {
             method: "POST",
             headers: {
