@@ -22,7 +22,7 @@ export default function CriarCliente (){
 
     async function criarCliente(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        const response = await fetch(`http://${url}/clientes`, {
+        const response = await fetch(`${url}/clientes`, {
             method: "POST",
             headers: {
                 "Content-type":"application/json"

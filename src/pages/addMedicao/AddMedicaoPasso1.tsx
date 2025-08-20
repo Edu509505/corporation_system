@@ -26,7 +26,7 @@ function AddMedicao() {
 
   const [contratos, setContratos] = useState<Contrato[]>([]);
   const [clienteSelecionado, setClienteSelecionado] = useState({
-    id: undefined
+    id: ""
   });
 
   useEffect(() => {

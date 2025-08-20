@@ -12,7 +12,7 @@ export default function VerClientes() {
   const [clientes, setClientes] = useState<Cliente[]>([]); 
   useEffect(() => {
     async function VerClientes() {
-      const response = await fetch(`http://${url}/clientes`);
+      const response = await fetch(`${url}/clientes`);
       const body = await response.json();
       setClientes(body);
     }
