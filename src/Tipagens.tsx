@@ -1,9 +1,9 @@
 export type Cliente = {
     id: number,
-    cliente: string,
-    cnpj: string,
-    local: string,
-    status: string,
+    cliente: string | null,
+    cnpj: string | null,
+    local: string | null,
+    status:  "Ativo" | "Pendente" | "Inativo" | null;
 }
 
 export type Contrato = {

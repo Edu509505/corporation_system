@@ -35,7 +35,7 @@ const items = [
   },
   {
     title: "Administração",
-    url: "blog",
+    url: "/",
     icon: Inbox,
     subMenu: [
       { title: "Clientes", url: "/clientes", icon: Building2Icon },
