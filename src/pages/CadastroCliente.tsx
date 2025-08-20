@@ -9,6 +9,10 @@ interface Cliente {
 }
 
 export default function CriarCliente (){
+
+    const url = import.meta.env.VITE_API_URL; 
+    //Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática 
+
     const [novoCliente, setNovoCliente] = useState<Cliente>({
         cliente: '',
         cnpj: '',
@@ -18,7 +22,7 @@ export default function CriarCliente (){
 
     async function criarCliente(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        const response = await fetch("http://localhost:3000/clientes", {
+        const response = await fetch(`http://${url}/clientes`, {
             method: "POST",
             headers: {
                 "Content-type":"application/json"

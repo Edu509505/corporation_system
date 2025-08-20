@@ -26,7 +26,7 @@ function AddMedicao() {
 
   const [contratos, setContratos] = useState<Contrato[]>([]);
   const [clienteSelecionado, setClienteSelecionado] = useState({
-    id: null,
+    id: undefined
   });
 
   useEffect(() => {
@@ -71,7 +71,7 @@ function AddMedicao() {
           onValueChange={(value) => {
             setClienteSelecionado({
               ...clienteSelecionado,
-              id: value.toString(),
+              id: value.toString()
             });
           }}
         >
@@ -101,11 +101,11 @@ function AddMedicao() {
           <SelectContent className="w-[300px]">
             <SelectGroup>
               <SelectLabel>Contrato Referente a essa Medição</SelectLabel>
-              {/* {contratos.map((contratos) => (
+              {contratos.map((contratos) => (
                 <SelectItem key={contratos.id} value={contratos.contrato}>
                   {contratos.contrato}
                 </SelectItem>
-              ))} */}
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>

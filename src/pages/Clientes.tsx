@@ -2,19 +2,17 @@ import { Button } from "@/components/ui/button";
 import { CirclePlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from 'react-router-dom'
-interface Clientes {
-  id: number;
-  cliente: string;
-  cnpj: string;
-  local: string;
-  status: string;
-}
+import type { Cliente } from '../Tipagens'
 
 export default function VerClientes() {
-  const [clientes, setClientes] = useState<Clientes[]>([]);
+
+  const url = import.meta.env.VITE_API_URL; 
+  //Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática
+
+  const [clientes, setClientes] = useState<Cliente[]>([]); 
   useEffect(() => {
     async function VerClientes() {
-      const response = await fetch("http://localhost:3000/clientes");
+      const response = await fetch(`http://${url}/clientes`);
       const body = await response.json();
       setClientes(body);
     }
