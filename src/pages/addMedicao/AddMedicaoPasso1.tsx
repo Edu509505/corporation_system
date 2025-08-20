@@ -26,11 +26,12 @@ function AddMedicao() {
 
   const [contratos, setContratos] = useState<Contrato[]>([]);
   const [clienteSelecionado, setClienteSelecionado] = useState({
-    id: "1",
+    id: null,
   });
 
   useEffect(() => {
     async function buscarContratos() {
+      if (!clienteSelecionado.id) return
       const contratos = await fetch(
         `${url}/clientes/${Number(clienteSelecionado.id)}/contratos`
       );
@@ -41,7 +42,7 @@ function AddMedicao() {
 
     }
     buscarContratos();
-  }, []);
+  }, [clienteSelecionado.id]);
 
   return (
     <div className="bg-gray-50 h-full w-full">
