@@ -8,7 +8,12 @@ interface Cliente {
     cnpj: string;
     local: string;
     status: "Ativo" | "Pendente" | "Inativo" | null;
+    path: string | null;
 }
+
+
+const url = import.meta.env.VITE_API_URL;
+    //Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática 
 
 export default function CriarCliente() {
 
@@ -18,14 +23,12 @@ export default function CriarCliente() {
         navigate(-1)
     }
 
-    const url = import.meta.env.VITE_API_URL;
-    //Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática 
-
     const [novoCliente, setNovoCliente] = useState<Cliente>({
         cliente: '',
         cnpj: '',
-        local: '',
-        status: null,
+        local: '',  
+        status: 'Ativo',
+        path: '',
     });
 
     console.log(novoCliente)
@@ -41,7 +44,8 @@ export default function CriarCliente() {
                 cliente: novoCliente.cliente,
                 cnpj: novoCliente.cnpj,
                 local: novoCliente.local,
-                status: novoCliente.status
+                status: novoCliente.status,
+                path: novoCliente.path,
             })
         });
         const body = await response.json();
@@ -93,10 +97,10 @@ export default function CriarCliente() {
                         Ativo
                     </option>
                     <option value="Pendente" >
-                        Inativo
+                        Pendente
                     </option>
                     <option value="Inativo" >
-                        Pendente
+                        Inativo
                     </option>
                 </select>
 

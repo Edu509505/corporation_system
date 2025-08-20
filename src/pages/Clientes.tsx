@@ -25,6 +25,10 @@ export default function VerClientes() {
     // itensRelacionados();
   }, []);
 
+    // async function deletarCliente() {
+      
+    // }
+
   return (
     <>
       <div className="w-full h-screen p-5 flex flex-col bg-gray-50">
