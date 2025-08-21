@@ -1,7 +1,6 @@
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -11,9 +10,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CircleCheck, CircleFadingPlusIcon } from "lucide-react";
+import { CircleCheck, CircleFadingPlusIcon, CircleX } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { cnpj } from 'cpf-cnpj-validator'
 //import type { Cliente } from "../Tipagens"
 
 interface Cliente {
@@ -43,6 +43,7 @@ export default function CriarCliente() {
   });
 
   console.log(novoCliente);
+  console.log(cnpj.isValid(novoCliente.cnpj))
 
   async function criarCliente(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,25 +63,19 @@ export default function CriarCliente() {
     const body = await response.json();
   }
 
-  const mensagemDeOkay = "Okay";
+  let verificacao = false;
 
-  const mensagemAlert = [
-    {
-      submitOkay: {
-        alertDialogTitle: "Cliente Cadastrado!",
-        alertDialogDescription: "Cliente foi cadastrado com sucesso!",
-      },
-      submitError: {
-        alertDialogTitle: "Erro ao cadastrar usuário",
-        alertDialogDescription:
-          "Você precisa preencher todos os campos para que o cadastro seja realizado",
-      },
-    },
-  ];
+  if(novoCliente.cliente.length >= 3){
+    if(cnpj.isValid(novoCliente.cnpj) === true){
+      if(novoCliente.local.length > 3){
+        verificacao = true
+      }
+    }
+  }
 
   return (
     <div className="w-full h-screen flex flex-col bg-[url('./src/assets/img/IMG-20240823-WA0007.jpg')] bg-cover bg-center">
-      <div className="w-full h-full flex flex-col backdrop-blur-xl bg-[rgba(255,255,255,0.40)]">
+      <div className="w-full h-full flex flex-col backdrop-blur-xl bg-[rgba(255,255,255,0.50)]">
         <form onSubmit={criarCliente} className="flex gap-3 flex-col p-5">
           <div className="flex gap-3 items-center">
             <CircleFadingPlusIcon className="size-10" />
@@ -100,19 +95,22 @@ export default function CriarCliente() {
             }
             className="bg-white"
           />
+          {novoCliente.cnpj.length === 18 && cnpj.isValid(novoCliente.cnpj) === !true ? <div className="text-destructive flex items-center gap-3"><CircleX /> <h2>Cnpj Inválido</h2></div> : ''}
           <Input
             type="text"
             name="cnpj"
+            maxLength={18}
             placeholder="Cnpj do cliente"
             value={novoCliente.cnpj}
             onChange={(event) =>
               setNovoCliente({
                 ...novoCliente,
-                cnpj: event.target.value,
+                cnpj: cnpj.format(event.target.value)
               })
             }
             className="bg-white"
           />
+
           <Input
             type="text"
             name="local"
@@ -140,7 +138,7 @@ export default function CriarCliente() {
             <option value="Pendente">Pendente</option>
             <option value="Inativo">Inativo</option>
           </select>
-
+          
           <AlertDialog>
             <AlertDialogTrigger>
               <Button variant="outline" className="bg-ring">
@@ -148,37 +146,37 @@ export default function CriarCliente() {
               </Button>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  {mensagemAlert.map((mensagem) =>
-                    mensagemDeOkay !== "Okay" ? (
+                    {verificacao === true ? (
                       <>
                         <AlertDialogTitle>
-                          {mensagem.submitError.alertDialogTitle}
+                          Cliente Cadastrado!
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                          {mensagem.submitError.alertDialogDescription}
+                          Cliente foi cadastrado com sucesso!
                         </AlertDialogDescription>
+
+                        <AlertDialogFooter>
+                          <AlertDialogAction
+                            type="button"
+                            className="cursor-pointer"
+                            onClick={voltar}
+                          >
+                            Continuar
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
                       </>
                     ) : (
                       <>
                         <AlertDialogTitle>
-                          {mensagem.submitOkay.alertDialogTitle}
+                          Erro ao cadastrar usuário
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                          {mensagem.submitOkay.alertDialogDescription}
+                          Você precisa preencher todos os campos para que o cadastro seja realizado
                         </AlertDialogDescription>
                       </>
                     )
-                  )}
+                  }
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogAction
-                    type="submit"
-                    className="cursor-pointer"
-                    onClick={voltar}
-                  >
-                    Continuar
-                  </AlertDialogAction>
-                </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialogTrigger>
           </AlertDialog>

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import {
+  Building,
   CircleAlert,
   CircleCheck,
   CirclePlusIcon,
@@ -35,8 +36,11 @@ export default function VerClientes() {
 
   return (
     <div className="w-full h-screen flex flex-col bg-[url('./src/assets/img/nossotrab2.jpg')] bg-cover bg-center">
-      <div className="w-full h-full p-5 flex flex-col backdrop-blur-xl bg-[rgba(255,255,255,0.40)]">
-        <h1 className="text-2xl font-bold">Clientes cadastrados</h1>
+      <div className="w-full h-full p-5 flex flex-col backdrop-blur-xl bg-[rgba(255,255,255,0.50)]">
+        <div className="flex items-center gap-3">
+          <Building/> <h1 className="text-2xl font-bold">Clientes cadastrados</h1>
+        </div>
+
         <div className="w-full h-20 flex justify-between items-center">
           <h2 className="text-2xl ">Lista de Clientes</h2>
           <Link to="/cadastro">
@@ -46,7 +50,7 @@ export default function VerClientes() {
             </Button>
           </Link>
         </div>
-        <section className="w-full h-full gap-3 flex flex-row flex-wrap overflow-auto p-4 max-[1153.50px]:justify-center">
+        <section className="w-full h-full gap-3 flex flex-row flex-wrap overflow-x-auto p-4">
           {clientes.map((c) => (
             <div
               key={c.id}
