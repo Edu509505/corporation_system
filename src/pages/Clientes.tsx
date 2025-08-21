@@ -1,11 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { CircleAlert, CircleCheck, CirclePlusIcon, CircleX } from "lucide-react";
+import {
+  CircleAlert,
+  CircleCheck,
+  CirclePlusIcon,
+  CircleX,
+} from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from 'react-router-dom'
-import type { Cliente } from '../Tipagens'
+import { Link } from "react-router-dom";
+import type { Cliente } from "../Tipagens";
 
 export default function VerClientes() {
-
   const url = import.meta.env.VITE_API_URL;
   //Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática
 
@@ -25,13 +29,13 @@ export default function VerClientes() {
     // itensRelacionados();
   }, []);
 
-    // async function deletarCliente() {
-      
-    // }
+  // async function deletarCliente() {
+
+  // }
 
   return (
-    <>
-      <div className="w-full h-screen p-5 flex flex-col bg-gray-50">
+    <div className="w-full h-screen flex flex-col bg-[url('./src/assets/img/nossotrab2.jpg')] bg-cover bg-center">
+      <div className="w-full h-full p-5 flex flex-col backdrop-blur-xl bg-[rgba(255,255,255,0.40)]">
         <h1 className="text-2xl font-bold">Clientes cadastrados</h1>
         <div className="w-full h-20 flex justify-between items-center">
           <h2 className="text-2xl ">Lista de Clientes</h2>
@@ -61,17 +65,26 @@ export default function VerClientes() {
                 <p>
                   <strong>Local:</strong> {c.local}
                 </p>
-                  {c.status === 'Ativo' ? (<p className="flex itens-center gap-2 font-bold text-ring"><CircleCheck /> {c.status}</p>)
-                    : c.status === 'Pendente' ? (<p className="flex itens-center gap-2 font-bold text-chart-1"><CircleAlert /> {c.status}</p>)
-                      : c.status === 'Inativo' ? (<p className="flex itens-center gap-2 font-bold text-destructive"><CircleX /> {c.status}</p>)
-                        : ''
-                  }
+                {c.status === "Ativo" ? (
+                  <p className="flex itens-center gap-2 font-bold text-ring">
+                    <CircleCheck /> {c.status}
+                  </p>
+                ) : c.status === "Pendente" ? (
+                  <p className="flex itens-center gap-2 font-bold text-chart-1">
+                    <CircleAlert /> {c.status}
+                  </p>
+                ) : c.status === "Inativo" ? (
+                  <p className="flex itens-center gap-2 font-bold text-destructive">
+                    <CircleX /> {c.status}
+                  </p>
+                ) : (
+                  ""
+                )}
               </div>
-
             </div>
           ))}
         </section>
       </div>
-    </>
+    </div>
   );
 }
