@@ -102,6 +102,9 @@ export default function CriarCliente() {
   //   return;
   // }
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   return (
     <div className="w-full h-screen flex flex-col bg-gray-50">
