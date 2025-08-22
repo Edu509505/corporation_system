@@ -21,7 +21,7 @@ interface Cliente {
   cnpj: string;
   local: string;
   status: "Ativo" | "Pendente" | "Inativo" | null;
-  path: string | null;
+  file: File | null;
 }
 
 const url = import.meta.env.VITE_API_URL;
@@ -39,14 +39,37 @@ export default function CriarCliente() {
     cnpj: "",
     local: "",
     status: "Ativo",
-    path: "",
+    file: null,
   });
 
   console.log(novoCliente);
   console.log(cnpj.isValid(novoCliente.cnpj))
 
+  
+  function convertFileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        resolve(reader.result as string);       
+      };
+
+      reader.onerror = (error) => {
+        reject(error);
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+  
   async function criarCliente(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if(!novoCliente.file) return;
+    const fileBase64 = await convertFileToBase64(novoCliente.file);
+    
+    const [, fileBase64SemAPrimeiraParte ] = fileBase64.split(',');
+    const [, ...resto] = fileBase64SemAPrimeiraParte
+
     const response = await fetch(`${url}/clientes`, {
       method: "POST",
       headers: {
@@ -57,21 +80,23 @@ export default function CriarCliente() {
         cnpj: novoCliente.cnpj,
         local: novoCliente.local,
         status: novoCliente.status,
-        path: novoCliente.path,
+        fileBase64: resto
       }),
     });
     const body = await response.json();
   }
 
-  let verificacao = false;
 
-  if(novoCliente.cliente.length >= 3){
-    if(cnpj.isValid(novoCliente.cnpj) === true){
-      if(novoCliente.local.length > 3){
-        verificacao = true
-      }
-    }
-  }
+
+  // let verificacao = false;
+
+  // if (novoCliente.cliente.length >= 3) {
+  //   if (cnpj.isValid(novoCliente.cnpj) === true) {
+  //     if (novoCliente.local.length > 3) {
+  //       verificacao = true
+  //     }
+  //   }
+  // }
 
   return (
     <div className="w-full h-screen flex flex-col bg-[url('./src/assets/img/IMG-20240823-WA0007.jpg')] bg-cover bg-center">
@@ -138,48 +163,19 @@ export default function CriarCliente() {
             <option value="Pendente">Pendente</option>
             <option value="Inativo">Inativo</option>
           </select>
-          
-          <AlertDialog>
-            <AlertDialogTrigger>
-              <Button variant="outline" className="bg-ring">
-                <CircleCheck /> Cadastrar
-              </Button>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                    {verificacao === true ? (
-                      <>
-                        <AlertDialogTitle>
-                          Cliente Cadastrado!
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Cliente foi cadastrado com sucesso!
-                        </AlertDialogDescription>
+          <div>
+            <input type='file' className="bg-white cursor-pointer" onChange={((event) => {
+              const files = event.target.files;
+              if(!files) return;
+              const filesArray = Array.from(files);
+              const file = filesArray[0];
+              setNovoCliente({
+                ...novoCliente,
+                file
+              })
+            })} />
+          </div>
 
-                        <AlertDialogFooter>
-                          <AlertDialogAction
-                            type="button"
-                            className="cursor-pointer"
-                            onClick={voltar}
-                          >
-                            Continuar
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </>
-                    ) : (
-                      <>
-                        <AlertDialogTitle>
-                          Erro ao cadastrar usuário
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Você precisa preencher todos os campos para que o cadastro seja realizado
-                        </AlertDialogDescription>
-                      </>
-                    )
-                  }
-                </AlertDialogHeader>
-              </AlertDialogContent>
-            </AlertDialogTrigger>
-          </AlertDialog>
         </form>
       </div>
     </div>
