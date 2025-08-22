@@ -35,7 +35,7 @@ export default function VerClientes() {
   // }
 
   return (
-    <div className="w-full h-screen p-5 flex flex-col bg-gray-50">
+    <div className="w-full h-screen p-2 flex flex-col bg-gray-50">
       <div className="flex items-center gap-3">
         <Building /> <h1 className="text-2xl font-bold">Clientes cadastrados</h1>
       </div>
@@ -49,7 +49,7 @@ export default function VerClientes() {
           </Button>
         </Link>
       </div>
-      <section className="w-full h-full gap-3 flex flex-row flex-wrap overflow-x-auto">
+      <section className="w-full h-full gap-2 flex flex-row flex-wrap overflow-x-auto">
 
         {
           //Caso a tabela donde fica cadastrado os clientes estiver vazia ele retorna essa mensagem
@@ -72,7 +72,7 @@ export default function VerClientes() {
               c.status === "Ativo" ? (
                 <div className="w-[8rem] h-[8rem] border-2 flex justify-center items-center border-ring rounded-full text-center">
                   <h1 className="text-5xl ">{
-                    (c.cliente)?.split(' ').map(palavra => palavra[0]).join('')
+                    (c.cliente)?.split(' ').map(palavra => palavra[0]).join('').toUpperCase()
                     //Essa função pega o nome do cliente, elimina os espaços dividindo em 2 textos, depois pega a primeira letra de cada um e no final junta
                   }
                   </h1>
@@ -88,7 +88,7 @@ export default function VerClientes() {
               ) : c.status === "Inativo" ? (
                 <div className="w-[8rem] h-[8rem] border-2 flex justify-center items-center border-destructive rounded-full text-center">
                   <h1 className="text-5xl ">{
-                    (c.cliente)?.split(' ').map(palavra => palavra[0]).join('')
+                    (c.cliente)?.split(' ').map(palavra => palavra[0]).join('').toUpperCase()
                     //Essa função pega o nome do cliente, elimina os espaços dividindo em 2 textos, depois pega a primeira letra de cada um e no final junta
                   }
                   </h1>

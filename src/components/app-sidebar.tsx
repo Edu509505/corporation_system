@@ -1,6 +1,9 @@
 import {
   Building2Icon,
   CircleDollarSignIcon,
+  FilePlus2Icon,
+  FileTextIcon,
+  HashIcon,
   Inbox,
   LucideLayoutDashboard,
   PanelTopOpenIcon,
@@ -34,35 +37,30 @@ const items = [
     icon: LucideLayoutDashboard,
   },
   {
-    title: "Administração",
+    title: "Comercial",
     url: "/",
     icon: Inbox,
     subMenu: [
       { title: "Clientes", url: "/clientes", icon: Building2Icon },
-      { title: "Contratos", url: "/oi", icon: PanelTopOpenIcon },
+      { title: "Propostas", url: "/propostas", icon: FileTextIcon},
+      { title: "Contratos", url: "/oi", icon: PanelTopOpenIcon }
     ],
   },
   {
-    title: "Medição",
-    url: "medicao",
+    title: "Obra",
+    url: "/",
     icon: PencilRuler,
-    // subMenu: [
-    //   { title: "Cadastrar nova Medição", url: "/oi2", icon: CirclePlus },
-    //   { title: "Consultar medição", url: "/oi", icon: Search },
-    //   { title: "Alterar Medição", url: "/oi3", icon: PencilLine },
-    //   { title: "Cancelar Medição", url: "/oi4", icon: CircleXIcon },
-    // ],
+    subMenu: [
+      { title: "Medição", url: '/medicao', icon: PencilRuler},
+    ],
   },
   {
-    title: "Nota Fiscal",
-    url: "notasFiscais",
+    title: "Financeiro",
+    url: "/",
     icon: CircleDollarSignIcon,
-    // subMenu: [
-    //   { title: 'Registrar Nota Fiscal', url: '/oi2', icon: CirclePlus },
-    //   { title: 'Consultar Nota Fiscal', url: '/oi', icon: Search },
-    //   { title: 'Alterar Nota Fiscal', url: '/oi3', icon: PencilLine },
-    //   { title: 'Cancelar Nota Fiscal', url: '/oi4', icon: CircleXIcon }
-    // ]
+    subMenu: [
+      { title: 'Faturamento', url: '/notasFiscais', icon: FilePlus2Icon}
+    ]
   },
 ];
 

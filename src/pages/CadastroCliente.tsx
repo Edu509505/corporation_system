@@ -31,11 +31,11 @@ export default function CriarCliente() {
   const navigate = useNavigate()
 
   const [novoCliente, setNovoCliente] = useState<Cliente>({
-    cliente: "",
-    cnpj: "",
-    local: "",
-    status: "",
-    file: null,
+    cliente: '',
+    cnpj: '',
+    local: '',
+    status: '',
+    file: null
   });
 
   console.log(novoCliente);
@@ -107,8 +107,14 @@ export default function CriarCliente() {
           className="bg-white"
         />
         {
-          novoCliente.cnpj.length === 18 && cnpj.isValid(novoCliente.cnpj) === !true ? <div className="text-destructive flex items-center gap-3"><CircleX /> <h2>Cnpj Inválido</h2></div>
-            : <><h2>Digite o CNPJ</h2></>}
+          novoCliente.cnpj.length === 18 &&
+            cnpj.isValid(novoCliente.cnpj) === !true ?
+            <div className="text-destructive flex items-center gap-3"><CircleX />
+              <h2>Cnpj Inválido</h2>
+            </div>
+            :
+            <><h2>Digite o CNPJ</h2></>
+        }
         <Input
           type="text"
           name="cnpj"
@@ -162,9 +168,9 @@ export default function CriarCliente() {
         </Select>
 
         <div className="flex gap-3">
-          {/* <Button variant='destructive' className="cursor-pointer" onClick={() => navigate(-1)}>
+          <Button type="button" variant='destructive' className="cursor-pointer" onClick={() => navigate(-1)}>
             <CircleArrowLeftIcon /> Voltar
-          </Button> */}
+          </Button>
 
           <AlertDialog>
             <AlertDialogTrigger>
@@ -174,10 +180,10 @@ export default function CriarCliente() {
               <AlertDialogContent>
 
                 <AlertDialogHeader>
-                  {novoCliente.cliente.length < 3 || 
-                  !cnpj.isValid(novoCliente.cnpj) || 
-                  novoCliente.local.length < 3 || 
-                  novoCliente.status === "" ? (
+                  {novoCliente.cliente.length < 3 ||
+                    !cnpj.isValid(novoCliente.cnpj) ||
+                    novoCliente.local.length < 3 ||
+                    novoCliente.status === "" ? (
                     <>
                       <AlertDialogTitle className="flex items-center gap-3">
                         <CircleX className="text-destructive" /> Erro ao cadastrar
