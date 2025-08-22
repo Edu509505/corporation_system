@@ -35,60 +35,84 @@ export default function VerClientes() {
   // }
 
   return (
-    <div className="w-full h-screen flex flex-col bg-[url('./src/assets/img/nossotrab2.jpg')] bg-cover bg-center">
-      <div className="w-full h-full p-5 flex flex-col backdrop-blur-xl bg-[rgba(255,255,255,0.50)]">
-        <div className="flex items-center gap-3">
-          <Building/> <h1 className="text-2xl font-bold">Clientes cadastrados</h1>
-        </div>
-
-        <div className="w-full h-20 flex justify-between items-center">
-          <h2 className="text-2xl ">Lista de Clientes</h2>
-          <Link to="/cadastro">
-            <Button className="cursor-pointer">
-              <CirclePlusIcon className="size-5" />
-              Adicionar
-            </Button>
-          </Link>
-        </div>
-        <section className="w-full h-full gap-3 flex flex-row flex-wrap overflow-x-auto p-4">
-          {clientes.map((c) => (
-            <div
-              key={c.id}
-              className="w-3xs h-96 flex flex-col items-center rounded-2xl border-[1px] b p-6 bg-white gap-3 "
-            >
-              <div className="w-[8rem] h-[8rem] border-2 flex justify-center items-center border-ring rounded-full">
-                Imagem
-              </div>
-              <p>
-                <strong>Cliente</strong> {c.cliente}
-              </p>
-              <div className="w-full flex flex-col gap-2">
-                <p>
-                  <strong>CNPJ:</strong> {c.cnpj}
-                </p>
-                <p>
-                  <strong>Local:</strong> {c.local}
-                </p>
-                {c.status === "Ativo" ? (
-                  <p className="flex itens-center gap-2 font-bold text-ring">
-                    <CircleCheck /> {c.status}
-                  </p>
-                ) : c.status === "Pendente" ? (
-                  <p className="flex itens-center gap-2 font-bold text-chart-1">
-                    <CircleAlert /> {c.status}
-                  </p>
-                ) : c.status === "Inativo" ? (
-                  <p className="flex itens-center gap-2 font-bold text-destructive">
-                    <CircleX /> {c.status}
-                  </p>
-                ) : (
-                  ""
-                )}
-              </div>
-            </div>
-          ))}
-        </section>
+    <div className="w-full h-screen p-5 flex flex-col bg-gray-50">
+      <div className="flex items-center gap-3">
+        <Building /> <h1 className="text-2xl font-bold">Clientes cadastrados</h1>
       </div>
+
+      <div className="w-full h-20 flex justify-between items-center">
+        <h2 className="text-2xl ">Lista de Clientes</h2>
+        <Link to="/cadastro">
+          <Button className="cursor-pointer">
+            <CirclePlusIcon className="size-5" />
+            Adicionar
+          </Button>
+        </Link>
+      </div>
+      <section className="w-full h-full gap-3 flex flex-row flex-wrap overflow-x-auto">
+        {clientes.map((c) => (
+          <div
+            key={c.id}
+            className="w-3xs h-96 flex flex-col items-center rounded-2xl border-[1px] b p-6 bg-white gap-3 "
+          >
+            {
+              c.status === "Ativo" ? (
+                <div className="w-[8rem] h-[8rem] border-2 flex justify-center items-center border-ring rounded-full text-center">
+                  <h1 className="text-5xl ">{
+                    (c.cliente)?.split(' ').map(palavra => palavra[0]).join('')
+                    //Essa função pega o nome do cliente, elimina os espaços dividindo em 2 textos, depois pega a primeira letra de cada um e no final junta
+                  }
+                  </h1>
+                </div>
+              ) : c.status === "Pendente" ? (
+                <div className="w-[8rem] h-[8rem] border-2 flex justify-center items-center border-chart-1 rounded-full text-center">
+                  <h1 className="text-5xl ">{
+                    (c.cliente)?.split(' ').map(palavra => palavra[0]).join('')
+                    //Essa função pega o nome do cliente, elimina os espaços dividindo em 2 textos, depois pega a primeira letra de cada um e no final junta
+                  }
+                  </h1>
+                </div>
+              ) : c.status === "Inativo" ? (
+                <div className="w-[8rem] h-[8rem] border-2 flex justify-center items-center border-destructive rounded-full text-center">
+                  <h1 className="text-5xl ">{
+                    (c.cliente)?.split(' ').map(palavra => palavra[0]).join('')
+                    //Essa função pega o nome do cliente, elimina os espaços dividindo em 2 textos, depois pega a primeira letra de cada um e no final junta
+                  }
+                  </h1>
+                </div>
+              ) : (
+                ""
+              )
+            }
+            <p>
+              <strong>Cliente:</strong> {c.cliente}
+            </p>
+            <div className="w-full flex flex-col gap-2">
+              <p>
+                <strong>CNPJ:</strong> {c.cnpj}
+              </p>
+              <p>
+                <strong>Local:</strong> {c.local}
+              </p>
+              {c.status === "Ativo" ? (
+                <p className="flex itens-center gap-2 font-bold text-ring">
+                  <CircleCheck /> {c.status}
+                </p>
+              ) : c.status === "Pendente" ? (
+                <p className="flex itens-center gap-2 font-bold text-chart-1">
+                  <CircleAlert /> {c.status}
+                </p>
+              ) : c.status === "Inativo" ? (
+                <p className="flex itens-center gap-2 font-bold text-destructive">
+                  <CircleX /> {c.status}
+                </p>
+              ) : (
+                ""
+              )}
+            </div>
+          </div>
+        ))}
+      </section>
     </div>
   );
 }

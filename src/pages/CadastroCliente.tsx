@@ -7,20 +7,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+} from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
-import { CircleCheck, CircleFadingPlusIcon, CircleX } from "lucide-react";
+import { CircleAlert, CircleArrowLeftIcon, CircleCheck, CircleFadingPlusIcon, CircleX } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { cnpj } from 'cpf-cnpj-validator'
-//import type { Cliente } from "../Tipagens"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
 
 interface Cliente {
   cliente: string;
   cnpj: string;
   local: string;
-  status: "Ativo" | "Pendente" | "Inativo" | null;
+  status: string;
   file: File | null;
 }
 
@@ -28,47 +28,46 @@ const url = import.meta.env.VITE_API_URL;
 //Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática
 
 export default function CriarCliente() {
-  const navigate = useNavigate();
-
-  const voltar = () => {
-    navigate(-1);
-  };
+  const navigate = useNavigate()
 
   const [novoCliente, setNovoCliente] = useState<Cliente>({
     cliente: "",
     cnpj: "",
     local: "",
-    status: "Ativo",
+    status: "",
     file: null,
   });
 
   console.log(novoCliente);
   console.log(cnpj.isValid(novoCliente.cnpj))
 
-  
-  function convertFileToBase64(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
 
-      reader.onloadend = () => {
-        resolve(reader.result as string);       
-      };
+  // function convertFileToBase64(file: File): Promise<string> {
+  //   return new Promise((resolve, reject) => {
+  //     const reader = new FileReader();
 
-      reader.onerror = (error) => {
-        reject(error);
-      };
+  //     reader.onloadend = () => {
+  //       resolve(reader.result as string);       
+  //     };
 
-      reader.readAsDataURL(file);
-    });
-  }
-  
+  //     reader.onerror = (error) => {
+  //       reject(error);
+  //     };
+
+  //     reader.readAsDataURL(file);
+  //   });
+  // }
+
   async function criarCliente(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if(!novoCliente.file) return;
-    const fileBase64 = await convertFileToBase64(novoCliente.file);
-    
-    const [, fileBase64SemAPrimeiraParte ] = fileBase64.split(',');
-    const [, ...resto] = fileBase64SemAPrimeiraParte
+
+    if (novoCliente.cliente.length < 3 || !cnpj.isValid(novoCliente.cnpj) || novoCliente.local.length < 3 || novoCliente.status === "") return
+
+    // if(!novoCliente.file) return;
+    // const fileBase64 = await convertFileToBase64(novoCliente.file);
+
+    // const [, fileBase64SemAPrimeiraParte ] = fileBase64.split(',');
+    // const [, ...resto] = fileBase64SemAPrimeiraParte
 
     const response = await fetch(`${url}/clientes`, {
       method: "POST",
@@ -80,90 +79,141 @@ export default function CriarCliente() {
         cnpj: novoCliente.cnpj,
         local: novoCliente.local,
         status: novoCliente.status,
-        fileBase64: resto
+        //fileBase64: resto
       }),
     });
     const body = await response.json();
   }
 
-
-
-  // let verificacao = false;
-
-  // if (novoCliente.cliente.length >= 3) {
-  //   if (cnpj.isValid(novoCliente.cnpj) === true) {
-  //     if (novoCliente.local.length > 3) {
-  //       verificacao = true
-  //     }
-  //   }
-  // }
-
   return (
-    <div className="w-full h-screen flex flex-col bg-[url('./src/assets/img/IMG-20240823-WA0007.jpg')] bg-cover bg-center">
-      <div className="w-full h-full flex flex-col backdrop-blur-xl bg-[rgba(255,255,255,0.50)]">
-        <form onSubmit={criarCliente} className="flex gap-3 flex-col p-5">
-          <div className="flex gap-3 items-center">
-            <CircleFadingPlusIcon className="size-10" />
-            <h1 className="text-2xl font-bold">Cadastrar novo Cliente</h1>
-          </div>
+    <div className="w-full h-screen flex flex-col bg-gray-50">
+      <form onSubmit={criarCliente} className="flex gap-3 flex-col p-5">
+        <div className="flex gap-3 items-center">
+          <CircleFadingPlusIcon className="size-10" />
+          <h1 className="text-2xl font-bold">Cadastrar novo Cliente</h1>
+        </div>
 
-          <Input
-            type="text"
-            name="cliente"
-            placeholder="Nome do cliente"
-            value={novoCliente.cliente}
-            onChange={(event) =>
-              setNovoCliente({
-                ...novoCliente,
-                cliente: event.target.value,
-              })
-            }
-            className="bg-white"
-          />
-          {novoCliente.cnpj.length === 18 && cnpj.isValid(novoCliente.cnpj) === !true ? <div className="text-destructive flex items-center gap-3"><CircleX /> <h2>Cnpj Inválido</h2></div> : ''}
-          <Input
-            type="text"
-            name="cnpj"
-            maxLength={18}
-            placeholder="Cnpj do cliente"
-            value={novoCliente.cnpj}
-            onChange={(event) =>
-              setNovoCliente({
-                ...novoCliente,
-                cnpj: cnpj.format(event.target.value)
-              })
-            }
-            className="bg-white"
-          />
+        <Input
+          type="text"
+          name="cliente"
+          placeholder="Nome do cliente"
+          value={novoCliente.cliente}
+          onChange={(event) =>
+            setNovoCliente({
+              ...novoCliente,
+              cliente: event.target.value,
+            })
+          }
+          className="bg-white"
+        />
+        {
+          novoCliente.cnpj.length === 18 && cnpj.isValid(novoCliente.cnpj) === !true ? <div className="text-destructive flex items-center gap-3"><CircleX /> <h2>Cnpj Inválido</h2></div>
+            : <><h2>Digite o CNPJ</h2></>}
+        <Input
+          type="text"
+          name="cnpj"
+          maxLength={18}
+          placeholder="Cnpj do cliente"
+          value={novoCliente.cnpj}
+          onChange={(event) =>
+            setNovoCliente({
+              ...novoCliente,
+              cnpj: cnpj.format(event.target.value)
+            })
+          }
+          className="bg-white"
+        />
 
-          <Input
-            type="text"
-            name="local"
-            placeholder="local do cliente"
-            value={novoCliente.local}
-            onChange={(event) =>
-              setNovoCliente({
-                ...novoCliente,
-                local: event.target.value,
-              })
-            }
-            className="bg-white"
-          />
-          <select
-            className="bg-white rounded-md h-8"
-            name="select"
-            onChange={(event) =>
-              setNovoCliente({
-                ...novoCliente,
-                status: event.target.value as "Ativo" | "Pendente" | "Inativo",
-              })
-            }
-          >
-            <option value="Ativo">Ativo</option>
-            <option value="Pendente">Pendente</option>
-            <option value="Inativo">Inativo</option>
-          </select>
-          <div>
+        <Input
+          type="text"
+          name="local"
+          placeholder="local do cliente"
+          value={novoCliente.local}
+          onChange={(event) =>
+            setNovoCliente({
+              ...novoCliente,
+              local: event.target.value,
+            })
+          }
+          className="bg-white"
+        />
+
+        <Select
+          value={novoCliente.status}
+          onValueChange={(event) =>
+            setNovoCliente({
+              ...novoCliente,
+              status: event
+            })
+          }
+        >
+          <SelectTrigger className="bg-white cursor-pointer w-48">
+            <SelectValue placeholder="Selecione o Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Localidade</SelectLabel>
+              <SelectItem className="cursor-pointer" value="Ativo">Ativo</SelectItem>
+              <SelectItem className="cursor-pointer" value="Pendente">Pendente</SelectItem>
+              <SelectItem className="cursor-pointer" value="Inativo">Inativo</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+
+        </Select>
+
+        <div className="flex gap-3">
+          <Button variant='destructive' className="cursor-pointer" onClick={() => navigate(-1)}>
+            <CircleArrowLeftIcon /> Voltar
+          </Button>
+
+          <AlertDialog>
+            <AlertDialogTrigger>
+              <Button variant='default' className="cursor-pointer">
+                <CircleCheck /> Cadastrar
+              </Button>
+              <AlertDialogContent>
+
+                <AlertDialogHeader>
+                  {novoCliente.cliente.length < 3 || !cnpj.isValid(novoCliente.cnpj) || novoCliente.local.length < 3 || novoCliente.status === "" ? (
+                    <>
+                      <AlertDialogTitle className="flex items-center gap-3">
+                        <CircleX className="text-destructive" /> Erro ao cadastrar
+                      </AlertDialogTitle>
+                      <AlertDialogDescription className="flex items-center gap-3">
+                        {novoCliente.cliente.length < 3 ? (<><CircleAlert /> Você precisa inserir um nome válido para o Cliente</>)
+                          : !cnpj.isValid(novoCliente.cnpj) ? (<><CircleAlert /> Você precisa inserir um CNPJ válido</>)
+                            : novoCliente.local.length < 3 ? (<><CircleAlert /> Você precisa inserir um local válido</>)
+                              : novoCliente.status === "" ? (<><CircleAlert /> Você precisa inserir o Status do cliente</>) : ''}
+                      </AlertDialogDescription>
+                    </>
+                  ) : (
+                    <>
+                      <AlertDialogTitle className="flex items-center gap-3">
+                        <CircleCheck className="text-ring" /> Usuário cadastrado com sucesso
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Usuário cadastrado e inserido no sistema
+                      </AlertDialogDescription>
+                      <AlertDialogFooter>
+                        <AlertDialogAction
+                          className="cursor-pointer"
+                          onClick={() => { navigate(-1) }}
+                        >
+                          Continuar
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </>
+                  )
+                  }
+                </AlertDialogHeader>
+
+              </AlertDialogContent>
+            </AlertDialogTrigger>
+
+          </AlertDialog>
+
+        </div>
+        {/* <div>
             <input type='file' className="bg-white cursor-pointer" onChange={((event) => {
               const files = event.target.files;
               if(!files) return;
@@ -174,10 +224,9 @@ export default function CriarCliente() {
                 file
               })
             })} />
-          </div>
+          </div> */}
 
-        </form>
-      </div>
+      </form>
     </div>
   );
 }
