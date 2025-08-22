@@ -85,6 +85,24 @@ export default function CriarCliente() {
     const body = await response.json();
   }
 
+<<<<<<< Updated upstream
+=======
+  let verificacao = false;
+
+  if(novoCliente.cliente.length >= 3){
+    if(cnpj.isValid(novoCliente.cnpj) === true){
+      if(novoCliente.local.length > 3){
+        verificacao = true
+      }
+    }
+  }
+
+  //   if (!verificacao) {
+  //   // não manda pro backend
+  //   return;
+  // }
+
+>>>>>>> Stashed changes
   return (
     <div className="w-full h-screen flex flex-col bg-gray-50">
       <form onSubmit={criarCliente} className="flex gap-3 flex-col p-5">
