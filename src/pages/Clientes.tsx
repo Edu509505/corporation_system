@@ -50,6 +50,19 @@ export default function VerClientes() {
         </Link>
       </div>
       <section className="w-full h-full gap-3 flex flex-row flex-wrap overflow-x-auto">
+
+        {
+          //Caso a tabela donde fica cadastrado os clientes estiver vazia ele retorna essa mensagem
+          clientes.length === 0 || null ?
+
+            <div className="w-full h-full flex flex-col justify-center items-center text-center gap-3 text-muted-foreground">
+              <CircleX className="size-20" />
+              <h1 className="text-4xl">Não há clientes cadastrados</h1>
+            </div>
+
+            : ''
+        }
+
         {clientes.map((c) => (
           <div
             key={c.id}
@@ -67,7 +80,7 @@ export default function VerClientes() {
               ) : c.status === "Pendente" ? (
                 <div className="w-[8rem] h-[8rem] border-2 flex justify-center items-center border-chart-1 rounded-full text-center">
                   <h1 className="text-5xl ">{
-                    (c.cliente)?.split(' ').map(palavra => palavra[0]).join('')
+                    (c.cliente)?.split(' ').map(palavra => palavra[0]).join('').toUpperCase()
                     //Essa função pega o nome do cliente, elimina os espaços dividindo em 2 textos, depois pega a primeira letra de cada um e no final junta
                   }
                   </h1>

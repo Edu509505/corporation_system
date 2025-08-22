@@ -174,7 +174,10 @@ export default function CriarCliente() {
               <AlertDialogContent>
 
                 <AlertDialogHeader>
-                  {novoCliente.cliente.length < 3 || !cnpj.isValid(novoCliente.cnpj) || novoCliente.local.length < 3 || novoCliente.status === "" ? (
+                  {novoCliente.cliente.length < 3 || 
+                  !cnpj.isValid(novoCliente.cnpj) || 
+                  novoCliente.local.length < 3 || 
+                  novoCliente.status === "" ? (
                     <>
                       <AlertDialogTitle className="flex items-center gap-3">
                         <CircleX className="text-destructive" /> Erro ao cadastrar
