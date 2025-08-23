@@ -69,20 +69,32 @@ export default function CriarCliente() {
     // const [, fileBase64SemAPrimeiraParte ] = fileBase64.split(',');
     // const [, ...resto] = fileBase64SemAPrimeiraParte
 
-    const response = await fetch(`${url}/clientes`, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify({
-        cliente: novoCliente.cliente,
-        cnpj: novoCliente.cnpj,
-        local: novoCliente.local,
-        status: novoCliente.status,
-        //fileBase64: resto
-      }),
-    });
+    try {
+      const response = await fetch(`${url}/clientes`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          cliente: novoCliente.cliente,
+          cnpj: novoCliente.cnpj,
+          local: novoCliente.local,
+          status: novoCliente.status,
+        }),
+      });
+
+    if (!response.ok) {
+      // Aqui você lida com o erro de forma clara
+      const errorText = await response.text();
+      throw new Error(`Erro ${response.status}: ${errorText}`);
+    }
+
     const body = await response.json();
+    console.log("Cliente criado com sucesso:", body);
+
+  } catch (error) {
+    console.error("Falha ao criar cliente:", error);
+  }
   }
 
   return (
