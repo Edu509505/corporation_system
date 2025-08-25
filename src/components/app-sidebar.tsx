@@ -3,7 +3,6 @@ import {
   CircleDollarSignIcon,
   FilePlus2Icon,
   FileTextIcon,
-  HashIcon,
   Inbox,
   LucideLayoutDashboard,
   PanelTopOpenIcon,

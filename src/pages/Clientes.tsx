@@ -5,6 +5,7 @@ import {
   CircleCheck,
   CirclePlusIcon,
   CircleX,
+  Edit,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -122,6 +123,18 @@ export default function VerClientes() {
               ) : (
                 ""
               )}
+            </div>
+            <div className="w-full flex justify-end">
+              <Link to={
+                {
+                  pathname:'/editarCliente',
+                  : { UserId: c.id }
+                }
+                } >
+                <Button variant="outline" className="flex itens-center gap-2 font-bold cursor-pointer">
+                  <Edit /> Editar
+                </Button>
+              </Link>
             </div>
           </div>
         ))}

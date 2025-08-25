@@ -38,8 +38,10 @@ export default function CriarCliente() {
     file: null
   });
 
-  console.log(novoCliente);
-  console.log(cnpj.isValid(novoCliente.cnpj))
+  const [resonseOk, setResponseOk] = useState(true)
+
+  // console.log(novoCliente);
+  // console.log(cnpj.isValid(novoCliente.cnpj))
 
 
   // function convertFileToBase64(file: File): Promise<string> {
@@ -85,17 +87,22 @@ export default function CriarCliente() {
 
     if (!response.ok) {
       // Aqui você lida com o erro de forma clara
+      setResponseOk(false) 
       const errorText = await response.text();
       throw new Error(`Erro ${response.status}: ${errorText}`);
+
     }
 
     const body = await response.json();
+    setResponseOk(true)
     console.log("Cliente criado com sucesso:", body);
 
   } catch (error) {
     console.error("Falha ao criar cliente:", error);
+    setResponseOk(false) 
   }
   }
+
 
   return (
     <div className="w-full h-screen flex flex-col bg-gray-50">
@@ -191,11 +198,13 @@ export default function CriarCliente() {
               </Button>
               <AlertDialogContent>
 
+                
                 <AlertDialogHeader>
                   {novoCliente.cliente.length < 3 ||
                     !cnpj.isValid(novoCliente.cnpj) ||
                     novoCliente.local.length < 3 ||
-                    novoCliente.status === "" ? (
+                    novoCliente.status === "" ||
+                    !resonseOk? (
                     <>
                       <AlertDialogTitle className="flex items-center gap-3">
                         <CircleX className="text-destructive" /> Erro ao cadastrar
@@ -204,7 +213,8 @@ export default function CriarCliente() {
                         {novoCliente.cliente.length < 3 ? (<><CircleAlert /> Você precisa inserir um nome válido para o Cliente</>)
                           : !cnpj.isValid(novoCliente.cnpj) ? (<><CircleAlert /> Você precisa inserir um CNPJ válido</>)
                             : novoCliente.local.length < 3 ? (<><CircleAlert /> Você precisa inserir um local válido</>)
-                              : novoCliente.status === "" ? (<><CircleAlert /> Você precisa inserir o Status do cliente</>) : ''}
+                              : novoCliente.status === "" ? (<><CircleAlert /> Você precisa inserir o Status do cliente</>)
+                                : !resonseOk? (<><CircleX /> Erro interno</>):''}
                       </AlertDialogDescription>
                     </>
                   ) : (
