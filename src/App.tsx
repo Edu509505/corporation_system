@@ -8,8 +8,9 @@ import NotasFiscais from "./pages/NotasFiscais";
 import Medicao from "./pages/Medicao";
 import AddMedicao from "./pages/addMedicao/AddMedicaoPasso1";
 import Login from "./pages/Login";
-import CadastroCliente from "./pages/CadastroCliente"
+import CadastroCliente from "./pages/clientes/CadastroCliente"
 import Clientes from "./pages/Clientes"
+import UpdateCliente from "./pages/clientes/cliente[userId]/UpdateCliente"
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             <Route path="/adicionarMedicao" element={<AddMedicao />} />
             <Route path="/cadastro" element={<CadastroCliente />} />
             <Route path="/clientes" element={<Clientes />} />
+            <Route path="/atualizarCliente/:id" element={<UpdateCliente />} />
             <Route path="*" element={<NoPage />} />
           </Route>
         </Routes>

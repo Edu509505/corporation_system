@@ -8,10 +8,12 @@ import {
   Edit,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { Cliente } from "../Tipagens";
 
 export default function VerClientes() {
+  const navigate = useNavigate(); 
+
   const url = import.meta.env.VITE_API_URL;
   //Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática
 
@@ -29,11 +31,18 @@ export default function VerClientes() {
     //   itensRelacionados(corpo);
     // }
     // itensRelacionados();
-  }, []);
+  }, [url]);
 
   // async function deletarCliente() {
 
   // }
+
+  const editarCliente = (clienteId: number) => {
+    navigate(`/atualizarCliente/${clienteId}`); // Navega para a rota específica do cliente
+    console.log('to aqui', editarCliente);
+  };
+
+
 
   return (
     <div className="w-full h-screen p-2 flex flex-col bg-gray-50">
@@ -125,16 +134,9 @@ export default function VerClientes() {
               )}
             </div>
             <div className="w-full flex justify-end">
-              <Link to={
-                {
-                  pathname:'/editarCliente',
-                  : { UserId: c.id }
-                }
-                } >
-                <Button variant="outline" className="flex itens-center gap-2 font-bold cursor-pointer">
+                <Button variant="outline" className="flex itens-center gap-2 font-bold cursor-pointer" onClick={() => editarCliente(c.id)}>
                   <Edit /> Editar
                 </Button>
-              </Link>
             </div>
           </div>
         ))}
