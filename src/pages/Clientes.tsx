@@ -10,6 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { Cliente } from "../Tipagens";
+import EditarCliente from "./EditarCliente";
 
 export default function VerClientes() {
   const navigate = useNavigate(); 
@@ -47,7 +48,8 @@ export default function VerClientes() {
   return (
     <div className="w-full h-screen p-2 flex flex-col bg-gray-50">
       <div className="flex items-center gap-3">
-        <Building /> <h1 className="text-2xl font-bold">Clientes cadastrados</h1>
+        <Building />{" "}
+        <h1 className="text-2xl font-bold">Clientes cadastrados</h1>
       </div>
 
       <div className="w-full h-20 flex justify-between items-center">
@@ -60,17 +62,16 @@ export default function VerClientes() {
         </Link>
       </div>
       <section className="w-full h-full gap-2 flex flex-row flex-wrap overflow-x-auto">
-
         {
           //Caso a tabela donde fica cadastrado os clientes estiver vazia ele retorna essa mensagem
-          clientes.length === 0 || null ?
-
+          clientes.length === 0 || null ? (
             <div className="w-full h-full flex flex-col justify-center items-center text-center gap-3 text-muted-foreground">
               <CircleX className="size-20" />
               <h1 className="text-4xl">Não há clientes cadastrados</h1>
             </div>
-
-            : ''
+          ) : (
+            ""
+          )
         }
 
         {clientes.map((c) => (
@@ -78,35 +79,48 @@ export default function VerClientes() {
             key={c.id}
             className="w-3xs h-96 flex flex-col items-center rounded-2xl border-[1px] b p-6 bg-white gap-3 "
           >
-            {
-              c.status === "Ativo" ? (
-                <div className="w-[8rem] h-[8rem] border-2 flex justify-center items-center border-ring rounded-full text-center">
-                  <h1 className="text-5xl ">{
-                    (c.cliente)?.split(' ').map(palavra => palavra[0]).join('').toUpperCase()
+            {c.status === "Ativo" ? (
+              <div className="w-[8rem] h-[8rem] border-2 flex justify-center items-center border-ring rounded-full text-center">
+                <h1 className="text-5xl ">
+                  {
+                    c.cliente
+                      ?.split(" ")
+                      .map((palavra) => palavra[0])
+                      .join("")
+                      .toUpperCase()
                     //Essa função pega o nome do cliente, elimina os espaços dividindo em 2 textos, depois pega a primeira letra de cada um e no final junta
                   }
-                  </h1>
-                </div>
-              ) : c.status === "Pendente" ? (
-                <div className="w-[8rem] h-[8rem] border-2 flex justify-center items-center border-chart-1 rounded-full text-center">
-                  <h1 className="text-5xl ">{
-                    (c.cliente)?.split(' ').map(palavra => palavra[0]).join('').toUpperCase()
+                </h1>
+              </div>
+            ) : c.status === "Pendente" ? (
+              <div className="w-[8rem] h-[8rem] border-2 flex justify-center items-center border-chart-1 rounded-full text-center">
+                <h1 className="text-5xl ">
+                  {
+                    c.cliente
+                      ?.split(" ")
+                      .map((palavra) => palavra[0])
+                      .join("")
+                      .toUpperCase()
                     //Essa função pega o nome do cliente, elimina os espaços dividindo em 2 textos, depois pega a primeira letra de cada um e no final junta
                   }
-                  </h1>
-                </div>
-              ) : c.status === "Inativo" ? (
-                <div className="w-[8rem] h-[8rem] border-2 flex justify-center items-center border-destructive rounded-full text-center">
-                  <h1 className="text-5xl ">{
-                    (c.cliente)?.split(' ').map(palavra => palavra[0]).join('').toUpperCase()
+                </h1>
+              </div>
+            ) : c.status === "Inativo" ? (
+              <div className="w-[8rem] h-[8rem] border-2 flex justify-center items-center border-destructive rounded-full text-center">
+                <h1 className="text-5xl ">
+                  {
+                    c.cliente
+                      ?.split(" ")
+                      .map((palavra) => palavra[0])
+                      .join("")
+                      .toUpperCase()
                     //Essa função pega o nome do cliente, elimina os espaços dividindo em 2 textos, depois pega a primeira letra de cada um e no final junta
                   }
-                  </h1>
-                </div>
-              ) : (
-                ""
-              )
-            }
+                </h1>
+              </div>
+            ) : (
+              ""
+            )}
             <p>
               <strong>Cliente:</strong> {c.cliente}
             </p>
