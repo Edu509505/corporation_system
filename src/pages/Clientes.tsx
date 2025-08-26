@@ -10,7 +10,6 @@ import {
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { Cliente } from "../Tipagens";
-import EditarCliente from "./EditarCliente";
 
 export default function VerClientes() {
   const navigate = useNavigate(); 
@@ -32,14 +31,14 @@ export default function VerClientes() {
     //   itensRelacionados(corpo);
     // }
     // itensRelacionados();
-  }, [url]);
+  }, []);
 
   // async function deletarCliente() {
 
   // }
 
   const editarCliente = (clienteId: number) => {
-    navigate(`/atualizarCliente/${clienteId}`); // Navega para a rota específica do cliente
+    navigate(`/clientes/${clienteId}`); // Navega para a rota específica do cliente
     console.log('to aqui', editarCliente);
   };
 

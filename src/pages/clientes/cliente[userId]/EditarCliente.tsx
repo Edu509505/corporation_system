@@ -21,6 +21,7 @@ interface Cliente {
   cnpj: string;
   local: string;
   status: string;
+  // file: File | null; // opcional, caso use upload
 }
 
 const url = import.meta.env.VITE_API_URL;
@@ -34,65 +35,60 @@ export default function EditarCliente() {
     cnpj: '',
     local: '',
     status: '',
+    // file: null
   });
 
   const [loading, setLoading] = useState(true);
-  const [responseOk, setResponseOk] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [responseOk, setResponseOk] = useState(true);
 
-  // Carregar cliente ao montar o componente
+  // Buscar cliente ao carregar
   useEffect(() => {
     async function fetchCliente() {
       try {
         const response = await fetch(`${url}/clientes/${id}`);
-        if (!response.ok) {
-          throw new Error(`Erro ao buscar cliente: ${response.status}`);
-        }
-        const data: Cliente = await response.json();
-
+        if (!response.ok) throw new Error("Cliente não encontrado");
+        const data = await response.json();
         setCliente({
-          cliente: data.cliente,
-          cnpj: cnpj.format(data.cnpj),
-          local: data.local,
-          status: data.status,
+          cliente: data.cliente || '',
+          cnpj: data.cnpj || '',
+          local: data.local || '',
+          status: data.status || '',
         });
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro desconhecido");
+        setError((err as Error).message);
       } finally {
         setLoading(false);
       }
     }
 
-    if (id) {
-      fetchCliente();
-    } else {
-      setError("ID do cliente não fornecido.");
+    if (id) fetchCliente();
+    else {
+      setError("ID inválido");
       setLoading(false);
     }
   }, [id]);
 
   // Atualizar cliente
-  async function atualizarCliente(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function atualizarCliente(e: React.FormEvent) {
+    e.preventDefault();
 
     if (
       cliente.cliente.length < 3 ||
       !cnpj.isValid(cliente.cnpj) ||
       cliente.local.length < 3 ||
       cliente.status === ""
-    ) {
-      return;
-    }
+    ) return;
 
     try {
       const response = await fetch(`${url}/clientes/${id}`, {
-        method: "PUT",
+        method: "PUT", // ou PATCH, dependendo da sua API
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           cliente: cliente.cliente,
-          cnpj: cliente.cnpj.replace(/\D/g, ""),
+          cnpj: cliente.cnpj,
           local: cliente.local,
           status: cliente.status,
         }),
@@ -104,43 +100,24 @@ export default function EditarCliente() {
         throw new Error(`Erro ${response.status}: ${errorText}`);
       }
 
-      const body = await response.json();
-      console.log("Cliente atualizado com sucesso:", body);
       setResponseOk(true);
-    } catch (error) {
-      console.error("Falha ao atualizar cliente:", error);
+    } catch (err) {
+      console.error("Falha ao atualizar cliente:", err);
       setResponseOk(false);
     }
   }
 
-  if (loading) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-lg text-gray-600">Carregando dados do cliente...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-destructive text-center">
-          <CircleX className="mx-auto size-10" />
-          <h2>Erro</h2>
-          <p>{error}</p>
-          <Button variant="outline" className="mt-4" onClick={() => navigate(-1)}>
-            Voltar
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <div className="p-5">Carregando dados do cliente...</div>;
+  if (error) return <div className="p-5 text-destructive">Erro: {error}</div>;
 
   return (
     <div className="w-full h-screen flex flex-col bg-gray-50">
       <form onSubmit={atualizarCliente} className="flex gap-3 flex-col p-5">
         <div className="flex gap-3 items-center">
-          <CircleCheck className="size-10 text-blue-600" />
+          <CircleArrowLeftIcon
+            className="size-6 cursor-pointer"
+            onClick={() => navigate(-1)}
+          />
           <h1 className="text-2xl font-bold">Editar Cliente</h1>
         </div>
 
@@ -158,15 +135,13 @@ export default function EditarCliente() {
           className="bg-white"
         />
 
-        <div>
-          <h2>Digite o CNPJ</h2>
-          {cliente.cnpj.length === 18 && !cnpj.isValid(cliente.cnpj) && (
-            <div className="text-destructive flex items-center gap-1 mt-1">
-              <CircleX className="size-4" />
-              <span className="text-sm">CNPJ inválido</span>
-            </div>
-          )}
-        </div>
+        {/* Validação CNPJ */}
+        {cliente.cnpj.length === 18 && !cnpj.isValid(cliente.cnpj) && (
+          <div className="text-destructive flex items-center gap-3">
+            <CircleX />
+            <h2>CNPJ Inválido</h2>
+          </div>
+        )}
 
         <Input
           type="text"
@@ -212,15 +187,9 @@ export default function EditarCliente() {
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Status</SelectLabel>
-              <SelectItem className="cursor-pointer" value="Ativo">
-                Ativo
-              </SelectItem>
-              <SelectItem className="cursor-pointer" value="Pendente">
-                Pendente
-              </SelectItem>
-              <SelectItem className="cursor-pointer" value="Inativo">
-                Inativo
-              </SelectItem>
+              <SelectItem className="cursor-pointer" value="Ativo">Ativo</SelectItem>
+              <SelectItem className="cursor-pointer" value="Pendente">Pendente</SelectItem>
+              <SelectItem className="cursor-pointer" value="Inativo">Inativo</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -229,7 +198,6 @@ export default function EditarCliente() {
           <Button
             type="button"
             variant="destructive"
-            className="cursor-pointer"
             onClick={() => navigate(-1)}
           >
             <CircleArrowLeftIcon /> Voltar
@@ -237,7 +205,7 @@ export default function EditarCliente() {
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="default" className="cursor-pointer">
+              <Button type="submit" variant="default">
                 <CircleCheck /> Salvar Alterações
               </Button>
             </AlertDialogTrigger>
@@ -251,20 +219,20 @@ export default function EditarCliente() {
                 !responseOk ? (
                   <>
                     <AlertDialogTitle className="flex items-center gap-3 text-destructive">
-                      <CircleX /> Erro ao salvar
+                      <CircleX /> Erro ao atualizar
                     </AlertDialogTitle>
                     <AlertDialogDescription className="flex items-center gap-3">
                       {cliente.cliente.length < 3 ? (
-                        <><CircleAlert /> Nome deve ter pelo menos 3 caracteres</>
+                        <><CircleAlert /> Nome do cliente inválido</>
                       ) : !cnpj.isValid(cliente.cnpj) ? (
                         <><CircleAlert /> CNPJ inválido</>
                       ) : cliente.local.length < 3 ? (
-                        <><CircleAlert /> Local deve ter pelo menos 3 caracteres</>
+                        <><CircleAlert /> Local inválido</>
                       ) : cliente.status === "" ? (
                         <><CircleAlert /> Selecione um status</>
-                      ) : !responseOk ? (
+                      ) : (
                         <><CircleX /> Erro interno no servidor</>
-                      ) : null}
+                      )}
                     </AlertDialogDescription>
                   </>
                 ) : (
