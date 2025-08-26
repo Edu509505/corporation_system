@@ -38,7 +38,7 @@ const items = [
   },
   {
     title: "Comercial",
-    url: "/",
+    url: "/#",
     icon: Inbox,
     subMenu: [
       { title: "Clientes", url: "/clientes", icon: Building2Icon },
@@ -48,13 +48,13 @@ const items = [
   },
   {
     title: "Obra",
-    url: "/",
+    url: "/#",
     icon: PencilRuler,
     subMenu: [{ title: "Medição", url: "/medicao", icon: PencilRuler }],
   },
   {
     title: "Financeiro",
-    url: "/",
+    url: "/#",
     icon: CircleDollarSignIcon,
     subMenu: [
       { title: "Faturamento", url: "/notasFiscais", icon: FilePlus2Icon },

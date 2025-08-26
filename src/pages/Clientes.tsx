@@ -39,15 +39,12 @@ export default function VerClientes() {
 
   const editarCliente = (clienteId: number) => {
     navigate(`/clientes/${clienteId}`); // Navega para a rota específica do cliente
-    console.log('to aqui', editarCliente);
   };
-
-
 
   return (
     <div className="w-full h-screen p-2 flex flex-col bg-gray-50">
       <div className="flex items-center gap-3">
-        <Building />{" "}
+        <Building />
         <h1 className="text-2xl font-bold">Clientes cadastrados</h1>
       </div>
 
@@ -84,9 +81,11 @@ export default function VerClientes() {
                   {
                     c.cliente
                       ?.split(" ")
+                      .slice(0, 2)
                       .map((palavra) => palavra[0])
                       .join("")
                       .toUpperCase()
+                      
                     //Essa função pega o nome do cliente, elimina os espaços dividindo em 2 textos, depois pega a primeira letra de cada um e no final junta
                   }
                 </h1>
@@ -97,6 +96,7 @@ export default function VerClientes() {
                   {
                     c.cliente
                       ?.split(" ")
+                      .slice(0, 2)
                       .map((palavra) => palavra[0])
                       .join("")
                       .toUpperCase()
@@ -108,11 +108,11 @@ export default function VerClientes() {
               <div className="w-[8rem] h-[8rem] border-2 flex justify-center items-center border-destructive rounded-full text-center">
                 <h1 className="text-5xl ">
                   {
-                    c.cliente
-                      ?.split(" ")
-                      .map((palavra) => palavra[0])
+                    c.cliente?.trim()
+                      .split(' ')       
+                      .slice(0, 2) //função que pega as duas primeiras palavras
+                      .map((palavra) => palavra[0].toUpperCase())
                       .join("")
-                      .toUpperCase()
                     //Essa função pega o nome do cliente, elimina os espaços dividindo em 2 textos, depois pega a primeira letra de cada um e no final junta
                   }
                 </h1>

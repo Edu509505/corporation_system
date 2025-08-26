@@ -15,6 +15,7 @@ import {
   CircleArrowLeftIcon,
   CircleCheck,
   CircleX,
+  Edit,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -28,6 +29,7 @@ import {
   SelectGroup,
   SelectLabel,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Cliente {
   cliente: string;
@@ -121,16 +123,28 @@ export default function EditarCliente() {
     }
   }
 
-  if (loading) return <div className="p-5">Carregando dados do cliente...</div>;
+  if (loading) return (
+    <div className="p-5 gap-5 flex flex-col">
+      <Skeleton className="h-9 w-58" />
+      <Skeleton className="h-9" />
+      <Skeleton className="h-9" />
+      <Skeleton className="h-9" />
+      <Skeleton className="h-9 w-48" />
+      <div className="flex gap-3">
+        <Skeleton className="h-9 w-25" />
+        <Skeleton className="h-9 w-50" />
+      </div>
+    </div>
+  );
+
   if (error) return <div className="p-5 text-destructive">Erro: {error}</div>;
 
   return (
     <div className="w-full h-screen flex flex-col bg-gray-50">
       <form onSubmit={atualizarCliente} className="flex gap-3 flex-col p-5">
         <div className="flex gap-3 items-center">
-          <CircleArrowLeftIcon
-            className="size-6 cursor-pointer"
-            onClick={() => navigate(-1)}
+          <Edit
+            className="size-6"
           />
           <h1 className="text-2xl font-bold">Editar Cliente</h1>
         </div>
@@ -238,10 +252,10 @@ export default function EditarCliente() {
             <AlertDialogContent>
               <AlertDialogHeader>
                 {cliente.cliente.length < 3 ||
-                !cnpj.isValid(cliente.cnpj) ||
-                cliente.local.length < 3 ||
-                cliente.status === "" ||
-                !responseOk ? (
+                  !cnpj.isValid(cliente.cnpj) ||
+                  cliente.local.length < 3 ||
+                  cliente.status === "" ||
+                  !responseOk ? (
                   <>
                     <AlertDialogTitle className="flex items-center gap-3 text-destructive">
                       <CircleX /> Erro ao atualizar
