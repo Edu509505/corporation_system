@@ -282,7 +282,10 @@ export default function EditarCliente() {
                           <CircleX /> Erro interno no servidor
                         </>
                       )}
-                    </AlertDialogDescription>
+                      </AlertDialogDescription>
+                      <AlertDialogFooter>
+                        <AlertDialogAction className="cursor-pointer">Retornar</AlertDialogAction>
+                      </AlertDialogFooter>     
                   </>
                 ) : (
                   <>
