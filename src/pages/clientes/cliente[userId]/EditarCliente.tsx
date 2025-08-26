@@ -10,11 +10,24 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CircleAlert, CircleArrowLeftIcon, CircleCheck, CircleX } from "lucide-react";
+import {
+  CircleAlert,
+  CircleArrowLeftIcon,
+  CircleCheck,
+  CircleX,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { cnpj } from 'cpf-cnpj-validator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
+import { cnpj } from "cpf-cnpj-validator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectGroup,
+  SelectLabel,
+} from "@/components/ui/select";
 
 interface Cliente {
   cliente: string;
@@ -31,10 +44,10 @@ export default function EditarCliente() {
   const navigate = useNavigate();
 
   const [cliente, setCliente] = useState<Cliente>({
-    cliente: '',
-    cnpj: '',
-    local: '',
-    status: '',
+    cliente: "",
+    cnpj: "",
+    local: "",
+    status: "",
     // file: null
   });
 
@@ -50,10 +63,10 @@ export default function EditarCliente() {
         if (!response.ok) throw new Error("Cliente não encontrado");
         const data = await response.json();
         setCliente({
-          cliente: data.cliente || '',
-          cnpj: data.cnpj || '',
-          local: data.local || '',
-          status: data.status || '',
+          cliente: data.cliente || "",
+          cnpj: data.cnpj || "",
+          local: data.local || "",
+          status: data.status || "",
         });
       } catch (err) {
         setError((err as Error).message);
@@ -78,7 +91,8 @@ export default function EditarCliente() {
       !cnpj.isValid(cliente.cnpj) ||
       cliente.local.length < 3 ||
       cliente.status === ""
-    ) return;
+    )
+      return;
 
     try {
       const response = await fetch(`${url}/clientes/${id}`, {
@@ -187,15 +201,22 @@ export default function EditarCliente() {
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Status</SelectLabel>
-              <SelectItem className="cursor-pointer" value="Ativo">Ativo</SelectItem>
-              <SelectItem className="cursor-pointer" value="Pendente">Pendente</SelectItem>
-              <SelectItem className="cursor-pointer" value="Inativo">Inativo</SelectItem>
+              <SelectItem className="cursor-pointer" value="Ativo">
+                Ativo
+              </SelectItem>
+              <SelectItem className="cursor-pointer" value="Pendente">
+                Pendente
+              </SelectItem>
+              <SelectItem className="cursor-pointer" value="Inativo">
+                Inativo
+              </SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
 
         <div className="flex gap-3">
           <Button
+            className="cursor-pointer"
             type="button"
             variant="destructive"
             onClick={() => navigate(-1)}
@@ -205,7 +226,11 @@ export default function EditarCliente() {
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button type="submit" variant="default">
+              <Button
+                type="submit"
+                variant="default"
+                className="cursor-pointer"
+              >
                 <CircleCheck /> Salvar Alterações
               </Button>
             </AlertDialogTrigger>
@@ -223,15 +248,25 @@ export default function EditarCliente() {
                     </AlertDialogTitle>
                     <AlertDialogDescription className="flex items-center gap-3">
                       {cliente.cliente.length < 3 ? (
-                        <><CircleAlert /> Nome do cliente inválido</>
+                        <>
+                          <CircleAlert /> Nome do cliente inválido
+                        </>
                       ) : !cnpj.isValid(cliente.cnpj) ? (
-                        <><CircleAlert /> CNPJ inválido</>
+                        <>
+                          <CircleAlert /> CNPJ inválido
+                        </>
                       ) : cliente.local.length < 3 ? (
-                        <><CircleAlert /> Local inválido</>
+                        <>
+                          <CircleAlert /> Local inválido
+                        </>
                       ) : cliente.status === "" ? (
-                        <><CircleAlert /> Selecione um status</>
+                        <>
+                          <CircleAlert /> Selecione um status
+                        </>
                       ) : (
-                        <><CircleX /> Erro interno no servidor</>
+                        <>
+                          <CircleX /> Erro interno no servidor
+                        </>
                       )}
                     </AlertDialogDescription>
                   </>

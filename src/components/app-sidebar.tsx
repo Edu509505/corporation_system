@@ -1,5 +1,6 @@
 import {
   Building2Icon,
+  ChartColumnIncreasing,
   CircleDollarSignIcon,
   FilePlus2Icon,
   FileTextIcon,
@@ -33,7 +34,7 @@ const items = [
   {
     title: "Home",
     url: "/",
-    icon: LucideLayoutDashboard,
+    icon: ChartColumnIncreasing,
   },
   {
     title: "Comercial",
@@ -41,25 +42,23 @@ const items = [
     icon: Inbox,
     subMenu: [
       { title: "Clientes", url: "/clientes", icon: Building2Icon },
-      { title: "Propostas", url: "/propostas", icon: FileTextIcon},
-      { title: "Contratos", url: "/oi", icon: PanelTopOpenIcon }
+      { title: "Propostas", url: "/propostas", icon: FileTextIcon },
+      { title: "Contratos", url: "/oi", icon: PanelTopOpenIcon },
     ],
   },
   {
     title: "Obra",
     url: "/",
     icon: PencilRuler,
-    subMenu: [
-      { title: "Medição", url: '/medicao', icon: PencilRuler},
-    ],
+    subMenu: [{ title: "Medição", url: "/medicao", icon: PencilRuler }],
   },
   {
     title: "Financeiro",
     url: "/",
     icon: CircleDollarSignIcon,
     subMenu: [
-      { title: 'Faturamento', url: '/notasFiscais', icon: FilePlus2Icon}
-    ]
+      { title: "Faturamento", url: "/notasFiscais", icon: FilePlus2Icon },
+    ],
   },
 ];
 
