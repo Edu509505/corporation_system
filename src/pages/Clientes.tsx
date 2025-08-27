@@ -20,6 +20,7 @@ export default function VerClientes() {
 
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
+  const [responseOk, setResponseOk] = useState(true)
 
   useEffect(() => {
     async function VerClientes() {
@@ -27,6 +28,13 @@ export default function VerClientes() {
         const response = await fetch(`${url}/clientes`);
         const body = await response.json();
         setClientes(body);
+
+        if (!response.ok) {
+          setResponseOk(false)
+          const erro = await response.text();
+          throw new Error(`Erro ${response.status}: ${erro}`);
+        }
+
       } catch (error) {
 
       } finally {
@@ -50,6 +58,21 @@ export default function VerClientes() {
       </div>
     </div>
   );
+
+  if(responseOk) return(
+    <div className="w-full h-screen flex flex-row items-center justify-around">
+
+      <div className="flex flex-col items-center justify-center gap-3 text-red-500">
+        <h1 className="text-3xl">Erro Inesperado</h1>
+        <h2>Tente novamente mais tarde</h2>
+        <CircleX className="size-20" />
+        <h1>Ops! Parece que ocorreu um erro inesperado</h1>
+
+      </div>
+
+    </div>
+    )
+  
 
   const editarCliente = (clienteId: number) => {
     navigate(`/clientes/${clienteId}`); // Navega para a rota específica do cliente
