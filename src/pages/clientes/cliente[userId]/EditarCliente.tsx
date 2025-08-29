@@ -30,6 +30,7 @@ import {
   SelectLabel,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Label } from "@/components/ui/label";
 
 interface Cliente {
   cliente: string;
@@ -66,7 +67,7 @@ export default function EditarCliente() {
         const data = await response.json();
         setCliente({
           cliente: data.cliente || "",
-          cnpj: data.cnpj || "",
+          cnpj: cnpj.format(data.cnpj || ""),
           local: data.local || "",
           status: data.status || "",
         });
@@ -95,7 +96,6 @@ export default function EditarCliente() {
       cliente.status === ""
     )
       return;
-
     try {
       const response = await fetch(`${url}/clientes/${id}`, {
         method: "PUT", // ou PATCH, dependendo da sua API
@@ -104,7 +104,7 @@ export default function EditarCliente() {
         },
         body: JSON.stringify({
           cliente: cliente.cliente,
-          cnpj: cliente.cnpj,
+          cnpj: cnpj.strip(cliente.cnpj),
           local: cliente.local,
           status: cliente.status,
         }),
@@ -149,6 +149,7 @@ export default function EditarCliente() {
           <h1 className="text-2xl font-bold">Editar Cliente</h1>
         </div>
 
+        <Label>Insira o nome do cliente</Label>
         <Input
           type="text"
           name="cliente"
@@ -164,9 +165,10 @@ export default function EditarCliente() {
         />
 
         {/* Validação CNPJ */}
+        <Label>Insira o cnpj do cliente</Label>
         {cliente.cnpj.length === 18 && !cnpj.isValid(cliente.cnpj) && (
-          <div className="text-destructive flex items-center gap-3">
-            <CircleX />
+          <div className="text-destructive flex items-center gap-3 text-sm leading-none font-medium">
+            <CircleX className="size-[18px]"/>
             <h2>CNPJ Inválido</h2>
           </div>
         )}
@@ -186,6 +188,7 @@ export default function EditarCliente() {
           className="bg-white"
         />
 
+        <Label>Insira o local do cliente</Label>
         <Input
           type="text"
           name="local"
@@ -200,6 +203,7 @@ export default function EditarCliente() {
           className="bg-white"
         />
 
+        <Label>Insira a situação inicial</Label>
         <Select
           value={cliente.status}
           onValueChange={(value) =>

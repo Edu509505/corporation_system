@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { Cliente } from "../Tipagens";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cnpj } from "cpf-cnpj-validator";
 
 export default function VerClientes() {
   const navigate = useNavigate();
@@ -30,15 +31,16 @@ export default function VerClientes() {
         setClientes(body);
 
         if (!response.ok) {
-          setResponseOk(false)
+          setResponseOk(true)
           const erro = await response.text();
           throw new Error(`Erro ${response.status}: ${erro}`);
         }
+        setResponseOk(false)
 
       } catch (error) {
-
+        
       } finally {
-        setLoading(false);
+        setLoading(false);  
       }
     } VerClientes()
   }, []);
@@ -163,7 +165,7 @@ export default function VerClientes() {
               </p>
               <div className="w-full flex flex-col gap-2">
                 <p>
-                  <strong>CNPJ:</strong> {c.cnpj}
+                  <strong>CNPJ:</strong> {cnpj.format(c.cnpj)}
                 </p>
                 <p>
                   <strong>Local:</strong> {c.local}

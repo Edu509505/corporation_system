@@ -29,6 +29,7 @@ import {
   SelectGroup,
   SelectLabel,
 } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface Cliente {
   cliente: string;
@@ -54,25 +55,6 @@ export default function CriarCliente() {
 
   const [resonseOk, setResponseOk] = useState(true);
 
-  // console.log(novoCliente);
-  // console.log(cnpj.isValid(novoCliente.cnpj))
-
-  // function convertFileToBase64(file: File): Promise<string> {
-  //   return new Promise((resolve, reject) => {
-  //     const reader = new FileReader();
-
-  //     reader.onloadend = () => {
-  //       resolve(reader.result as string);
-  //     };
-
-  //     reader.onerror = (error) => {
-  //       reject(error);
-  //     };
-
-  //     reader.readAsDataURL(file);
-  //   });
-  // }
-
   async function criarCliente(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -83,13 +65,6 @@ export default function CriarCliente() {
       novoCliente.status === ""
     )
       return;
-
-    // if(!novoCliente.file) return;
-    // const fileBase64 = await convertFileToBase64(novoCliente.file);
-
-    // const [, fileBase64SemAPrimeiraParte ] = fileBase64.split(',');
-    // const [, ...resto] = fileBase64SemAPrimeiraParte
-
     try {
       const response = await fetch(`${url}/clientes`, {
         method: "POST",
@@ -98,10 +73,10 @@ export default function CriarCliente() {
         },
         body: JSON.stringify({
           cliente: novoCliente.cliente,
-          cnpj: novoCliente.cnpj,
+          cnpj: cnpj.strip(novoCliente.cnpj),
           local: novoCliente.local,
           status: novoCliente.status,
-        }),
+        })
       });
 
       if (!response.ok) {
@@ -128,6 +103,7 @@ export default function CriarCliente() {
           <h1 className="text-2xl font-bold">Cadastrar novo Cliente</h1>
         </div>
 
+        <Label>Insira o nome do cliente</Label>
         <Input
           type="text"
           name="cliente"
@@ -141,17 +117,23 @@ export default function CriarCliente() {
           }
           className="bg-white"
         />
+
+        <Label>Insira o cnpj do cliente</Label>
         {novoCliente.cnpj.length === 18 &&
-        cnpj.isValid(novoCliente.cnpj) === !true ? (
-          <div className="text-destructive flex items-center gap-3">
-            <CircleX />
+          cnpj.isValid(novoCliente.cnpj) === !true ? (
+          <div className="text-destructive flex items-center gap-3 text-sm leading-none font-medium">
+            <CircleX className="size-[18px]" />
             <h2>Cnpj Inválido</h2>
           </div>
-        ) : (
-          <>
-            <h2>Digite o CNPJ</h2>
-          </>
-        )}
+        ) : 
+        
+          // verificacao.cnpjOk === false? (
+          // <div className="text-chart-1 flex items-center gap-3 text-sm leading-none font-medium">
+          //   <CircleAlert className="size-[18px]" />
+          //   <h2>Cnpj já cadastrado no sistema</h2>
+          // </div>) :
+           ''
+      }
         <Input
           type="text"
           name="cnpj"
@@ -167,6 +149,7 @@ export default function CriarCliente() {
           className="bg-white"
         />
 
+        <Label>Insira o local do cliente</Label>
         <Input
           type="text"
           name="local"
@@ -181,6 +164,7 @@ export default function CriarCliente() {
           className="bg-white"
         />
 
+        <Label>Insira a situação inicial</Label>
         <Select
           value={novoCliente.status}
           onValueChange={(event) =>
@@ -220,74 +204,81 @@ export default function CriarCliente() {
           </Button>
 
           <AlertDialog>
-            <AlertDialogTrigger>
-              <Button variant="default" className="cursor-pointer">
+            <AlertDialogTrigger asChild>
+              <Button
+                type="submit"
+                variant="default"
+                className="cursor-pointer"
+              >
                 <CircleCheck /> Cadastrar
               </Button>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  {novoCliente.cliente.length < 3 ||
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                {novoCliente.cliente.length < 3 ||
                   !cnpj.isValid(novoCliente.cnpj) ||
                   novoCliente.local.length < 3 ||
                   novoCliente.status === "" ||
                   !resonseOk ? (
-                    <>
-                      <AlertDialogTitle className="flex items-center gap-3">
-                        <CircleX className="text-destructive" /> Erro ao
-                        cadastrar
-                      </AlertDialogTitle>
-                      <AlertDialogDescription className="flex items-center gap-3">
-                        {novoCliente.cliente.length < 3 ? (
-                          <>
-                            <CircleAlert /> Você precisa inserir um nome válido
-                            para o Cliente
-                          </>
-                        ) : !cnpj.isValid(novoCliente.cnpj) ? (
-                          <>
-                            <CircleAlert /> Você precisa inserir um CNPJ válido
-                          </>
-                        ) : novoCliente.local.length < 3 ? (
-                          <>
-                            <CircleAlert /> Você precisa inserir um local válido
-                          </>
-                        ) : novoCliente.status === "" ? (
-                          <>
-                            <CircleAlert /> Você precisa inserir o Status do
-                            cliente
-                          </>
-                        ) : !resonseOk ? (
-                          <>
-                            <CircleX /> Erro interno
-                          </>
-                        ) : (
-                          ""
-                        )}
-                      </AlertDialogDescription>
-                    </>
-                  ) : (
-                    <>
-                      <AlertDialogTitle className="flex items-center gap-3">
-                        <CircleCheck className="text-ring" /> Usuário cadastrado
-                        com sucesso
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Usuário cadastrado e inserido no sistema
-                      </AlertDialogDescription>
-                      <AlertDialogFooter>
-                        <AlertDialogAction
-                          className="cursor-pointer"
-                          onClick={() => {
-                            navigate(-1);
-                          }}
-                        >
-                          Continuar
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </>
-                  )}
-                </AlertDialogHeader>
-              </AlertDialogContent>
-            </AlertDialogTrigger>
+                  <>
+                    <AlertDialogTitle className="flex items-center gap-3 text-destructive">
+                      <CircleX /> Erro ao
+                      cadastrar
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="flex items-center gap-3">
+                      {novoCliente.cliente.length < 3 ? (
+                        <>
+                          <CircleAlert /> Você precisa inserir um nome válido
+                          para o Cliente
+                        </>
+                      ) : !cnpj.isValid(novoCliente.cnpj) ? (
+                        <>
+                          <CircleAlert /> Você precisa inserir um CNPJ válido
+                        </>
+                      ) : novoCliente.local.length < 3 ? (
+                        <>
+                          <CircleAlert /> Você precisa inserir um local válido
+                        </>
+                      ) : novoCliente.status === "" ? (
+                        <>
+                          <CircleAlert /> Você precisa inserir o Status do
+                          cliente
+                        </>
+                      ) : !resonseOk ? (
+                        <>
+                          <CircleX /> Erro interno
+                        </>
+                      ) : (
+                        ""
+                      )}
+                    </AlertDialogDescription>
+                    <AlertDialogFooter>
+                      <AlertDialogAction className="cursor-pointer">Retornar</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </>
+                ) : (
+                  <>
+                    <AlertDialogTitle className="flex items-center gap-3 text-ring">
+                      <CircleCheck />
+                      Usuário cadastrado com sucesso
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Usuário cadastrado e inserido no sistema
+                    </AlertDialogDescription>
+                    <AlertDialogFooter>
+                      <AlertDialogAction
+                        className="cursor-pointer"
+                        onClick={() => {
+                          navigate(-1);
+                        }}
+                      >
+                        Continuar
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </>
+                )}
+              </AlertDialogHeader>
+            </AlertDialogContent>
           </AlertDialog>
         </div>
         {/* <div>
