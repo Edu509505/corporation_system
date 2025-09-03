@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import CadastroCliente from "./pages/clientes/CadastroCliente"
 import Clientes from "./pages/Clientes"
 import EditarCliente from "./pages/clientes/cliente[userId]/EditarCliente"
+import CriarProposta from "./pages/propostas/CriarProposta";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/criarProposta" element={<CriarProposta />} />
           <Route path="/" element={<Layout children={undefined} />}>
             <Route index element={<Home />} />
             <Route path="/blog" element={<Blog />} />

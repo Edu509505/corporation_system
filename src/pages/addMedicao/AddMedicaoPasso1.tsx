@@ -76,7 +76,7 @@ function AddMedicao() {
           }}
         >
           <SelectTrigger className="w-[300px]">
-            <SelectValue placeholder="Selecione o contrato" />
+            <SelectValue placeholder="Selecionar cliente" />
           </SelectTrigger>
           <SelectContent className="w-[300px]">
             <SelectGroup>
@@ -96,7 +96,7 @@ function AddMedicao() {
         </h1>
         <Select>
           <SelectTrigger className="w-[300px]">
-            <SelectValue placeholder="Selecione o contrato" />
+            <SelectValue placeholder="Seleciar contrato" />
           </SelectTrigger>
           <SelectContent className="w-[300px]">
             <SelectGroup>
