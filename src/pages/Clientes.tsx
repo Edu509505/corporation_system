@@ -24,7 +24,7 @@ export default function VerClientes() {
   const [responseOk, setResponseOk] = useState(true)
 
   useEffect(() => {
-    async function VerClientes() {
+    async function verClientes() {
       try {
         const response = await fetch(`${url}/clientes`);
         const body = await response.json();
@@ -42,7 +42,7 @@ export default function VerClientes() {
       } finally {
         setLoading(false);  
       }
-    } VerClientes()
+    } verClientes()
   }, []);
 
   if (loading) return (

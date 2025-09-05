@@ -6,6 +6,12 @@ import { useEffect, useState } from "react";
 
 const url = import.meta.env.VITE_API_URL;
 
+interface formularioComImagem {
+    nomeDaProposta: string
+    descricao: string
+    file: File | null;
+}
+
 export default function CriarProposta() {
     const [clientes, setClientes] = useState<Cliente[]>([]);
 
@@ -19,38 +25,42 @@ export default function CriarProposta() {
     }, []);
 
     const [clienteSelecionado, setClienteSelecionado] = useState({
-        id: ""
+        idCliente: ""
     });
 
-    const [novaProposta, setNovaProposta] = useState({
-        nome: "",
+    const [novaProposta, setNovaProposta] = useState <formularioComImagem>({
+        nomeDaProposta: "",
         descricao: "",
-        pathDeAnexo: null
+        file: null
     });
 
     
 
     async function criarProposta(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        
+        if (!novaProposta.file) return;
+        const form = new FormData();
+        
+        form.set('idCliente', clienteSelecionado.idCliente);
+        form.set('nomeDaProposta', novaProposta.nomeDaProposta);
+        form.set('descricao', novaProposta.descricao);
+        form.set('file', novaProposta.file);
+
 
         console.log("Parei aqui")
-        const response = await fetch(`${url}/propostas`, {
+        const response = await fetch(`${url}/proposta`, {
             method: "POST",
-             headers: {
-                "Content-type": "application/json",
-            },
-            body: JSON.stringify({
-                idCliente: clienteSelecionado.id,
-                nomeDaProposta: novaProposta.nome
+            body: form,
             })
-        });
+
 
         const body = await response.json();
         console.log("OI ZÉ DA MANGA", body)
 
     }
 
-    console.log("Cliente Selecionado: ", clienteSelecionado)
+    console.log("Cliente Selecionado: ", clienteSelecionado)    
     console.log("Nova Proposta: ", novaProposta)
 
 
@@ -62,11 +72,11 @@ export default function CriarProposta() {
 
                     <label>Escolha o cliente desejado!</label>
                     <Select
-                        value={clienteSelecionado.id}
+                        value={clienteSelecionado.idCliente}
                         onValueChange={(value) => {
                             setClienteSelecionado({
                                 ...clienteSelecionado,
-                                id: value.toString()
+                                idCliente: value.toString()
                             });
                         }}
                     >
@@ -85,20 +95,48 @@ export default function CriarProposta() {
                         </SelectContent>
                     </Select>
 
-
                     <label>Insira o nome da proposta</label>
                     <Input 
                         type="text"
                         name="nome da proposta"
                         placeholder="digite aqui"
-                        value={novaProposta.nome}
+                        value={novaProposta.nomeDaProposta}
                         onChange={(event) => 
                             setNovaProposta({
                                 ...novaProposta,
-                                nome: event.target.value,
+                            nomeDaProposta: event.target.value,
                             })
                         }
                         />
+                    
+                    <label>Adicione uma descrição</label>
+                    <Input
+                    type="text"
+                    name="descrição"
+                    placeholder="digite aqui"
+                    value={novaProposta.descricao}
+                    onChange={(event) => 
+                        setNovaProposta({
+                            ...novaProposta,
+                            descricao: event.target.value
+                        })
+                    }
+                    />
+
+                    <label>Adicionar Anexo</label>
+                    <Input
+                        type="file"
+                        onChange={(event) => {
+                            const files = event.target.files;
+                            if (!files) return;
+                            const filesArray = Array.from(files);
+                            const file = filesArray[0];
+                            setNovaProposta({
+                                ...novaProposta,
+                                file
+                            })
+                        }}
+                    /> 
                     <Button
                         type="submit"
                         variant="default"
