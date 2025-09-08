@@ -9,7 +9,7 @@ const url = import.meta.env.VITE_API_URL;
 interface formularioComImagem {
     nomeDaProposta: string
     descricao: string
-    files: File | null;
+    files: FileList | File[] | null;
 }
 
 export default function CriarProposta() {
@@ -40,12 +40,21 @@ export default function CriarProposta() {
         event.preventDefault();
         
         if (!novaProposta.files) return;
+        console.log("Quantidade de arquivos no frontend:", novaProposta.files.length);
+        console.log("Arquivos:", novaProposta.files);
+    
         const form = new FormData();
         
         form.set('idCliente', clienteSelecionado.idCliente);
         form.set('nomeDaProposta', novaProposta.nomeDaProposta);
         form.set('descricao', novaProposta.descricao);
-        form.set('files', novaProposta.files);
+        
+        // Este código itera sobre todos os arquivos selecionados no input
+        // e adiciona cada um individualmente ao FormData com a chave 'files'
+        for (let i = 0; i < novaProposta.files.length; i++) {
+            console.log("Adicionando arquivo:", novaProposta.files);
+            form.append('files', novaProposta.files[i]);
+        }
 
 
         console.log("Parei aqui")
@@ -128,16 +137,15 @@ export default function CriarProposta() {
                         type="file"
                         multiple
                         onChange={(event) => {
-                            const files_ = event.target.files;
-                            if (!files_) return;
-                            const filesArray = Array.from(files_);
-                            const file = filesArray[0];
+                            const files = event.target.files;
+                            if (!files) return;
+                            const filesArray = Array.from(files)
                             setNovaProposta({
                                 ...novaProposta,
-                                files: file
+                                files: filesArray  
                             })
                         }}
-                    /> 
+                    />
                     <Button
                         type="submit"
                         variant="default"
