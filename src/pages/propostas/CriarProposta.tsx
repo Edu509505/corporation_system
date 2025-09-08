@@ -9,7 +9,7 @@ const url = import.meta.env.VITE_API_URL;
 interface formularioComImagem {
     nomeDaProposta: string
     descricao: string
-    file: File | null;
+    files: File | null;
 }
 
 export default function CriarProposta() {
@@ -31,7 +31,7 @@ export default function CriarProposta() {
     const [novaProposta, setNovaProposta] = useState <formularioComImagem>({
         nomeDaProposta: "",
         descricao: "",
-        file: null
+        files: null
     });
 
     
@@ -39,13 +39,13 @@ export default function CriarProposta() {
     async function criarProposta(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         
-        if (!novaProposta.file) return;
+        if (!novaProposta.files) return;
         const form = new FormData();
         
         form.set('idCliente', clienteSelecionado.idCliente);
         form.set('nomeDaProposta', novaProposta.nomeDaProposta);
         form.set('descricao', novaProposta.descricao);
-        form.set('file', novaProposta.file);
+        form.set('files', novaProposta.files);
 
 
         console.log("Parei aqui")
@@ -125,16 +125,16 @@ export default function CriarProposta() {
 
                     <label>Adicionar Anexo</label>
                     <Input
-                        multiple
                         type="file"
+                        multiple
                         onChange={(event) => {
-                            const files = event.target.files;
-                            if (!files) return;
-                            const filesArray = Array.from(files);
+                            const files_ = event.target.files;
+                            if (!files_) return;
+                            const filesArray = Array.from(files_);
                             const file = filesArray[0];
                             setNovaProposta({
                                 ...novaProposta,
-                                file
+                                files: file
                             })
                         }}
                     /> 
