@@ -12,6 +12,7 @@ import CadastroCliente from "./pages/clientes/CadastroCliente"
 import Clientes from "./pages/Clientes"
 import EditarCliente from "./pages/clientes/cliente[userId]/EditarCliente"
 import CriarProposta from "./pages/propostas/CriarProposta";
+import VerPropostas from "./pages/Propostas";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path="/adicionarMedicao" element={<AddMedicao />} />
             <Route path="/cadastro" element={<CadastroCliente />} />
             <Route path="/clientes" element={<Clientes />} />
+            <Route path="/propostas" element={<VerPropostas />} />
             <Route path="/clientes/:id" element={<EditarCliente />} />
             <Route path="*" element={<NoPage />} />
           </Route>

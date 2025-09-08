@@ -1,5 +1,8 @@
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+const url = import.meta.env.VITE_API_URL;
 
 
 interface Propostas{
@@ -12,7 +15,7 @@ interface Propostas{
 export default function VerPropostas(){
     const navigate = useNavigate();
 
-    const url = import.meta.env.VITE_API_URL;
+   
 
     const [propostas, setPropostas] = useState<Propostas[]>([]);
     
@@ -25,9 +28,19 @@ export default function VerPropostas(){
         verPropostas();
     }, []);
 
+
+    const handleClick = () => {
+    navigate('/criarProposta'); // Navigates to the /dashboard route
+  };
+
+
     return (
         <div>
             <h1>Propostas</h1>
+
+            <Button onClick={handleClick}> 
+                Criar Proposta
+            </Button>
 
             <div>
                 {
@@ -40,7 +53,6 @@ export default function VerPropostas(){
                     ))
                 }
             </div>
-
         </div>
     )
 }
