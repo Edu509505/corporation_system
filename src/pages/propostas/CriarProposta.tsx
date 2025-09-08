@@ -125,6 +125,7 @@ export default function CriarProposta() {
 
                     <label>Adicionar Anexo</label>
                     <Input
+                        multiple
                         type="file"
                         onChange={(event) => {
                             const files = event.target.files;
