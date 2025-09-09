@@ -7,7 +7,7 @@ const url = import.meta.env.VITE_API_URL;
 
 interface Propostas{
     id: number;
-    nome: string;
+    nomeDaProposta: string;
     descricao: string;
     file: File | null;
 }
@@ -46,13 +46,13 @@ export default function VerPropostas(){
                 {
                     propostas.map((proposta) => (
                         <div key={proposta.id}>
-                            <div>nome: {proposta.nome}</div>
+                            <div>Nome: {proposta.nomeDaProposta}</div>
                             <div>Descricao: {proposta.descricao}</div>
                             {/* <div>Anexo {proposta.file}</div> */}
                         </div>
                     ))
                 }
-            </div>
+            </div>  
         </div>
     )
 }

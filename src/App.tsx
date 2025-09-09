@@ -13,6 +13,7 @@ import Clientes from "./pages/Clientes"
 import EditarCliente from "./pages/clientes/cliente[userId]/EditarCliente"
 import CriarProposta from "./pages/propostas/CriarProposta";
 import VerPropostas from "./pages/Propostas";
+import VerVersionamento from "./Versionamento";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/criarProposta" element={<CriarProposta />} />
+          <Route path="/versionamento" element={<VerVersionamento />} />
           <Route path="/" element={<Layout children={undefined} />}>
             <Route index element={<Home />} />
             <Route path="/blog" element={<Blog />} />
