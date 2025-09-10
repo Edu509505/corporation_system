@@ -21,10 +21,10 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/criarProposta" element={<CriarProposta />} />
-          <Route path="/versionamento" element={<VerVersionamento />} />
           <Route path="/" element={<Layout children={undefined} />}>
             <Route index element={<Home />} />
+            <Route path="/criarProposta" element={<CriarProposta />} />
+            <Route path="/versionamento" element={<VerVersionamento />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/notasFiscais" element={<NotasFiscais />} />
             <Route path="/medicao" element={<Medicao />} />
