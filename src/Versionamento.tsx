@@ -22,6 +22,7 @@ export default function VerVersionamento (){
                 const response = await fetch(`${url}/versionamento`);
                 const body = await response.json();
                 setVersionamentos(body);
+                const responseAnexo = await fetch (`${url}/versionamento/idVersionamento`)
             } 
             verVersionamento();
         }, []);
