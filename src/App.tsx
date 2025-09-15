@@ -8,12 +8,13 @@ import NotasFiscais from "./pages/NotasFiscais";
 import Medicao from "./pages/Medicao";
 import AddMedicao from "./pages/addMedicao/AddMedicaoPasso1";
 import Login from "./pages/Login";
-import CadastroCliente from "./pages/clientes/CadastroCliente"
-import Clientes from "./pages/Clientes"
-import EditarCliente from "./pages/clientes/cliente[userId]/EditarCliente"
+import CadastroCliente from "./pages/clientes/CadastroCliente";
+import Clientes from "./pages/Clientes";
+import EditarCliente from "./pages/clientes/cliente[userId]/EditarCliente";
 import CriarProposta from "./pages/propostas/CriarProposta";
 import VerPropostas from "./pages/Propostas";
 import VerVersionamento from "./Versionamento";
+import Versionamento from "./pages/versionamento/Versionamento";
 
 function App() {
   return (
@@ -32,6 +33,10 @@ function App() {
             <Route path="/cadastro" element={<CadastroCliente />} />
             <Route path="/clientes" element={<Clientes />} />
             <Route path="/propostas" element={<VerPropostas />} />
+            <Route
+              path="/proposta/versionamento/:id"
+              element={<Versionamento />}
+            />
             <Route path="/clientes/:id" element={<EditarCliente />} />
             <Route path="*" element={<NoPage />} />
           </Route>

@@ -1,160 +1,181 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { Cliente } from "@/Tipagens";
+import { CircleCheck, CirclePlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Route, useNavigate } from "react-router-dom";
 
 const url = import.meta.env.VITE_API_URL;
 
 interface formularioComImagem {
-    nomeDaProposta: string
-    descricao: string
-    files: FileList | File[] | null;
+  nomeDaProposta: string;
+  descricao: string;
+  files: FileList | File[] | null;
 }
 
 export default function CriarProposta() {
-    const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
 
-    useEffect(() => {
-        async function buscarClientes() {
-            const empresas = await fetch(`${url}/clientes`);
-            const body = await empresas.json();
-            setClientes(body);
-        }
-        buscarClientes();
-    }, []);
+  useEffect(() => {
+    async function buscarClientes() {
+      const empresas = await fetch(`${url}/clientes`);
+      const body = await empresas.json();
+      setClientes(body);
+    }
+    buscarClientes();
+  }, []);
 
-    const [clienteSelecionado, setClienteSelecionado] = useState({
-        idCliente: ""
-    });
+  const [clienteSelecionado, setClienteSelecionado] = useState({
+    idCliente: "",
+  });
 
-    const [novaProposta, setNovaProposta] = useState <formularioComImagem>({
-        nomeDaProposta: "",
-        descricao: "",
-        files: null
-    });
+  const [novaProposta, setNovaProposta] = useState<formularioComImagem>({
+    nomeDaProposta: "",
+    descricao: "",
+    files: null,
+  });
 
-    
+  async function criarProposta(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-    async function criarProposta(event: React.FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-        
-        if (!novaProposta.files) return;
-        console.log("Quantidade de arquivos no frontend:", novaProposta.files.length);
-        console.log("Arquivos:", novaProposta.files);
-    
-        const form = new FormData();
-        
-        form.set('idCliente', clienteSelecionado.idCliente);
-        form.set('nomeDaProposta', novaProposta.nomeDaProposta);
-        form.set('descricao', novaProposta.descricao);
-        
-        // Este código itera sobre todos os arquivos selecionados no input
-        // e adiciona cada um individualmente ao FormData com a chave 'files'
-        for (let i = 0; i < novaProposta.files.length; i++) {
-            console.log("Adicionando arquivo:", novaProposta.files);
-            form.append('files', novaProposta.files[i]);
-        }
+    if (!novaProposta.files) return;
+    console.log(
+      "Quantidade de arquivos no frontend:",
+      novaProposta.files.length
+    );
+    console.log("Arquivos:", novaProposta.files);
 
+    const form = new FormData();
 
-        console.log("Parei aqui")
-        const response = await fetch(`${url}/proposta`, {
-            method: "POST",
-            body: form,
-            })
+    form.set("idCliente", clienteSelecionado.idCliente);
+    form.set("nomeDaProposta", novaProposta.nomeDaProposta);
+    form.set("descricao", novaProposta.descricao);
 
-
-        const body = await response.json();
-        console.log("OI ZÉ DA MANGA", body)
-
+    // Este código itera sobre todos os arquivos selecionados no input
+    // e adiciona cada um individualmente ao FormData com a chave 'files'
+    for (let i = 0; i < novaProposta.files.length; i++) {
+      console.log("Adicionando arquivo:", novaProposta.files);
+      form.append("files", novaProposta.files[i]);
     }
 
-    console.log("Cliente Selecionado: ", clienteSelecionado)    
-    console.log("Nova Proposta: ", novaProposta)
+    console.log("Parei aqui");
+    const response = await fetch(`${url}/proposta`, {
+      method: "POST",
+      body: form,
+    });
 
+    const body = await response.json();
+    console.log(body);
+  }
 
-    return (
-        <>
-            <div>
-                <form onSubmit={criarProposta}>
-                    <h1>Criar nova Proposta</h1>
+  console.log("Cliente Selecionado: ", clienteSelecionado);
+  console.log("Nova Proposta: ", novaProposta);
 
-                    <label>Escolha o cliente desejado!</label>
-                    <Select
-                        value={clienteSelecionado.idCliente}
-                        onValueChange={(value) => {
-                            setClienteSelecionado({
-                                ...clienteSelecionado,
-                                idCliente: value.toString()
-                            });
-                        }}
-                    >
-                        <SelectTrigger className="w-[300px]">
-                            <SelectValue placeholder="Selecionar cliente" />
-                        </SelectTrigger>
-                        <SelectContent className="w-[300px]">
-                            <SelectGroup>
-                                <SelectLabel>Cliente</SelectLabel>
-                                {clientes.map((cliente) => (
-                                    <SelectItem key={cliente.id} value={cliente.id.toString()}>
-                                        {cliente.cliente}
-                                    </SelectItem>
-                                ))}
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
+  const navigate = useNavigate();
 
-                    <label>Insira o nome da proposta</label>
-                    <Input 
-                        type="text"
-                        name="nome da proposta"
-                        placeholder="digite aqui"
-                        value={novaProposta.nomeDaProposta}
-                        onChange={(event) => 
-                            setNovaProposta({
-                                ...novaProposta,
-                            nomeDaProposta: event.target.value,
-                            })
-                        }
-                        />
-                    
-                    <label>Adicione uma descrição</label>
-                    <Input
-                    type="text"
-                    name="descrição"
-                    placeholder="digite aqui"
-                    value={novaProposta.descricao}
-                    onChange={(event) => 
-                        setNovaProposta({
-                            ...novaProposta,
-                            descricao: event.target.value
-                        })
-                    }
-                    />
+  return (
+    <>
+      <div className="h-full p-5">
+        <form onSubmit={criarProposta} className="flex flex-col gap-3">
+          <div className="flex gap-3 items-center">
+            <CirclePlusIcon className="size-8" />
+            <h1 className="text-2xl font-bold">Criar nova Proposta</h1>
+          </div>
 
-                    <label>Adicionar Anexo</label>
-                    <Input
-                        type="file"
-                        multiple
-                        onChange={(event) => {
-                            const files = event.target.files;
-                            if (!files) return;
-                            const filesArray = Array.from(files)
-                            setNovaProposta({
-                                ...novaProposta,
-                                files: filesArray  
-                            })
-                        }}
-                    />
-                    <Button
-                        type="submit"
-                        variant="default"
-                        className="cursor-pointer"
-                    >
-                        Criar
-                    </Button>
-                </form>
-            </div>
-        </>
-    )
+          <Label>Selecione o Cliente</Label>
+          <Select
+            value={clienteSelecionado.idCliente}
+            onValueChange={(value) => {
+              setClienteSelecionado({
+                ...clienteSelecionado,
+                idCliente: value.toString(),
+              });
+            }}
+          >
+            <SelectTrigger className="w-[300px]">
+              <SelectValue placeholder="Selecionar cliente" />
+            </SelectTrigger>
+            <SelectContent className="w-[300px]">
+              <SelectGroup>
+                <SelectLabel>Cliente</SelectLabel>
+                {clientes.map((cliente) => (
+                  <SelectItem key={cliente.id} value={cliente.id.toString()}>
+                    {cliente.cliente}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+
+          <Label>Insira o nome da proposta</Label>
+          <Input
+            type="text"
+            name="nome da proposta"
+            placeholder="digite aqui"
+            value={novaProposta.nomeDaProposta}
+            onChange={(event) =>
+              setNovaProposta({
+                ...novaProposta,
+                nomeDaProposta: event.target.value,
+              })
+            }
+          />
+
+          <Label>Adicione uma descrição</Label>
+          <Input
+            type="text"
+            name="descrição"
+            placeholder="digite aqui"
+            value={novaProposta.descricao}
+            onChange={(event) =>
+              setNovaProposta({
+                ...novaProposta,
+                descricao: event.target.value,
+              })
+            }
+          />
+
+          <Label>Adicionar Anexo</Label>
+          <Input
+            type="file"
+            multiple
+            onChange={(event) => {
+              const files = event.target.files;
+              if (!files) return;
+              const filesArray = Array.from(files);
+              setNovaProposta({
+                ...novaProposta,
+                files: filesArray,
+              });
+            }}
+          />
+          <div className="flex gap-3 ">
+            <Button
+              type="button"
+              variant="destructive"
+              className="cursor-pointer"
+              onClick={() => navigate(-1)}
+            >
+              Retornar
+            </Button>
+
+            <Button type="submit" variant="default" className="cursor-pointer">
+              <CircleCheck />
+              Criar
+            </Button>
+          </div>
+        </form>
+      </div>
+    </>
+  );
 }
