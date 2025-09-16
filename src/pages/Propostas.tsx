@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { formatToBRL } from 'brazilian-values';
 import {
   Table,
   TableBody,
@@ -7,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CircleCheck, CirclePlus, Eye } from "lucide-react";
+import { CirclePlus, Eye } from "lucide-react";
 //import { table } from "console";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +19,7 @@ interface Propostas {
   id: number;
   nomeDaProposta: string;
   descricao: string;
+  valorProposta: string;
   createdAt: string;
   cliente: {
     cliente: string;
@@ -88,7 +90,7 @@ export default function VerPropostas() {
                     .reverse()
                     .join("/")}
                 </TableCell>
-                <TableCell>R$ 50,00</TableCell>
+                <TableCell>{ formatToBRL(parseInt(proposta.valorProposta))}</TableCell>
                 <TableCell className="cursor-pointer">
                   <Eye />
                 </TableCell>

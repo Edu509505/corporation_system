@@ -32,16 +32,16 @@ function Versionamento() {
   useEffect(() => {
     async function fetchProposta() {
       try {
-        const response = await fetch(`${url}/propostas/${id}/versao`);
+        const response = await fetch(`${url}/proposta/${id}`);
         if (!response.ok) throw new Error("Proposta não encontrada");
         const data = await response.json();
         setProposta({
           nomeDaProposta: data.nomeDaProposta || "",
           descricao: data.descricao || "",
           createdAt: data.createdAt || "",
-          cliente: { cliente: data.cliente || "" },
+          cliente: { cliente: data.cliente || "" }
         });
-      } catch (err) {}
+      } catch (err) { }
     }
 
     if (id) fetchProposta();
@@ -51,11 +51,17 @@ function Versionamento() {
   }, [id]);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col gap-3 p-5">
       <div className="flex">
         <section>
           <h1 className="font-bold text-2xl">Versionamento de Proposta</h1>
-          {proposta.nomeDaProposta}
+          <h1>Nome da Proposta: {proposta.nomeDaProposta}</h1>
+          <h1>Data: {proposta.createdAt
+            .split("T")[0]
+            .split("-")
+            .reverse()
+            .join("/")}
+          </h1>
         </section>
         <section>
           <iframe></iframe>

@@ -20,6 +20,7 @@ const url = import.meta.env.VITE_API_URL;
 interface formularioComImagem {
   nomeDaProposta: string;
   descricao: string;
+  valorProposta: string;
   files: FileList | File[] | null;
 }
 
@@ -42,8 +43,11 @@ export default function CriarProposta() {
   const [novaProposta, setNovaProposta] = useState<formularioComImagem>({
     nomeDaProposta: "",
     descricao: "",
+    valorProposta: "",
     files: null,
   });
+
+  console.log(novaProposta.valorProposta)
 
   async function criarProposta(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,6 +64,7 @@ export default function CriarProposta() {
     form.set("idCliente", clienteSelecionado.idCliente);
     form.set("nomeDaProposta", novaProposta.nomeDaProposta);
     form.set("descricao", novaProposta.descricao);
+    form.set("valorProposta", novaProposta.valorProposta)
 
     // Este código itera sobre todos os arquivos selecionados no input
     // e adiciona cada um individualmente ao FormData com a chave 'files'
@@ -141,6 +146,20 @@ export default function CriarProposta() {
               setNovaProposta({
                 ...novaProposta,
                 descricao: event.target.value,
+              })
+            }
+          />
+
+          <Label>Qual o valor da proposta?</Label>
+          <Input
+            type="text"
+            name="valor da proposta"
+            placeholder="R$ -"
+            value={novaProposta.valorProposta ?? ''}
+            onChange={(event) =>
+              setNovaProposta({
+                ...novaProposta,
+                valorProposta: (event.target.value)
               })
             }
           />
