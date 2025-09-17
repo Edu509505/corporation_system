@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Cliente } from "@/Tipagens";
-import { formatToBRL } from "brazilian-values";
+//import { formatToBRL } from "brazilian-values";
 import { CircleCheck, CirclePlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";

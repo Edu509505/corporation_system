@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { cnpj } from "cpf-cnpj-validator";
 import { CircleArrowLeftIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -109,7 +109,14 @@ function Versionamento() {
     <div className="h-full flex flex-col gap-3 p-5">
       <div className="flex">
         <section>
-          <Button variant="ghost" onClick={() => (navigate(-1))}><CircleArrowLeftIcon />Retornar</Button>
+          <Link to="/propostas">
+            <Button variant="ghost"
+              //onClick={() => (navigate(-1))}
+            >
+              <CircleArrowLeftIcon />Retornar
+            </Button>
+
+          </Link>
           <h1 className="font-bold text-2xl">Versionamento de Proposta</h1>
           <h1>Nome da Proposta: {proposta.nomeDaProposta}</h1>
           <h1>Data: {proposta.createdAt
@@ -149,7 +156,7 @@ function Versionamento() {
                     .split("-")
                     .reverse()
                     .join("/")
-                    }
+                  }
                 </TableCell>
               </TableRow>
             ))}

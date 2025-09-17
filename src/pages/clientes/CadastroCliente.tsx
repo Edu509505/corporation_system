@@ -1,36 +1,46 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  CircleAlert,
-  CircleArrowLeftIcon,
-  CircleCheck,
-  CircleFadingPlusIcon,
-  CircleX,
-} from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { cnpj } from "cpf-cnpj-validator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectGroup,
-  SelectLabel,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+// import {
+//   AlertDialog,
+//   AlertDialogAction,
+//   AlertDialogContent,
+//   AlertDialogDescription,
+//   AlertDialogFooter,
+//   AlertDialogHeader,
+//   AlertDialogTitle,
+//   AlertDialogTrigger,
+// } from "@/components/ui/alert-dialog";
+// import { Button } from "@/components/ui/button";
+// import { Input } from "@/components/ui/input";
+// import {
+//   CircleAlert,
+//   CircleArrowLeftIcon,
+//   CircleCheck,
+//   CircleFadingPlusIcon,
+//   CircleX,
+// } from "lucide-react";
+// import { useState } from "react";
+// import { Form, useNavigate } from "react-router-dom";
+// import { cnpj } from "cpf-cnpj-validator";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+//   SelectGroup,
+//   SelectLabel,
+// } from "@/components/ui/select";
+// import { Label } from "@/components/ui/label";
+// import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Form, useForm, type FieldValue } from "react-hook-form";
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { TypeOf } from "zod/v3";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 interface Cliente {
   cliente: string;
   cnpj: string;
@@ -43,61 +53,93 @@ const url = import.meta.env.VITE_API_URL;
 //Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática
 
 export default function CriarCliente() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const [novoCliente, setNovoCliente] = useState<Cliente>({
-    cliente: "",
-    cnpj: "",
-    local: "",
-    status: "",
-    file: null,
-  });
+  // const [novoCliente, setNovoCliente] = useState<Cliente>({
+  //   cliente: "",
+  //   cnpj: "",
+  //   local: "",
+  //   status: "",
+  //   file: null,
+  // });
 
-  const [resonseOk, setResponseOk] = useState(true);
+  // const [resonseOk, setResponseOk] = useState(true);
 
-  async function criarCliente(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  // async function criarCliente(event: React.FormEvent<HTMLFormElement>) {
+  //   event.preventDefault();
 
-    if (
-      novoCliente.cliente.length < 3 ||
-      !cnpj.isValid(novoCliente.cnpj) ||
-      novoCliente.local.length < 3 ||
-      novoCliente.status === ""
-    )
-      return;
-    try {
-      const response = await fetch(`${url}/clientes`, {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({
-          cliente: novoCliente.cliente,
-          cnpj: cnpj.strip(novoCliente.cnpj),
-          local: novoCliente.local,
-          status: novoCliente.status,
-        })
-      });
+  //   if (
+  //     novoCliente.cliente.length < 3 ||
+  //     !cnpj.isValid(novoCliente.cnpj) ||
+  //     novoCliente.local.length < 3 ||
+  //     novoCliente.status === ""
+  //   )
+  //     return;
+  //   try {
+  //     const response = await fetch(`${url}/clientes`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         cliente: novoCliente.cliente,
+  //         cnpj: cnpj.strip(novoCliente.cnpj),
+  //         local: novoCliente.local,
+  //         status: novoCliente.status,
+  //       })
+  //     });
 
-      if (!response.ok) {
-        // Aqui você lida com o erro de forma clara
-        setResponseOk(false);
-        const errorText = await response.text();
-        throw new Error(`Erro ${response.status}: ${errorText}`);
-      }
+  //     if (!response.ok) {
+  //       // Aqui você lida com o erro de forma clara
+  //       setResponseOk(false);
+  //       const errorText = await response.text();
+  //       throw new Error(`Erro ${response.status}: ${errorText}`);
+  //     }
 
-      const body = await response.json();
-      setResponseOk(true);
-      console.log("Cliente criado com sucesso:", body);
-    } catch (error) {
-      console.error("Falha ao criar cliente:", error);
-      setResponseOk(false);
-    }
-  }
+  //     const body = await response.json();
+  //     setResponseOk(true);
+  //     console.log("Cliente criado com sucesso:", body);
+  //   } catch (error) {
+  //     console.error("Falha ao criar cliente:", error);
+  //     setResponseOk(false);
+  //   }
+  // }
 
+  const { register, handleSubmit } = useForm<Cliente>();
+  const [data, setData] = useState("");
+  
   return (
+    
     <div className="w-full h-screen flex flex-col bg-gray-50">
-      <form onSubmit={criarCliente} className="flex gap-3 flex-col p-5">
+
+      <form onSubmit={handleSubmit((data) => setData(JSON.stringify(data)))}>
+        <Input {...register("cliente")} placeholder="Cliente" />
+        <Input {...register("cnpj")} placeholder="Cliente" />
+        <Input {...register("local")} placeholder="Cliente" />
+        {/* <Select {...register("status", { required: true })}>
+          <SelectTrigger className="bg-white cursor-pointer w-48">
+            <SelectValue placeholder="Selecione o Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Localidade</SelectLabel>
+              <SelectItem className="cursor-pointer" value="Ativo">
+                Ativo
+              </SelectItem>
+              <SelectItem className="cursor-pointer" value="Pendente">
+                Pendente
+              </SelectItem>
+              <SelectItem className="cursor-pointer" value="Inativo">
+                Inativo
+              </SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select> */}
+        <Button className="cursor-pointer">Enviar</Button>
+        <p>{data}</p>
+      </form>
+
+      {/* <form onSubmit={criarCliente} className="flex gap-3 flex-col p-5">
         <div className="flex gap-3 items-center">
           <CircleFadingPlusIcon className="size-10" />
           <h1 className="text-2xl font-bold">Cadastrar novo Cliente</h1>
@@ -281,19 +323,7 @@ export default function CriarCliente() {
             </AlertDialogContent>
           </AlertDialog>
         </div>
-        {/* <div>
-            <input type='file' className="bg-white cursor-pointer" onChange={((event) => {
-              const files = event.target.files;
-              if(!files) return;
-              const filesArray = Array.from(files);
-              const file = filesArray[0];
-              setNovoCliente({
-                ...novoCliente,
-                file
-              })
-            })} />
-          </div> */}
-      </form>
+      </form> */}
     </div>
   );
 }
