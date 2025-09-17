@@ -11,9 +11,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Cliente } from "@/Tipagens";
+import { formatToBRL } from "brazilian-values";
 import { CircleCheck, CirclePlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Route, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const url = import.meta.env.VITE_API_URL;
 
