@@ -35,7 +35,7 @@
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Form, useForm, type FieldValue } from "react-hook-form";
-import { z } from "zod"
+import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { TypeOf } from "zod/v3";
 import { Button } from "@/components/ui/button";
@@ -107,15 +107,25 @@ export default function CriarCliente() {
 
   const { register, handleSubmit } = useForm<Cliente>();
   const [data, setData] = useState("");
-  
+  const status = z.literal(["Ativo", "Inativo", "Pendente"]);
+
+ //console.log("verificação: ", status.parse('Sai lá'))
+
+  //console.log(data)
+
   return (
-    
+
     <div className="w-full h-screen flex flex-col bg-gray-50">
 
       <form onSubmit={handleSubmit((data) => setData(JSON.stringify(data)))}>
         <Input {...register("cliente")} placeholder="Cliente" />
         <Input {...register("cnpj")} placeholder="Cliente" />
         <Input {...register("local")} placeholder="Cliente" />
+        <select {...register("status", { required: true })}>
+          <option value="Ativo">Ativo</option>
+          <option value="Pendente">Pendente</option>
+          <option value="Inativo">Inativo</option>
+        </select>
         {/* <Select {...register("status", { required: true })}>
           <SelectTrigger className="bg-white cursor-pointer w-48">
             <SelectValue placeholder="Selecione o Status" />
