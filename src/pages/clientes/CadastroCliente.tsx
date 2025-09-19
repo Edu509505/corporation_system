@@ -19,7 +19,7 @@
 // } from "lucide-react";
 // import { useState } from "react";
 // import { Form, useNavigate } from "react-router-dom";
-// import { cnpj } from "cpf-cnpj-validator";
+import { cnpj } from "cpf-cnpj-validator";
 // import {
 //   Select,
 //   SelectContent,
@@ -52,6 +52,15 @@ interface Cliente {
 const url = import.meta.env.VITE_API_URL;
 //Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática
 
+ const criarClienteSchema = z.object({
+    cliente: z.string().min(3, 'Escreva um nome válido').nonempty('Campo Obrigatório'),
+    cnpj: z.string().min(18, 'Escreva um cnpj válido').refine((val) => cnpj.isValid(val), 'Cnpj Inválido').nonempty('Campo Obrigatório'),
+    local: z.string().min(3, 'Escreva um nome válido').nonempty('Campo Obrigatório'),
+    status: z.string().nonempty('Campo Obrigatório')
+  })
+
+  type CriarClienteFromData = z.infer<typeof criarClienteSchema>
+
 export default function CriarCliente() {
   // const navigate = useNavigate();
 
@@ -63,51 +72,44 @@ export default function CriarCliente() {
   //   file: null,
   // });
 
-  // const [resonseOk, setResponseOk] = useState(true);
+  const [resonseOk, setResponseOk] = useState(true);
 
-  // async function criarCliente(event: React.FormEvent<HTMLFormElement>) {
-  //   event.preventDefault();
+  async function criarCliente(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    console.log('parei aqui')
+    try {
+      const response = await fetch(`${url}/clientes`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(data)
+      });
 
-  //   if (
-  //     novoCliente.cliente.length < 3 ||
-  //     !cnpj.isValid(novoCliente.cnpj) ||
-  //     novoCliente.local.length < 3 ||
-  //     novoCliente.status === ""
-  //   )
-  //     return;
-  //   try {
-  //     const response = await fetch(`${url}/clientes`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         cliente: novoCliente.cliente,
-  //         cnpj: cnpj.strip(novoCliente.cnpj),
-  //         local: novoCliente.local,
-  //         status: novoCliente.status,
-  //       })
-  //     });
+      if (!response.ok) {
+        // Aqui você lida com o erro de forma clara
+        setResponseOk(false);
+        const errorText = await response.text();
+        throw new Error(`Erro ${response.status}: ${errorText}`);
+      }
 
-  //     if (!response.ok) {
-  //       // Aqui você lida com o erro de forma clara
-  //       setResponseOk(false);
-  //       const errorText = await response.text();
-  //       throw new Error(`Erro ${response.status}: ${errorText}`);
-  //     }
+      const body = await response.json();
+      setResponseOk(true);
+      console.log("Cliente criado com sucesso:", body);
+    } catch (error) {
+      console.error("Falha ao criar cliente:", error);
+      setResponseOk(false);
+    }
+  }
 
-  //     const body = await response.json();
-  //     setResponseOk(true);
-  //     console.log("Cliente criado com sucesso:", body);
-  //   } catch (error) {
-  //     console.error("Falha ao criar cliente:", error);
-  //     setResponseOk(false);
-  //   }
-  // }
+ 
 
-  const { register, handleSubmit } = useForm<Cliente>();
+  const { register, handleSubmit, formState: { errors } } = useForm<CriarClienteFromData>({
+    resolver: zodResolver(criarClienteSchema)
+  });
   const [data, setData] = useState("");
-  const status = z.literal(["Ativo", "Inativo", "Pendente"]);
+
+  console.log(data)
 
  //console.log("verificação: ", status.parse('Sai lá'))
 
@@ -119,8 +121,12 @@ export default function CriarCliente() {
 
       <form onSubmit={handleSubmit((data) => setData(JSON.stringify(data)))}>
         <Input {...register("cliente")} placeholder="Cliente" />
-        <Input {...register("cnpj")} placeholder="Cliente" />
+        {errors.cliente && <h1>{errors.cliente.message}</h1>}
+        
+        <Input {...register("cnpj")} placeholder="cnpj" />
+        {errors.cnpj && <h1>{errors.cnpj.message}</h1>}
         <Input {...register("local")} placeholder="Cliente" />
+        {errors.local && <h1>{errors.local.message}</h1>}
         <select {...register("status", { required: true })}>
           <option value="Ativo">Ativo</option>
           <option value="Pendente">Pendente</option>
