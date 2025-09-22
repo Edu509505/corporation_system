@@ -3,11 +3,12 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { CircleArrowLeftIcon } from "lucide-react";
+import { Cigarette, CircleArrowLeftIcon, CircleCheckBig, CircleX, Divide, Paperclip, TimerIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { cnpj } from "cpf-cnpj-validator";
@@ -89,7 +90,7 @@ function Versionamento() {
           createdAt: data.createdAt || "",
           cliente: { cliente: data.cliente || "" },
         });
-      } catch (err) {}
+      } catch (err) { }
     }
 
     async function fetchCliente() {
@@ -139,13 +140,12 @@ function Versionamento() {
   // console.log("versionamento", versionamento);
   console.log("Anexo Versionamento: ", anexoVersionamento);
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex">
+    <div className="h-full flex flex-col p-3">
+      <div className="flex items-start justify-between gap-4">
         <section>
           <Link to="/propostas">
             <Button
               variant="ghost"
-              //onClick={() => (navigate(-1))}
             >
               <CircleArrowLeftIcon />
               Retornar
@@ -160,21 +160,19 @@ function Versionamento() {
           <h1>Cliente: {cliente.cliente}</h1>
           <h1>CNPJ: {cnpj.format(cliente.cnpj)}</h1>
         </section>
-        <section className=" flex gap-4">
-          {anexoVersionamento.length > 0 ? (
-            anexoVersionamento.map((anexo, idx) => (
-              <iframe
-                key={idx}
-                src={anexo.url}
-                width="400"
-                height="600"
-                title={`Anexo PDF ${idx + 1}`}
-                className="border-3 border-gray-300"
-              ></iframe>
-            ))
-          ) : (
-            <span>Nenhum PDF encontrado.</span>
-          )}
+        <section className="flex flex-col gap-4">
+          <div className="border-2 border-gray-400 rounded-2xl p-2 w-2xs">
+            <h1 className="font-bold text-2xl flex items-center justify-start gap-3">Items anexados <Paperclip /></h1>
+            {anexoVersionamento.length > 0 ? (
+              anexoVersionamento.map((anexo, idx) => (
+                <a key={idx} href={anexo.url} className=" bg-gray-500 cursor-pointer">
+                  <h1>{idx + 1} Arquivo anexado</h1>
+                </a>
+              ))
+            ) : (
+              <span>Nenhum PDF encontrado.</span>
+            )}
+          </div>
         </section>
       </div>
       <div className="h-[800px] border-t-1 border-gray-500">
@@ -184,6 +182,7 @@ function Versionamento() {
               <TableHead>Versão</TableHead>
               <TableHead>Data</TableHead>
               <TableHead>Status</TableHead>
+              {/* <TableHead>Ações</TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -192,7 +191,6 @@ function Versionamento() {
                 <TableCell className="font-bold">
                   {itemVersionamento.versao}
                 </TableCell>
-                <TableCell>{itemVersionamento.status}</TableCell>
                 <TableCell>
                   {itemVersionamento.createdAt
                     .split("T")[0]
@@ -200,9 +198,61 @@ function Versionamento() {
                     .reverse()
                     .join("/")}
                 </TableCell>
+                <TableCell>{
+                  itemVersionamento.status === 'EM_ANALISE' ?
+                    <>
+                      <div className="flex items-center justify-center gap-3 text-chart-1 bg-amber-50 rounded-2xl">
+                        <TimerIcon />Em Análise
+                      </div>
+                    </>
+                    : itemVersionamento.status ==="REPROVADA" ? 
+                    <>
+                      <div className="flex items-center justify-center gap-3 text-destructive bg-red-100 rounded-2xl">
+                        <TimerIcon />Em Análise
+                      </div>
+                    </>
+                    : itemVersionamento.status ==="APROVADA"?
+                    <>
+                      <div className="flex items-center justify-center gap-3 text-ring bg-green-100 rounded-2xl">
+                        <TimerIcon />Em Análise
+                      </div>
+                    </>
+                    :''
+                  }
+                </TableCell>
+                {/* <TableCell className="flex gap-3">
+                  <div className="flex flex-col items-center text-[0.8rem] text-destructive rounded-2xl p-2 bg-red-100">
+                  <CircleX className="size-5"/>
+                  Reprovada
+                  </div>
+                  <div className="flex flex-col items-center text-[0.8rem] text-ring rounded-2xl p-2 bg-green-100">
+                  <CircleCheckBig className="size-5"/>
+                  Aprovada
+                  </div>
+
+                </TableCell> */}
               </TableRow>
             ))}
           </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={3}>
+                <div className="flex items-center justify-between">
+                  Ações
+                  <div className="flex gap-3">
+                    <div className="flex gap-2 items-center text-[0.8rem] text-destructive rounded-2xl p-2 cursor-pointer bg-red-200 ">
+                      <CircleX className="size-5" />
+                      Reprovada
+                    </div>
+                    <div className="flex gap-2 items-center text-[0.8rem] text-ring rounded-2xl p-2 cursor-pointer bg-green-200">
+                      <CircleCheckBig className="size-5" />
+                      Aprovada
+                    </div>
+                  </div>
+                </div>
+              </TableCell>
+            </TableRow>
+          </TableFooter>
         </Table>
       </div>
     </div>
