@@ -10,6 +10,31 @@ export type Payment = {
     valor: number
 }
 
+
+export type Propostas = {
+    nomeDaProposta: string;
+    descricao: string;
+    createdAt: string;
+    cliente:{
+        cliente: string;
+    };
+}
+
+export type Cliente = {
+    cliente: string;
+    cnpj: string;
+    local: string;
+    status: string;
+    file: File | null;
+}
+export type Versionamento = {
+  id: number;
+  versao: number;
+  idProposta: number;
+  status: string;
+  createdAt: string;
+}
+
 export const columns: ColumnDef<Payment>[] = [
     {
         accessorKey: 'id',
@@ -62,4 +87,38 @@ export const columns: ColumnDef<Payment>[] = [
             return <div className="text-right font-medium">{formatted}</div>
         }
     },
+]
+
+export const colunaVersionamento: ColumnDef<Versionamento>[] =[
+    {
+        accessorKey: 'versao',
+        header: 'Versão',
+    },
+    {
+        accessorKey: 'status',
+        header: () => <div className="text-center">Situação</div>,
+        cell: ({ row }) => {
+
+            let modos = null
+            let color = ''
+
+            if(row.getValue('status') === 'APROVADO'){
+                modos = <CircleCheck className="text-ring" />
+                color = 'text-ring'
+            }if (row.getValue('status') === 'EM_ANALISE'){
+                modos = <CircleAlertIcon className="text-chart-1" />
+                color = 'text-chart-1'
+            }if(row.getValue('status') === 'REPROVADO'){
+                modos = <CircleX className="text-destructive" />
+                color='text-destructive'
+            }else{''} 
+
+            return <div className="flex flex-col items-center justify-center">{modos}<h5 className={color}>{row.getValue('status')}</h5></div>
+        }
+    },
+    {
+        accessorKey: 'createdAt',
+        header: 'Data',
+        cell: ({row}) => {row.getValue.toString().split("T")[0].split("-").reverse().join("/")}
+    }
 ]
