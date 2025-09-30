@@ -10,7 +10,7 @@ import {
   TimerIcon,
   Trash2,
 } from "lucide-react";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { cnpj } from "cpf-cnpj-validator";
 
@@ -47,6 +47,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
 import { Label } from "@/components/ui/label";
+//import { Label } from "@/components/ui/label";
 //import { no } from "zod/v4/locales";
 
 const url = import.meta.env.VITE_API_URL;
@@ -173,7 +174,7 @@ function Versionamento() {
           createdAt: data.createdAt || "",
           cliente: { cliente: data.cliente || "" },
         });
-      } catch (err) {}
+      } catch (err) { }
     }
 
     async function fetchCliente() {
@@ -413,7 +414,7 @@ function Versionamento() {
                               <AlertDialogContent>
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>
-                                    Deseja recusar a proposta?
+                                    A proposta foi recusada?
                                   </AlertDialogTitle>
                                   <AlertDialogDescription>
                                     DEPOIS EU PENSO NO QUE ESCREVER
@@ -452,7 +453,7 @@ function Versionamento() {
                               <AlertDialogContent>
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>
-                                    Deseja aprovar a Proposta?
+                                    A proposta foi aprovada?
                                   </AlertDialogTitle>
                                   <AlertDialogDescription>
                                     Uma vez que aprovada a ação não poderá ser
@@ -495,11 +496,15 @@ function Versionamento() {
                                         <div className="grid gap-4">
                                           <div className="flex gap-3 items-center border-1 border-gray-500 rounded-2xl p-3">
                                             <div className="space-y-4">
+                                              <div className="flex">
+                                              </div>
                                               {itens.map((item, index) => (
                                                 <div
                                                   key={index}
-                                                  className="flex items-center gap-4"
+                                                  className="flex items-end gap-4"
                                                 >
+                                                  <div className="flex flex-col gap-3">
+                                                  <Label>Nome</Label>
                                                   <Input
                                                     placeholder="Nome"
                                                     value={item.descricao}
@@ -511,6 +516,9 @@ function Versionamento() {
                                                       )
                                                     }
                                                   />
+                                                  </div>
+                                                  <div className="flex flex-col gap-3">
+                                                  <Label>Tipo de unidade</Label>
                                                   <Input
                                                     placeholder="Unidade"
                                                     value={item.unidade}
@@ -522,6 +530,9 @@ function Versionamento() {
                                                       )
                                                     }
                                                   />
+                                                  </div>
+                                                  <div className="flex flex-col gap-3">
+                                                  <Label>Quantidade</Label>
                                                   <Input
                                                     type="number"
                                                     placeholder="Quantidade"
@@ -536,6 +547,9 @@ function Versionamento() {
                                                       )
                                                     }
                                                   />
+                                                  </div>
+                                                  <div  className="flex flex-col gap-3">
+                                                  <Label>Valor</Label>
                                                   <Input
                                                     placeholder="Valor Unitário"
                                                     value={item.valorUnitario}
@@ -547,9 +561,11 @@ function Versionamento() {
                                                       )
                                                     }
                                                   />
+                                                  </div>
                                                   <Button
                                                     variant="ghost"
                                                     size="icon"
+                                                    className="cursor-pointer"
                                                     onClick={() =>
                                                       removerItem(index)
                                                     }
@@ -559,24 +575,13 @@ function Versionamento() {
                                                 </div>
                                               ))}
 
-                                              <Button onClick={adicionarItem}>
-                                                Adicionar
+                                              <Button variant="outline" className="cursor-pointer" onClick={adicionarItem}>
+                                                <CirclePlus /> Adicionar
                                               </Button>
                                             </div>
                                           </div>
                                         </div>
-                                        <Button
-                                          variant="outline"
-                                          className="cursor-pointer"
-                                        >
-                                          Adicionar Item
-                                        </Button>
                                         <DialogFooter>
-                                          <DialogClose asChild>
-                                            <Button variant="outline">
-                                              Cancel
-                                            </Button>
-                                          </DialogClose>
                                           <Button type="submit">
                                             Save changes
                                           </Button>
