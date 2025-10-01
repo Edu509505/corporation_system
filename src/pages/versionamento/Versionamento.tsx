@@ -57,6 +57,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -91,37 +92,39 @@ interface formularioComImagem {
 function Versionamento() {
   const { id } = useParams<{ id: string }>();
 
-  const [proposta, setProposta] = useState<Propostas>({
-    nomeDaProposta: "",
-    descricao: "",
-    createdAt: "",
-    cliente: { cliente: "" },
-  });
+  // const [proposta, setProposta] = useState<Propostas>({
+  //   nomeDaProposta: "",
+  //   descricao: "",
+  //   createdAt: "",
+  //   cliente: { cliente: "" },
+  // });
 
-  const [cliente, setCliente] = useState<Cliente>({
-    cliente: "",
-    cnpj: "",
-    local: "",
-    status: "",
-    file: null,
-  });
+  // const [cliente, setCliente] = useState<Cliente>({
+  //   cliente: "",
+  //   cnpj: "",
+  //   local: "",
+  //   status: "",
+  //   file: null,
+  // });
 
-  const [versionamento, setVersionamento] = useState<Versionamento[]>([
-    {
-      id: 0,
-      versao: 0,
-      idProposta: 0,
-      status: "",
-      createdAt: "",
-      anexos: "",
-    },
-  ]);
+  // const [versionamento, setVersionamento] = useState<Versionamento[]>([
+  //   {
+  //     id: 0,
+  //     versao: 0,
+  //     idProposta: 0,
+  //     status: "",
+  //     createdAt: "",
+  //     anexos: "",
+  //   },
+  // ]);
   const [idVersionamento, setIdVersionamento] = useState<number | null>(null);
   const [anexoVersionamento, setAnexoVersionamento] = useState<
     { url: string }[]
   >([]);
 
+
   //ATUALIZA O STATUS DO VERSINAMENTO E JOGA PARA O BANCO
+
   const [atualizarStatusVersionamento, setAtualiarStatusVersionamento] =
     useState<string | null>(null);
   useEffect(() => {
@@ -161,49 +164,83 @@ function Versionamento() {
       fetchAnexoVersionamento();
     }
   }, [idVersionamento]);
-
-  useEffect(() => {
-    async function fetchProposta() {
-      try {
+  
+  const { isPending: propostaLoading, error: propostaError, data: proposta } = useQuery({
+    queryKey: ['proposta', id],
+    queryFn: async () => {
         const response = await fetch(`${url}/proposta/${id}`);
         if (!response.ok) throw new Error("Proposta não encontrada");
         const data = await response.json();
-        setProposta({
-          nomeDaProposta: data.nomeDaProposta || "",
-          descricao: data.descricao || "",
-          createdAt: data.createdAt || "",
-          cliente: { cliente: data.cliente || "" },
-        });
-      } catch (err) {}
-    }
+        return data as Propostas
+    } 
+  });
 
-    async function fetchCliente() {
-      const response = await fetch(`${url}/cliente/${id}`);
+   const { isPending: clienteLoading, error: clienteError, data: cliente } = useQuery({
+      queryKey: [ 'cliente', id ],
+      queryFn: async () => {
+        const response = await fetch(`${url}/cliente/${id}`);
       if (!response.ok) throw new Error("Cliente não encontrado");
       const data = await response.json();
-
-      setCliente({
-        cliente: data.cliente,
-        cnpj: data.cnpj,
-        local: data.local,
-        status: data.status,
-        file: null,
-      });
+      return data as Cliente;
     }
+   })
 
-    async function fetchVersionamento() {
-      const response = await fetch(`${url}/proposta/${id}/versionamentos`);
+   const { isPending: versionamentoLoading, error: versionamentoError, data: versionamentos, refetch: refetchVersionamentos } = useQuery({
+      queryKey: [ 'versionamento', id ],
+      queryFn: async () => {
+        const response = await fetch(`${url}/proposta/${id}/versionamentos`);
       if (!response.ok) throw new Error("Versionamento Não encontrado");
       const data = await response.json();
+      return data as Versionamento[];
+      }
+   })
 
-      setVersionamento(data);
+   const { mutateAsync: updateVersionamento } = useMutation({
+    mutationKey: [ 'updateVersionamento' ],
+    mutationFn: async ({id, status }: {id: number, status: string}) => {
+      const response = await fetch(`${url}/versionamento/${id}`, {
+        method: "PUT", // ou PATCH, dependendo da sua API
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: status,
+        }),
+      });
+      if (!response.ok) throw new Error("Versionamento não encontrado");
     }
+   })
 
-    if (id) fetchProposta(), fetchCliente(), fetchVersionamento();
-    else {
-      console.log("Deu erro aqui");
-    }
-  }, [id]);
+
+  // useEffect(() => {
+
+  //   async function fetchCliente() {
+  //     const response = await fetch(`${url}/cliente/${id}`);
+  //     if (!response.ok) throw new Error("Cliente não encontrado");
+  //     const data = await response.json();
+
+  //     setCliente({
+  //       cliente: data.cliente,
+  //       cnpj: data.cnpj,
+  //       local: data.local,
+  //       status: data.status,
+  //       file: null,
+  //     });
+  //   }
+
+  //   async function fetchVersionamento() {
+  //     const response = await fetch(`${url}/proposta/${id}/versionamentos`);
+  //     if (!response.ok) throw new Error("Versionamento Não encontrado");
+  //     const data = await response.json();
+
+  //     setVersionamento(data);
+  //   }
+
+  //   if (id) fetchProposta(), fetchCliente(), fetchVersionamento();
+  //   else {
+  //     console.log("Deu erro aqui");
+  //   }
+  // }, [id]);
 
   const [novoVersionamento, setNovoVersionamento] =
     useState<formularioComImagem>({
@@ -270,13 +307,6 @@ function Versionamento() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       itens: [
-        {
-          nome: "",
-          unidade: "",
-          quantidadePrevista: "",
-          valor: "",
-          quantidade: 1,
-        },
       ],
     },
   });
@@ -284,6 +314,8 @@ function Versionamento() {
     control: form.control,
     name: "itens",
   });
+
+  console.log(form.formState.errors);
 
   const onSubmit = async (data: Quantitativas) => {
     console.log(data.itens);
@@ -306,7 +338,7 @@ function Versionamento() {
           Retornar
         </Button>
       </Link>
-      <div className="flex items-start justify-between gap-4">
+      {proposta && cliente && (<div className="flex items-start justify-between gap-4">
         <section>
           <h1 className="font-bold text-2xl">Versionamento de Proposta</h1>
           <h1>Nome da Proposta: {proposta.nomeDaProposta}</h1>
@@ -317,7 +349,7 @@ function Versionamento() {
           <h1>Cliente: {cliente.cliente}</h1>
           <h1>CNPJ: {cnpj.format(cliente.cnpj)}</h1>
         </section>
-      </div>
+      </div>)}
       <div className="h-max-[800px] border-1 border-gray-400 rounded-2xl">
         <Table className="h-[100%]">
           <TableHeader>
@@ -329,7 +361,7 @@ function Versionamento() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {versionamento.map((itemVersionamento) => (
+            {versionamentos?.map((itemVersionamento) => (
               <TableRow key={itemVersionamento.id}>
                 {/* <TableCell> {itemVersionamento.id} </TableCell> */}
                 <TableCell className="font-bold">
@@ -454,12 +486,14 @@ function Versionamento() {
                                   <DialogClose asChild>
                                     <AlertDialogAction
                                       className="cursor-pointer"
-                                      onClick={() => (
-                                        setAtualiarStatusVersionamento(
-                                          "REPROVADA"
-                                        ),
+                                      onClick={async () => {
+                                        await updateVersionamento({
+                                          id: itemVersionamento.id,
+                                          status: "REPROVADA"
+                                        })
                                         setOpenDialog(false)
-                                      )}
+                                        refetchVersionamentos()
+                                      }}
                                     >
                                       Continue
                                     </AlertDialogAction>
@@ -501,6 +535,7 @@ function Versionamento() {
                                       <Button
                                         variant="default"
                                         className="cursor-pointer"
+                                        //onSubmit={form.reset(onSubmit)}
                                       >
                                         Aprovar
                                       </Button>
