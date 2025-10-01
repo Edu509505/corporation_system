@@ -48,7 +48,7 @@ export default function CriarProposta() {
     files: null,
   });
 
-  console.log(novaProposta.valorProposta)
+  console.log(novaProposta.valorProposta);
 
   async function criarProposta(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -65,7 +65,7 @@ export default function CriarProposta() {
     form.set("idCliente", clienteSelecionado.idCliente);
     form.set("nomeDaProposta", novaProposta.nomeDaProposta);
     form.set("descricao", novaProposta.descricao);
-    form.set("valorProposta", novaProposta.valorProposta)
+    form.set("valorProposta", novaProposta.valorProposta);
 
     // Este código itera sobre todos os arquivos selecionados no input
     // e adiciona cada um individualmente ao FormData com a chave 'files'
@@ -156,11 +156,11 @@ export default function CriarProposta() {
             type="text"
             name="valor da proposta"
             placeholder="R$ -"
-            value={novaProposta.valorProposta ?? ''}
+            value={novaProposta.valorProposta ?? ""}
             onChange={(event) =>
               setNovaProposta({
                 ...novaProposta,
-                valorProposta: (event.target.value)
+                valorProposta: event.target.value,
               })
             }
           />

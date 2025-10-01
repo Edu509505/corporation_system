@@ -122,7 +122,6 @@ function Versionamento() {
     { url: string }[]
   >([]);
 
-
   //ATUALIZA O STATUS DO VERSINAMENTO E JOGA PARA O BANCO
 
   const [atualizarStatusVersionamento, setAtualiarStatusVersionamento] =
@@ -164,40 +163,68 @@ function Versionamento() {
       fetchAnexoVersionamento();
     }
   }, [idVersionamento]);
-  
-  const { isPending: propostaLoading, error: propostaError, data: proposta } = useQuery({
-    queryKey: ['proposta', id],
+
+  const {
+    isPending: propostaLoading,
+    error: propostaError,
+    data: proposta,
+  } = useQuery({
+    queryKey: ["proposta", id],
     queryFn: async () => {
-        const response = await fetch(`${url}/proposta/${id}`);
-        if (!response.ok) throw new Error("Proposta não encontrada");
-        const data = await response.json();
-        return data as Propostas
-    } 
+      const response = await fetch(`${url}/proposta/${id}`);
+      if (!response.ok) throw new Error("Proposta não encontrada");
+      const data = await response.json();
+      return data as Propostas;
+    },
   });
 
-   const { isPending: clienteLoading, error: clienteError, data: cliente } = useQuery({
-      queryKey: [ 'cliente', id ],
-      queryFn: async () => {
-        const response = await fetch(`${url}/cliente/${id}`);
+  const {
+    isPending: clienteLoading,
+    error: clienteError,
+    data: cliente,
+  } = useQuery({
+    queryKey: ["cliente", id],
+    queryFn: async () => {
+      const response = await fetch(`${url}/cliente/${id}`);
       if (!response.ok) throw new Error("Cliente não encontrado");
       const data = await response.json();
       return data as Cliente;
-    }
-   })
+    },
+  });
 
-   const { isPending: versionamentoLoading, error: versionamentoError, data: versionamentos, refetch: refetchVersionamentos } = useQuery({
-      queryKey: [ 'versionamento', id ],
-      queryFn: async () => {
-        const response = await fetch(`${url}/proposta/${id}/versionamentos`);
+  const {
+    isPending: versionamentoLoading,
+    error: versionamentoError,
+    data: versionamentos,
+    refetch: refetchVersionamentos,
+  } = useQuery({
+    queryKey: ["versionamento", id],
+    queryFn: async () => {
+      const response = await fetch(`${url}/proposta/${id}/versionamentos`);
       if (!response.ok) throw new Error("Versionamento Não encontrado");
       const data = await response.json();
       return data as Versionamento[];
-      }
-   })
+    },
+  });
 
-   const { mutateAsync: updateVersionamento } = useMutation({
-    mutationKey: [ 'updateVersionamento' ],
-    mutationFn: async ({id, status }: {id: number, status: string}) => {
+  const {
+    isPending: quantidadeLoading,
+    error: quantitativaError,
+    data: quantitativa,
+    refetch: refetchQuantitativa,
+  } = useQuery({
+    queryKey: ["quantitativa", idVersionamento],
+    queryFn: async () => {
+      const response = await fetch(`${url}/quantitativa/${idVersionamento}`);
+      if (!response.ok) throw new Error("Quantitativa Não encontrado");
+      const data = await response.json();
+      return data as Quantitativas;
+    },
+  });
+
+  const { mutateAsync: updateVersionamento } = useMutation({
+    mutationKey: ["updateVersionamento"],
+    mutationFn: async ({ id, status }: { id: number; status: string }) => {
       const response = await fetch(`${url}/versionamento/${id}`, {
         method: "PUT", // ou PATCH, dependendo da sua API
         headers: {
@@ -208,9 +235,8 @@ function Versionamento() {
         }),
       });
       if (!response.ok) throw new Error("Versionamento não encontrado");
-    }
-   })
-
+    },
+  });
 
   // useEffect(() => {
 
@@ -281,11 +307,10 @@ function Versionamento() {
 
   const itemSchema = z.object({
     idVersionamento: z.number(),
-    nome: z.string().min(2, "Nome obrigatório"),
-    unidade: z.string().min(1, "Unidade obrigatória"),
-    quantidadePrevista: z.string(),
-    valor: z.string(),
-    quantidade: z.number().min(1, "Quantidade obrigatória"),
+    descricao: z.string().min(2, "Nome obrigatório"),
+    unidadeDeMedida: z.string().min(1, "Unidade obrigatória"),
+    quantidade: z.string(),
+    valorUnitario: z.string(),
   });
 
   const formSchema = z.object({
@@ -295,19 +320,17 @@ function Versionamento() {
   type Quantitativas = {
     itens: {
       idVersionamento: number;
-      nome: string;
-      unidade: string;
-      quantidadePrevista: string;
-      valor: string;
-      quantidade: number;
+      descricao: string;
+      quantidade: string;
+      valorUnitario: string;
+      unidadeDeMedida: string;
     }[];
   };
 
   const form = useForm<Quantitativas>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      itens: [
-      ],
+      itens: [],
     },
   });
   const { fields, append, remove } = useFieldArray({
@@ -318,14 +341,15 @@ function Versionamento() {
   console.log(form.formState.errors);
 
   const onSubmit = async (data: Quantitativas) => {
-    console.log(data.itens);
+    console.log(data);
+
     try {
       const response = await fetch(`${url}/quantitativa`, {
         method: "POST",
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify(data.itens),
+        body: JSON.stringify(data),
       });
     } catch {}
   };
@@ -338,18 +362,20 @@ function Versionamento() {
           Retornar
         </Button>
       </Link>
-      {proposta && cliente && (<div className="flex items-start justify-between gap-4">
-        <section>
-          <h1 className="font-bold text-2xl">Versionamento de Proposta</h1>
-          <h1>Nome da Proposta: {proposta.nomeDaProposta}</h1>
-          <h1>
-            Data:{" "}
-            {proposta.createdAt.split("T")[0].split("-").reverse().join("/")}
-          </h1>
-          <h1>Cliente: {cliente.cliente}</h1>
-          <h1>CNPJ: {cnpj.format(cliente.cnpj)}</h1>
-        </section>
-      </div>)}
+      {proposta && cliente && (
+        <div className="flex items-start justify-between gap-4">
+          <section>
+            <h1 className="font-bold text-2xl">Versionamento de Proposta</h1>
+            <h1>Nome da Proposta: {proposta.nomeDaProposta}</h1>
+            <h1>
+              Data:{" "}
+              {proposta.createdAt.split("T")[0].split("-").reverse().join("/")}
+            </h1>
+            <h1>Cliente: {cliente.cliente}</h1>
+            <h1>CNPJ: {cnpj.format(cliente.cnpj)}</h1>
+          </section>
+        </div>
+      )}
       <div className="h-max-[800px] border-1 border-gray-400 rounded-2xl">
         <Table className="h-[100%]">
           <TableHeader>
@@ -454,6 +480,12 @@ function Versionamento() {
                           ) : (
                             <span>Nenhum anexo encontrado.</span>
                           )}
+                          {quantitativa && (
+                            <>
+                              <h1>Quantitativas fechada no contrato</h1>
+                              <h1></h1>
+                            </>
+                          )}
                         </div>
                         {itemVersionamento.status == "EM_ANALISE" ? (
                           <>
@@ -489,10 +521,10 @@ function Versionamento() {
                                       onClick={async () => {
                                         await updateVersionamento({
                                           id: itemVersionamento.id,
-                                          status: "REPROVADA"
-                                        })
-                                        setOpenDialog(false)
-                                        refetchVersionamentos()
+                                          status: "REPROVADA",
+                                        });
+                                        setOpenDialog(false);
+                                        refetchVersionamentos();
                                       }}
                                     >
                                       Continue
@@ -569,7 +601,7 @@ function Versionamento() {
                                                       >
                                                         <FormField
                                                           control={form.control}
-                                                          name={`itens.${index}.nome`}
+                                                          name={`itens.${index}.descricao`}
                                                           render={({
                                                             field,
                                                           }) => (
@@ -589,7 +621,7 @@ function Versionamento() {
                                                         />
                                                         <FormField
                                                           control={form.control}
-                                                          name={`itens.${index}.unidade`}
+                                                          name={`itens.${index}.unidadeDeMedida`}
                                                           render={({
                                                             field,
                                                           }) => (
@@ -629,27 +661,7 @@ function Versionamento() {
                                                         />
                                                         <FormField
                                                           control={form.control}
-                                                          name={`itens.${index}.quantidadePrevista`}
-                                                          render={({
-                                                            field,
-                                                          }) => (
-                                                            <FormItem>
-                                                              <FormLabel>
-                                                                Quantidade
-                                                              </FormLabel>
-                                                              <FormControl>
-                                                                <Input
-                                                                  placeholder="Quantidade"
-                                                                  {...field}
-                                                                />
-                                                              </FormControl>
-                                                              <FormMessage />
-                                                            </FormItem>
-                                                          )}
-                                                        />
-                                                        <FormField
-                                                          control={form.control}
-                                                          name={`itens.${index}.valor`}
+                                                          name={`itens.${index}.valorUnitario`}
                                                           render={({
                                                             field,
                                                           }) => (
@@ -687,11 +699,10 @@ function Versionamento() {
                                                     append({
                                                       idVersionamento:
                                                         itemVersionamento.versao,
-                                                      nome: "",
-                                                      unidade: "",
-                                                      quantidadePrevista: "",
-                                                      valor: "",
-                                                      quantidade: 1,
+                                                      descricao: "",
+                                                      unidadeDeMedida: "",
+                                                      quantidade: "",
+                                                      valorUnitario: "",
                                                     })
                                                   }
                                                 >
@@ -709,12 +720,22 @@ function Versionamento() {
                                                   Fechar
                                                 </Button>
                                               </DialogClose>
-                                              <Button
-                                                className="cursor-pointer"
-                                                type="submit"
-                                              >
-                                                Enviar
-                                              </Button>
+                                              <DialogClose>
+                                                <Button
+                                                  className="cursor-pointer"
+                                                  type="submit"
+                                                  onClick={async () => {
+                                                    await updateVersionamento({
+                                                      id: itemVersionamento.id,
+                                                      status: "APROVADA",
+                                                    });
+                                                    setOpenDialog(false);
+                                                    refetchVersionamentos();
+                                                  }}
+                                                >
+                                                  Definir Quantitativa
+                                                </Button>
+                                              </DialogClose>
                                             </DialogFooter>
                                           </div>
                                         </form>
