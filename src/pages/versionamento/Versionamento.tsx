@@ -11,7 +11,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { data, Link, useParams } from "react-router-dom";
 import { cnpj } from "cpf-cnpj-validator";
 
 import {
@@ -192,6 +192,10 @@ function Versionamento() {
     },
   });
 
+  const [test, setTest] = useState<Versionamento | null>(null)
+
+  console.log(test)
+
   const {
     isPending: versionamentoLoading,
     error: versionamentoError,
@@ -203,6 +207,8 @@ function Versionamento() {
       const response = await fetch(`${url}/proposta/${id}/versionamentos`);
       if (!response.ok) throw new Error("Versionamento Não encontrado");
       const data = await response.json();
+      setTest(data)
+
       return data as Versionamento[];
     },
   });
@@ -299,6 +305,7 @@ function Versionamento() {
 
     const body = await response.json();
     console.log(body);
+    refetchVersionamentos()
   }
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -773,7 +780,12 @@ function Versionamento() {
                   <div>
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="outline">
+                        <Button 
+                        variant="outline" 
+                        className="cursor-pointer"
+                        disabled={versionamentos.status}
+                        
+                        >
                           <CirclePlus />
                           Criar Nova Proposta
                         </Button>

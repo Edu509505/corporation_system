@@ -5,9 +5,14 @@ import {
   FilePlus2Icon,
   FileTextIcon,
   Inbox,
+  NotebookPenIcon,
   //LucideLayoutDashboard,
   PanelTopOpenIcon,
+  PenBoxIcon,
   PencilRuler,
+  PencilRulerIcon,
+  PenOffIcon,
+  Percent,
 } from "lucide-react";
 
 import {
@@ -50,7 +55,10 @@ const items = [
     title: "Obra",
     url: "/#",
     icon: PencilRuler,
-    subMenu: [{ title: "Medição", url: "/medicao", icon: PencilRuler }],
+    subMenu: [
+      { title: "Diário De Obra", url:"/diarioDeObra", icon: NotebookPenIcon },
+      { title: "Medição", url: "/medicao", icon: PencilRuler }
+    ],
   },
   {
     title: "Financeiro",
