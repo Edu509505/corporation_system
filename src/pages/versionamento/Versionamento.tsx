@@ -76,6 +76,7 @@ interface Propostas {
   createdAt: string;
   cliente: {
     cliente: string;
+    cnpj: string
   };
 }
 
@@ -165,8 +166,8 @@ function Versionamento() {
   }, [idVersionamento]);
 
   const {
-    isPending: propostaLoading,
-    error: propostaError,
+    //isPending: propostaLoading,
+    //error: propostaError,
     data: proposta,
   } = useQuery({
     queryKey: ["proposta", id],
@@ -178,27 +179,15 @@ function Versionamento() {
     },
   });
 
-  const {
-    isPending: clienteLoading,
-    error: clienteError,
-    data: cliente,
-  } = useQuery({
-    queryKey: ["cliente", id],
-    queryFn: async () => {
-      const response = await fetch(`${url}/cliente/${id}`);
-      if (!response.ok) throw new Error("Cliente não encontrado");
-      const data = await response.json();
-      return data as Cliente;
-    },
-  });
+
 
   const [test, setTest] = useState<Versionamento | null>(null)
 
   console.log(test)
 
   const {
-    isPending: versionamentoLoading,
-    error: versionamentoError,
+    //isPending: versionamentoLoading,
+    //error: versionamentoError,
     data: versionamentos,
     refetch: refetchVersionamentos,
   } = useQuery({
@@ -214,8 +203,8 @@ function Versionamento() {
   });
 
   const {
-    isPending: quantidadeLoading,
-    error: quantitativaError,
+    //isPending: quantidadeLoading,
+    //error: quantitativaError,
     data: quantitativa,
     refetch: refetchQuantitativa,
   } = useQuery({
@@ -226,6 +215,7 @@ function Versionamento() {
       const data = await response.json();
       return data as Quantitativas;
     },
+    enabled: idVersionamento != null
   });
 
   const { mutateAsync: updateVersionamento } = useMutation({
@@ -351,7 +341,7 @@ function Versionamento() {
     console.log(data);
 
     try {
-      const response = await fetch(`${url}/quantitativa`, {
+      await fetch(`${url}/quantitativa`, {
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -369,7 +359,7 @@ function Versionamento() {
           Retornar
         </Button>
       </Link>
-      {proposta && cliente && (
+      {proposta && (
         <div className="flex items-start justify-between gap-4">
           <section>
             <h1 className="font-bold text-2xl">Versionamento de Proposta</h1>
@@ -378,8 +368,8 @@ function Versionamento() {
               Data:{" "}
               {proposta.createdAt.split("T")[0].split("-").reverse().join("/")}
             </h1>
-            <h1>Cliente: {cliente.cliente}</h1>
-            <h1>CNPJ: {cnpj.format(cliente.cnpj)}</h1>
+            <h1>Cliente: {proposta.cliente.cliente}</h1>
+            <h1>CNPJ: {cnpj.format(proposta.cliente.cnpj)}</h1>
           </section>
         </div>
       )}
@@ -783,7 +773,7 @@ function Versionamento() {
                         <Button 
                         variant="outline" 
                         className="cursor-pointer"
-                        disabled={versionamentos.status}
+                        
                         
                         >
                           <CirclePlus />

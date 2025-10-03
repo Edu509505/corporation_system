@@ -62,7 +62,7 @@ export default function EditarCliente() {
   useEffect(() => {
     async function fetchCliente() {
       try {
-        const response = await fetch(`${url}/clientes/${id}`);
+        const response = await fetch(`${url}/cliente/${id}`);
         if (!response.ok) throw new Error("Cliente não encontrado");
         const data = await response.json();
         setCliente({
