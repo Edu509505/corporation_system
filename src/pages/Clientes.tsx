@@ -21,7 +21,7 @@ export default function VerClientes() {
 
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
-  const [responseOk, setResponseOk] = useState(true)
+  const [responseOk, setResponseOk] = useState(true);
 
   useEffect(() => {
     async function verClientes() {
@@ -31,50 +31,47 @@ export default function VerClientes() {
         setClientes(body);
 
         if (!response.ok) {
-          setResponseOk(true)
+          setResponseOk(true);
           const erro = await response.text();
           throw new Error(`Erro ${response.status}: ${erro}`);
         }
-        setResponseOk(false)
-
+        setResponseOk(false);
       } catch (error) {
-        
       } finally {
-        setLoading(false);  
+        setLoading(false);
       }
-    } verClientes()
+    }
+    verClientes();
   }, []);
 
-  if (loading) return (
-    <div className="p-2 w-full h-screen gap-3 flex flex-col">
-      <Skeleton className="h-9 w-100" />
-      <div className="gap-3 flex justify-between">
-        <Skeleton className="h-9 w-50" />
-        <Skeleton className="h-9 w-30" />
+  if (loading)
+    return (
+      <div className="p-2 w-full h-screen gap-3 flex flex-col">
+        <Skeleton className="h-9 w-100" />
+        <div className="gap-3 flex justify-between">
+          <Skeleton className="h-9 w-50" />
+          <Skeleton className="h-9 w-30" />
+        </div>
+        <div className="w-full h-full flex flex-wrap gap-3">
+          <Skeleton className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 gap-3 " />
+          <Skeleton className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 gap-3 " />
+          <Skeleton className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 gap-3 " />
+          <Skeleton className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 gap-3 " />
+        </div>
       </div>
-      <div className="w-full h-full flex flex-wrap gap-3">
-        <Skeleton className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 gap-3 " />
-        <Skeleton className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 gap-3 " />
-        <Skeleton className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 gap-3 " />
-        <Skeleton className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 gap-3 " />
+    );
+
+  if (responseOk)
+    return (
+      <div className="w-full h-screen flex flex-row items-center justify-around">
+        <div className="flex flex-col items-center justify-center gap-3 text-red-500">
+          <h1 className="text-3xl">Erro Inesperado</h1>
+          <h2>Tente novamente mais tarde</h2>
+          <CircleX className="size-20" />
+          <h1>Ops! Parece que ocorreu um erro inesperado</h1>
+        </div>
       </div>
-    </div>
-  );
-
-  if(responseOk) return(
-    <div className="w-full h-screen flex flex-row items-center justify-around">
-
-      <div className="flex flex-col items-center justify-center gap-3 text-red-500">
-        <h1 className="text-3xl">Erro Inesperado</h1>
-        <h2>Tente novamente mais tarde</h2>
-        <CircleX className="size-20" />
-        <h1>Ops! Parece que ocorreu um erro inesperado</h1>
-
-      </div>
-
-    </div>
-    )
-  
+    );
 
   const editarCliente = (clienteId: number) => {
     navigate(`/clientes/${clienteId}`); // Navega para a rota específica do cliente
@@ -148,8 +145,9 @@ export default function VerClientes() {
                 <div className="w-[8rem] h-[8rem] border-4 flex justify-center items-center border-destructive rounded-full text-center">
                   <h1 className="text-5xl ">
                     {
-                      c.cliente?.trim()
-                        .split(' ')
+                      c.cliente
+                        ?.trim()
+                        .split(" ")
                         .slice(0, 2) //função que pega as duas primeiras palavras
                         .map((palavra) => palavra[0].toUpperCase())
                         .join("")
@@ -188,7 +186,11 @@ export default function VerClientes() {
               </div>
             </section>
             <div className="w-full flex justify-end">
-              <Button variant="outline" className="flex itens-center gap-2 font-bold cursor-pointer" onClick={() => editarCliente(c.id)}>
+              <Button
+                variant="outline"
+                className="flex itens-center gap-2 font-bold cursor-pointer"
+                onClick={() => editarCliente(c.id)}
+              >
                 <Edit /> Editar
               </Button>
             </div>

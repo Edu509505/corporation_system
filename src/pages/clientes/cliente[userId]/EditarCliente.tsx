@@ -62,7 +62,7 @@ export default function EditarCliente() {
   useEffect(() => {
     async function fetchCliente() {
       try {
-        const response = await fetch(`${url}/clientes/${id}`);
+        const response = await fetch(`${url}/cliente/${id}`);
         if (!response.ok) throw new Error("Cliente não encontrado");
         const data = await response.json();
         setCliente({
@@ -123,19 +123,20 @@ export default function EditarCliente() {
     }
   }
 
-  if (loading) return (
-    <div className="p-5 gap-5 flex flex-col">
-      <Skeleton className="h-9 w-58" />
-      <Skeleton className="h-9" />
-      <Skeleton className="h-9" />
-      <Skeleton className="h-9" />
-      <Skeleton className="h-9 w-48" />
-      <div className="flex gap-3">
-        <Skeleton className="h-9 w-25" />
-        <Skeleton className="h-9 w-50" />
+  if (loading)
+    return (
+      <div className="p-5 gap-5 flex flex-col">
+        <Skeleton className="h-9 w-58" />
+        <Skeleton className="h-9" />
+        <Skeleton className="h-9" />
+        <Skeleton className="h-9" />
+        <Skeleton className="h-9 w-48" />
+        <div className="flex gap-3">
+          <Skeleton className="h-9 w-25" />
+          <Skeleton className="h-9 w-50" />
+        </div>
       </div>
-    </div>
-  );
+    );
 
   if (error) return <div className="p-5 text-destructive">Erro: {error}</div>;
 
@@ -143,9 +144,7 @@ export default function EditarCliente() {
     <div className="w-full h-screen flex flex-col bg-gray-50">
       <form onSubmit={atualizarCliente} className="flex gap-3 flex-col p-5">
         <div className="flex gap-3 items-center">
-          <Edit
-            className="size-6"
-          />
+          <Edit className="size-6" />
           <h1 className="text-2xl font-bold">Editar Cliente</h1>
         </div>
 
@@ -168,7 +167,7 @@ export default function EditarCliente() {
         <Label>Insira o cnpj do cliente</Label>
         {cliente.cnpj.length === 18 && !cnpj.isValid(cliente.cnpj) && (
           <div className="text-destructive flex items-center gap-3 text-sm leading-none font-medium">
-            <CircleX className="size-[18px]"/>
+            <CircleX className="size-[18px]" />
             <h2>CNPJ Inválido</h2>
           </div>
         )}
@@ -256,10 +255,10 @@ export default function EditarCliente() {
             <AlertDialogContent>
               <AlertDialogHeader>
                 {cliente.cliente.length < 3 ||
-                  !cnpj.isValid(cliente.cnpj) ||
-                  cliente.local.length < 3 ||
-                  cliente.status === "" ||
-                  !responseOk ? (
+                !cnpj.isValid(cliente.cnpj) ||
+                cliente.local.length < 3 ||
+                cliente.status === "" ||
+                !responseOk ? (
                   <>
                     <AlertDialogTitle className="flex items-center gap-3 text-destructive">
                       <CircleX /> Erro ao atualizar
@@ -286,10 +285,12 @@ export default function EditarCliente() {
                           <CircleX /> Erro interno no servidor
                         </>
                       )}
-                      </AlertDialogDescription>
-                      <AlertDialogFooter>
-                        <AlertDialogAction className="cursor-pointer">Retornar</AlertDialogAction>
-                      </AlertDialogFooter>     
+                    </AlertDialogDescription>
+                    <AlertDialogFooter>
+                      <AlertDialogAction className="cursor-pointer">
+                        Retornar
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
                   </>
                 ) : (
                   <>

@@ -192,9 +192,7 @@ function Versionamento() {
     },
   });
 
-  const [test, setTest] = useState<Versionamento | null>(null)
-
-  console.log(test)
+  const [test, setTest] = useState<Versionamento | null>(null);
 
   const {
     isPending: versionamentoLoading,
@@ -207,11 +205,13 @@ function Versionamento() {
       const response = await fetch(`${url}/proposta/${id}/versionamentos`);
       if (!response.ok) throw new Error("Versionamento Não encontrado");
       const data = await response.json();
-      setTest(data)
+      setTest(data);
 
       return data as Versionamento[];
     },
   });
+
+  console.log(test);
 
   const {
     isPending: quantidadeLoading,
@@ -305,7 +305,7 @@ function Versionamento() {
 
     const body = await response.json();
     console.log(body);
-    refetchVersionamentos()
+    refetchVersionamentos();
   }
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -780,11 +780,10 @@ function Versionamento() {
                   <div>
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button 
-                        variant="outline" 
-                        className="cursor-pointer"
-                        disabled={versionamentos.status}
-                        
+                        <Button
+                          variant="outline"
+                          className="cursor-pointer"
+                          //disabled={versionamentos?.filter() === 'APROVADA'? true}
                         >
                           <CirclePlus />
                           Criar Nova Proposta
