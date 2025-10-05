@@ -58,6 +58,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import StatusDeAprovacao from "@/components/componentsVersionamento/StatusDeAprovaao";
+import InfoClientes from "@/components/componentsVersionamento/informacoesCliente";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -211,8 +213,10 @@ function Versionamento() {
       const response = await fetch(`${url}/quantitativa/${idVersionamento}`);
       if (!response.ok) throw new Error("Quantitativa Não encontrado");
       const data = await response.json();
+      console.log(data);
       return data as Quantitativas;
     },
+
     enabled: idVersionamento != null,
   });
 
@@ -358,18 +362,12 @@ function Versionamento() {
         </Button>
       </Link>
       {proposta && (
-        <div className="flex items-start justify-between gap-4">
-          <section>
-            <h1 className="font-bold text-2xl">Versionamento de Proposta</h1>
-            <h1>Nome da Proposta: {proposta.nomeDaProposta}</h1>
-            <h1>
-              Data:{" "}
-              {proposta.createdAt.split("T")[0].split("-").reverse().join("/")}
-            </h1>
-            <h1>Cliente: {proposta.cliente.cliente}</h1>
-            <h1>CNPJ: {cnpj.format(proposta.cliente.cnpj)}</h1>
-          </section>
-        </div>
+        <InfoClientes
+          nomeDaProposta={proposta.nomeDaProposta}
+          createdAt={proposta.createdAt}
+          cliente={proposta.cliente.cliente}
+          cnpjCliente={proposta.cliente.cnpj}
+        />
       )}
       <div className="h-max-[800px] border-1 border-gray-400 rounded-2xl">
         <Table className="h-[100%]">
@@ -395,30 +393,8 @@ function Versionamento() {
                     .reverse()
                     .join("/")}
                 </TableCell>
-                {/* <TableCell>{anexoVersionamento.length}</TableCell> */}
                 <TableCell>
-                  {itemVersionamento.status === "EM_ANALISE" ? (
-                    <>
-                      <div className="flex items-center justify-center gap-3 text-chart-1 bg-amber-50 rounded-2xl">
-                        <TimerIcon />
-                        Em Análise
-                      </div>
-                    </>
-                  ) : itemVersionamento.status === "REPROVADA" ? (
-                    <>
-                      <div className="flex items-center justify-center gap-3 text-destructive bg-red-100 rounded-2xl">
-                        <CircleX /> Reprovada
-                      </div>
-                    </>
-                  ) : itemVersionamento.status === "APROVADA" ? (
-                    <>
-                      <div className="flex items-center justify-center gap-3 text-ring bg-green-100 rounded-2xl">
-                        <CircleCheckBig /> Aprovada
-                      </div>
-                    </>
-                  ) : (
-                    ""
-                  )}
+                  <StatusDeAprovacao prop={itemVersionamento.status} />
                 </TableCell>
                 <TableCell className="flex flex-col justify-center items-center">
                   <Dialog defaultOpen={openDialog}>
@@ -434,28 +410,7 @@ function Versionamento() {
                       </DialogHeader>
                       <DialogDescription className="flex flex-col gap-4 text-black">
                         Situação da proposta
-                        {itemVersionamento.status === "EM_ANALISE" ? (
-                          <>
-                            <div className="flex items-center justify-center gap-3 text-chart-1 bg-amber-50 rounded-2xl">
-                              <TimerIcon />
-                              Em Análise
-                            </div>
-                          </>
-                        ) : itemVersionamento.status === "REPROVADA" ? (
-                          <>
-                            <div className="flex items-center justify-center gap-3 text-destructive bg-red-100 rounded-2xl">
-                              <CircleX /> Reprovada
-                            </div>
-                          </>
-                        ) : itemVersionamento.status === "APROVADA" ? (
-                          <>
-                            <div className="flex items-center justify-center gap-3 text-ring bg-green-100 rounded-2xl">
-                              <CircleCheckBig /> Aprovada
-                            </div>
-                          </>
-                        ) : (
-                          ""
-                        )}
+                        <StatusDeAprovacao prop={itemVersionamento.status} />
                         <h1 className="font-bold text-2xl flex items-center justify-start gap-3">
                           Itens anexados <Paperclip />
                         </h1>
@@ -693,7 +648,7 @@ function Versionamento() {
                                                   onClick={() =>
                                                     append({
                                                       idVersionamento:
-                                                        itemVersionamento.versao,
+                                                        itemVersionamento.id,
                                                       descricao: "",
                                                       unidadeDeMedida: "",
                                                       quantidade: "",
