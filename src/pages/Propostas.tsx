@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { formatToBRL } from 'brazilian-values';
+import { formatToBRL } from "brazilian-values";
 import {
   Table,
   TableBody,
@@ -90,10 +90,14 @@ export default function VerPropostas() {
                     .reverse()
                     .join("/")}
                 </TableCell>
-                <TableCell>{formatToBRL(parseInt(proposta.valorProposta))}</TableCell>
+                <TableCell>
+                  {formatToBRL(parseInt(proposta.valorProposta))}
+                </TableCell>
                 <Link to={`/proposta/versionamento/${proposta.id}`}>
                   <TableCell className="cursor-pointer">
-                    <Eye />
+                    <div className="flex justify-center w-24 p-2 rounded-full hover:bg-blue-500 hover:text-white hover:font-bold transition">
+                      <p>Visualizar</p>
+                    </div>
                   </TableCell>
                 </Link>
               </TableRow>

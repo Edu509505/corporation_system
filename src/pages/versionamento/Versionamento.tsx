@@ -60,6 +60,16 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import StatusDeAprovacao from "@/components/componentsVersionamento/StatusDeAprovaao";
 import InfoClientes from "@/components/componentsVersionamento/informacoesCliente";
+import { Label } from "@radix-ui/react-select";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import Quantitativa from "@/components/componentsVersionamento/Quantitativas";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -121,6 +131,10 @@ function Versionamento() {
   //   },
   // ]);
   const [idVersionamento, setIdVersionamento] = useState<number | null>(null);
+  const [idRealVersinamento, setIdRaealVersionamento] = useState<number | null>(
+    null
+  );
+
   const [anexoVersionamento, setAnexoVersionamento] = useState<
     { url: string }[]
   >([]);
@@ -206,19 +220,21 @@ function Versionamento() {
     //isPending: quantidadeLoading,
     //error: quantitativaError,
     data: quantitativa,
-    refetch: refetchQuantitativa,
+    //refetch: refetchQuantitativa,
   } = useQuery({
-    queryKey: ["quantitativa", idVersionamento],
+    queryKey: ["quantitativa", idRealVersinamento],
     queryFn: async () => {
-      const response = await fetch(`${url}/quantitativa/${idVersionamento}`);
+      const response = await fetch(`${url}/quantitativa/${idRealVersinamento}`);
       if (!response.ok) throw new Error("Quantitativa Não encontrado");
       const data = await response.json();
-      console.log(data);
+      console.log("quantitativa: ", data);
       return data as Quantitativas;
     },
 
-    enabled: idVersionamento != null,
+    enabled: idRealVersinamento != null,
   });
+
+  console.log(quantitativa);
 
   const { mutateAsync: updateVersionamento } = useMutation({
     mutationKey: ["updateVersionamento"],
@@ -235,36 +251,6 @@ function Versionamento() {
       if (!response.ok) throw new Error("Versionamento não encontrado");
     },
   });
-
-  // useEffect(() => {
-
-  //   async function fetchCliente() {
-  //     const response = await fetch(`${url}/cliente/${id}`);
-  //     if (!response.ok) throw new Error("Cliente não encontrado");
-  //     const data = await response.json();
-
-  //     setCliente({
-  //       cliente: data.cliente,
-  //       cnpj: data.cnpj,
-  //       local: data.local,
-  //       status: data.status,
-  //       file: null,
-  //     });
-  //   }
-
-  //   async function fetchVersionamento() {
-  //     const response = await fetch(`${url}/proposta/${id}/versionamentos`);
-  //     if (!response.ok) throw new Error("Versionamento Não encontrado");
-  //     const data = await response.json();
-
-  //     setVersionamento(data);
-  //   }
-
-  //   if (id) fetchProposta(), fetchCliente(), fetchVersionamento();
-  //   else {
-  //     console.log("Deu erro aqui");
-  //   }
-  // }, [id]);
 
   const [novoVersionamento, setNovoVersionamento] =
     useState<formularioComImagem>({
@@ -332,10 +318,10 @@ function Versionamento() {
       itens: [],
     },
   });
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "itens",
-  });
+  // const { fields, append, remove } = useFieldArray({
+  //   control: form.control,
+  //   name: "itens",
+  // });
 
   console.log(form.formState.errors);
 
@@ -369,6 +355,13 @@ function Versionamento() {
           cnpjCliente={proposta.cliente.cnpj}
         />
       )}
+      {/* {Array.isArray(quantitativa?.itens) && quantitativa.itens.length > 0 ? (
+        quantitativa.itens.map((item) => (
+          <h1 key={item.descricao}>{item.descricao}</h1>
+        ))
+      ) : (
+        <span>Nenhum item encontrado.</span>
+      )} */}
       <div className="h-max-[800px] border-1 border-gray-400 rounded-2xl">
         <Table className="h-[100%]">
           <TableHeader>
@@ -399,7 +392,10 @@ function Versionamento() {
                 <TableCell className="flex flex-col justify-center items-center">
                   <Dialog defaultOpen={openDialog}>
                     <DialogTrigger
-                      onClick={() => setIdVersionamento(itemVersionamento.id)}
+                      onClick={() => (
+                        setIdVersionamento(itemVersionamento.id),
+                        setIdRaealVersionamento(itemVersionamento.id)
+                      )}
                       className="cursor-pointer"
                     >
                       <Eye />
@@ -411,9 +407,9 @@ function Versionamento() {
                       <DialogDescription className="flex flex-col gap-4 text-black">
                         Situação da proposta
                         <StatusDeAprovacao prop={itemVersionamento.status} />
-                        <h1 className="font-bold text-2xl flex items-center justify-start gap-3">
+                        <DialogDescription className="font-bold text-2xl flex items-center justify-start gap-3">
                           Itens anexados <Paperclip />
-                        </h1>
+                        </DialogDescription>
                         <div className="flex gap-3 flex-wrap">
                           {anexoVersionamento.length > 0 ? (
                             anexoVersionamento.map((anexo, idx) => (
@@ -429,12 +425,6 @@ function Versionamento() {
                             ))
                           ) : (
                             <span>Nenhum anexo encontrado.</span>
-                          )}
-                          {quantitativa && (
-                            <>
-                              <h1>Quantitativas fechada no contrato</h1>
-                              <h1></h1>
-                            </>
                           )}
                         </div>
                         {itemVersionamento.status == "EM_ANALISE" ? (
@@ -512,186 +502,9 @@ function Versionamento() {
 
                                   {/* A baixo está o Dialog para adicionar as quantitativas */}
 
-                                  <Dialog>
-                                    <DialogTrigger asChild>
-                                      <Button
-                                        variant="default"
-                                        className="cursor-pointer"
-                                        //onSubmit={form.reset(onSubmit)}
-                                      >
-                                        Aprovar
-                                      </Button>
-                                    </DialogTrigger>
-
-                                    <DialogContent className="sm:max-w-[70%] [&>button]:hidden">
-                                      <Form {...form}>
-                                        <form
-                                          onSubmit={form.handleSubmit(onSubmit)}
-                                        >
-                                          <div className="flex flex-col gap-3">
-                                            <DialogHeader>
-                                              <DialogTitle>
-                                                Adocionar quantitativa
-                                              </DialogTitle>
-                                              <DialogDescription>
-                                                Para proseguir, é necessário
-                                                adicionar a quantitativa dessa
-                                                proposta, item, unidade e preço
-                                              </DialogDescription>
-                                            </DialogHeader>
-
-                                            <div className="flex gap-3 items-center border-1 border-gray-500 rounded-2xl p-4 scroll-auto">
-                                              <div className="space-y-4">
-                                                <div className="flex flex-col gap-4">
-                                                  {fields.map(
-                                                    (field, index) => (
-                                                      <div
-                                                        key={field.id}
-                                                        className="flex items-start gap-1"
-                                                      >
-                                                        <FormField
-                                                          control={form.control}
-                                                          name={`itens.${index}.descricao`}
-                                                          render={({
-                                                            field,
-                                                          }) => (
-                                                            <FormItem>
-                                                              <FormLabel>
-                                                                Nome
-                                                              </FormLabel>
-                                                              <FormControl>
-                                                                <Input
-                                                                  placeholder="Nome do item"
-                                                                  {...field}
-                                                                />
-                                                              </FormControl>
-                                                              <FormMessage />
-                                                            </FormItem>
-                                                          )}
-                                                        />
-                                                        <FormField
-                                                          control={form.control}
-                                                          name={`itens.${index}.unidadeDeMedida`}
-                                                          render={({
-                                                            field,
-                                                          }) => (
-                                                            <FormItem>
-                                                              <FormLabel>
-                                                                Unidade
-                                                              </FormLabel>
-                                                              <FormControl>
-                                                                <Input
-                                                                  placeholder="Unidade de medida"
-                                                                  {...field}
-                                                                />
-                                                              </FormControl>
-                                                              <FormMessage />
-                                                            </FormItem>
-                                                          )}
-                                                        />
-                                                        <FormField
-                                                          control={form.control}
-                                                          name={`itens.${index}.quantidade`}
-                                                          render={({
-                                                            field,
-                                                          }) => (
-                                                            <FormItem>
-                                                              <FormLabel>
-                                                                Quantidade
-                                                              </FormLabel>
-                                                              <FormControl>
-                                                                <Input
-                                                                  placeholder="Quantidade"
-                                                                  {...field}
-                                                                />
-                                                              </FormControl>
-                                                              <FormMessage />
-                                                            </FormItem>
-                                                          )}
-                                                        />
-                                                        <FormField
-                                                          control={form.control}
-                                                          name={`itens.${index}.valorUnitario`}
-                                                          render={({
-                                                            field,
-                                                          }) => (
-                                                            <FormItem>
-                                                              <FormLabel>
-                                                                Valor
-                                                              </FormLabel>
-                                                              <FormControl>
-                                                                <Input
-                                                                  placeholder="R$ -"
-                                                                  {...field}
-                                                                />
-                                                              </FormControl>
-                                                              <FormMessage />
-                                                            </FormItem>
-                                                          )}
-                                                        />
-                                                        <Button
-                                                          type="button"
-                                                          variant="ghost"
-                                                          size="icon"
-                                                          onClick={() =>
-                                                            remove(index)
-                                                          }
-                                                        >
-                                                          <Trash2 className="w-4 h-4" />
-                                                        </Button>
-                                                      </div>
-                                                    )
-                                                  )}
-                                                </div>
-                                                <Button
-                                                  type="button"
-                                                  onClick={() =>
-                                                    append({
-                                                      idVersionamento:
-                                                        itemVersionamento.id,
-                                                      descricao: "",
-                                                      unidadeDeMedida: "",
-                                                      quantidade: "",
-                                                      valorUnitario: "",
-                                                    })
-                                                  }
-                                                >
-                                                  Adicionar item
-                                                </Button>
-                                              </div>
-                                            </div>
-                                            <DialogFooter className="flex gap-3">
-                                              <DialogClose>
-                                                <Button
-                                                  variant="outline"
-                                                  type="button"
-                                                  className="cursor-pointer"
-                                                >
-                                                  Fechar
-                                                </Button>
-                                              </DialogClose>
-                                              <DialogClose>
-                                                <Button
-                                                  className="cursor-pointer"
-                                                  type="submit"
-                                                  onClick={async () => {
-                                                    await updateVersionamento({
-                                                      id: itemVersionamento.id,
-                                                      status: "APROVADA",
-                                                    });
-                                                    setOpenDialog(false);
-                                                    refetchVersionamentos();
-                                                  }}
-                                                >
-                                                  Definir Quantitativa
-                                                </Button>
-                                              </DialogClose>
-                                            </DialogFooter>
-                                          </div>
-                                        </form>
-                                      </Form>
-                                    </DialogContent>
-                                  </Dialog>
+                                  <Quantitativa
+                                    itemVersionamento={itemVersionamento.id}
+                                  />
                                   {/* fim */}
                                 </AlertDialogFooter>
                               </AlertDialogContent>
@@ -734,33 +547,47 @@ function Versionamento() {
                             Adicionar um novo versionamento
                           </DialogTitle>
                           <DialogDescription className="">
-                            <h1>Adicionar Anexo</h1>
                             <form
                               onSubmit={criarNovoVersionamento}
                               className="flex flex-col gap-4"
                             >
-                              <Input
-                                className="h-[200px] cursor-pointer"
-                                type="file"
-                                multiple
-                                onChange={(event) => {
-                                  const files = event.target.files;
-                                  if (!files) return;
-                                  const filesArray = Array.from(files);
-                                  setNovoVersionamento({
-                                    ...novoVersionamento,
-                                    files: filesArray,
-                                  });
-                                }}
-                              />
-                              <DialogClose asChild>
-                                <Button
-                                  type="submit"
-                                  className="cursor-pointer"
-                                >
-                                  Enviar
-                                </Button>
-                              </DialogClose>
+                              <Empty className="border border-dashed">
+                                <EmptyHeader>
+                                  <EmptyMedia variant="icon">
+                                    <Paperclip />
+                                  </EmptyMedia>
+                                  <EmptyTitle>Selecione um Arquivo</EmptyTitle>
+                                  <EmptyDescription>
+                                    Escolha um aruivo de seu dispositivo para
+                                    realizar o Upload
+                                    <Input
+                                      className="cursor-pointer"
+                                      type="file"
+                                      multiple
+                                      onChange={(event) => {
+                                        const files = event.target.files;
+                                        if (!files) return;
+                                        const filesArray = Array.from(files);
+                                        setNovoVersionamento({
+                                          ...novoVersionamento,
+                                          files: filesArray,
+                                        });
+                                      }}
+                                    />
+                                  </EmptyDescription>
+                                </EmptyHeader>
+                                <EmptyContent>
+                                  <DialogClose asChild>
+                                    <Button
+                                      variant="outline"
+                                      type="submit"
+                                      className="cursor-pointer"
+                                    >
+                                      Enviar
+                                    </Button>
+                                  </DialogClose>
+                                </EmptyContent>
+                              </Empty>
                             </form>
                           </DialogDescription>
                         </DialogHeader>

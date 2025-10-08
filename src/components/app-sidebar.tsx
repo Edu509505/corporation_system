@@ -8,11 +8,11 @@ import {
   NotebookPenIcon,
   //LucideLayoutDashboard,
   PanelTopOpenIcon,
-  PenBoxIcon,
+  // PenBoxIcon,
   PencilRuler,
-  PencilRulerIcon,
-  PenOffIcon,
-  Percent,
+  // PencilRulerIcon,
+  // PenOffIcon,
+  // Percent,
 } from "lucide-react";
 
 import {
@@ -48,7 +48,7 @@ const items = [
     subMenu: [
       { title: "Clientes", url: "/clientes", icon: Building2Icon },
       { title: "Propostas", url: "/propostas", icon: FileTextIcon },
-      { title: "Contratos", url: "/oi", icon: PanelTopOpenIcon },
+      { title: "Contratos", url: "/contratos", icon: PanelTopOpenIcon },
     ],
   },
   {
@@ -56,8 +56,8 @@ const items = [
     url: "/#",
     icon: PencilRuler,
     subMenu: [
-      { title: "Diário De Obra", url:"/diarioDeObra", icon: NotebookPenIcon },
-      { title: "Medição", url: "/medicao", icon: PencilRuler }
+      { title: "Diário De Obra", url: "/diarioDeObra", icon: NotebookPenIcon },
+      { title: "Medição", url: "/medicao", icon: PencilRuler },
     ],
   },
   {

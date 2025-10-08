@@ -15,6 +15,8 @@ import CriarProposta from "./pages/propostas/CriarProposta";
 import VerPropostas from "./pages/Propostas";
 import VerVersionamento from "./Versionamento";
 import Versionamento from "./pages/versionamento/Versionamento";
+import Contratos from "./pages/Contratos";
+import AddContrato from "./pages/contratos/AddContrato";
 
 function App() {
   return (
@@ -37,6 +39,8 @@ function App() {
               path="/proposta/versionamento/:id"
               element={<Versionamento />}
             />
+            <Route path="/contratos" element={<Contratos />} />
+            <Route path="/addContrato" element={<AddContrato />} />
             <Route path="/clientes/:id" element={<EditarCliente />} />
             <Route path="*" element={<NoPage />} />
           </Route>
