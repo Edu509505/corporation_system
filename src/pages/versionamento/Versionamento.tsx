@@ -130,10 +130,8 @@ function Versionamento() {
   //     anexos: "",
   //   },
   // ]);
+  const [idVersao, setidVersao] = useState<number | null>(null);
   const [idVersionamento, setIdVersionamento] = useState<number | null>(null);
-  const [idRealVersinamento, setIdRaealVersionamento] = useState<number | null>(
-    null
-  );
 
   const [anexoVersionamento, setAnexoVersionamento] = useState<
     { url: string }[]
@@ -145,7 +143,7 @@ function Versionamento() {
     useState<string | null>(null);
   useEffect(() => {
     async function atualizarVersionamento() {
-      const response = await fetch(`${url}/versionamento/${idVersionamento}`, {
+      const response = await fetch(`${url}/versionamento/${idVersao}`, {
         method: "PUT", // ou PATCH, dependendo da sua API
         headers: {
           "Content-Type": "application/json",
@@ -164,7 +162,7 @@ function Versionamento() {
   useEffect(() => {
     async function fetchAnexoVersionamento() {
       const response = await fetch(
-        `${url}/versionamento/${idVersionamento}/anexos/urls`
+        `${url}/versionamento/${idVersao}/anexos/urls`
       );
       console.log(response);
       if (!response.ok) throw new Error("Versionamento Não encontrado");
@@ -175,11 +173,11 @@ function Versionamento() {
       setAnexoVersionamento(anexos);
       console.log("data", anexos);
     }
-    console.log(idVersionamento);
-    if (idVersionamento) {
+    console.log(idVersao);
+    if (idVersao) {
       fetchAnexoVersionamento();
     }
-  }, [idVersionamento]);
+  }, [idVersao]);
 
   const {
     //isPending: propostaLoading,
@@ -196,9 +194,6 @@ function Versionamento() {
   });
 
   const [test, setTest] = useState<Versionamento | null>(null);
-
-  const [blockCriarQuantitativa, setBlockCriarQuantitativa] = useState(false);
-
   const {
     //isPending: versionamentoLoading,
     //error: versionamentoError,
@@ -221,16 +216,16 @@ function Versionamento() {
     data: quantitativa,
     //refetch: refetchQuantitativa,
   } = useQuery({
-    queryKey: ["quantitativa", idRealVersinamento],
+    queryKey: ["quantitativa", idVersionamento],
     queryFn: async () => {
-      const response = await fetch(`${url}/quantitativa/${idRealVersinamento}`);
+      const response = await fetch(`${url}/quantitativa/${idVersionamento}`);
       if (!response.ok) throw new Error("Quantitativa Não encontrado");
       const data = await response.json();
       console.log("quantitativa: ", data);
       return data as Quantitativas;
     },
 
-    enabled: idRealVersinamento != null,
+    enabled: idVersionamento != null,
   });
 
   console.log(quantitativa);
@@ -306,7 +301,7 @@ function Versionamento() {
   //FORM DA QUATITATIVA
 
   const itemSchema = z.object({
-    idVersionamento: z.number(),
+    idVersao: z.number(),
     descricao: z.string().min(2, "Nome obrigatório"),
     unidadeDeMedida: z.string().min(1, "Unidade obrigatória"),
     quantidade: z.string(),
@@ -319,7 +314,7 @@ function Versionamento() {
 
   type Quantitativas = {
     itens: {
-      idVersionamento: number;
+      idVersao: number;
       descricao: string;
       quantidade: string;
       valorUnitario: string;
@@ -345,7 +340,7 @@ function Versionamento() {
 
     try {
       await updateVersionamento({
-        id: idRealVersinamento!,
+        id: idVersionamento!,
         status: "APROVADA",
       });
 
@@ -416,8 +411,8 @@ function Versionamento() {
                   <Dialog defaultOpen={openDialog}>
                     <DialogTrigger
                       onClick={() => (
-                        setIdVersionamento(itemVersionamento.id),
-                        setIdRaealVersionamento(itemVersionamento.id)
+                        setidVersao(itemVersionamento.id),
+                        setIdVersionamento(itemVersionamento.id)
                       )}
                       className="cursor-pointer"
                     >
@@ -504,7 +499,12 @@ function Versionamento() {
                               */}
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <Button className="cursor-pointer">
+                                <Button
+                                  className="cursor-pointer"
+                                  disabled={versionamentos?.some(
+                                    (item) => item.status === "APROVADA"
+                                  )}
+                                >
                                   <CircleCheckBig /> Aprovada
                                 </Button>
                               </AlertDialogTrigger>
@@ -653,7 +653,7 @@ function Versionamento() {
                                                   type="button"
                                                   onClick={() =>
                                                     append({
-                                                      idVersionamento:
+                                                      idVersao:
                                                         itemVersionamento.id,
                                                       descricao: "",
                                                       unidadeDeMedida: "",

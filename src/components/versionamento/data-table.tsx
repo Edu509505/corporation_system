@@ -24,7 +24,7 @@ import { EyeIcon, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
-import { number } from "zod";
+//import { number } from "zod";
 import { Label } from "../ui/label";
 
 interface DataTableProps<TData, TValue> {
@@ -124,7 +124,7 @@ export function DataTable<TData, TValue>({
               }
             />
           </div>
-          <div className="flex flex-col w-auto">
+          <div className="flex flex-col gap-3">
             <Label>Valor da proposta</Label>
             <Input
               type="String"
