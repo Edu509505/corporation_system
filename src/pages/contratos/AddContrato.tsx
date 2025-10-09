@@ -28,6 +28,7 @@ const url = import.meta.env.VITE_API_URL;
 interface Cliente {
   cliente: string;
   cnpj: string;
+  proposta: string;
 }
 
 function AddContrato() {
@@ -46,11 +47,12 @@ function AddContrato() {
   const contratoSchema = z.object({
     titulo: z.string().min(1, "Título é obrigatório"),
     descricao: z.string().min(1, "Descrição é obrigatória"),
-    local: z.string().min(1, "Local é obrigatório"),
+    //local: z.string().min(1, "Local é obrigatório"),
     cliente: z.enum(
       clienteNomes as [string, ...string[]],
       "Selecione um cliente válido"
     ),
+    proposta: z.literal(["sim", "não"]),
   });
 
   console.log(clientes);
@@ -60,7 +62,8 @@ function AddContrato() {
     defaultValues: {
       titulo: "",
       descricao: "",
-      local: "",
+      proposta: "" as "sim" | "não",
+      //local: "",
     },
   });
 
@@ -68,11 +71,19 @@ function AddContrato() {
     console.log(data);
   }
   return (
-    <div className="flex flex-col bg-gray-50 h-full p-4">
+    <div className="flex flex-col bg-gray-50 h-full gap-3 p-4">
       <header>
         <h1 className="text-2xl font-bold">Adicionar Contrato</h1>
         <p className="text-gray-600">
           Preencha os detalhes do novo contrato abaixo.
+        </p>
+        <p className="text-sm text-gray-500">
+          <strong>Atenção:</strong> O preenchimento do contrato deve ser
+          realizado em comum acordo entre ambas as partes envolvidas, garantindo
+          que todas as informações estejam corretas, completas e devidamente
+          validadas. É fundamental que os dados inseridos reflitam fielmente os
+          termos negociados, evitando divergências futuras e assegurando a
+          conformidade legal do documento.
         </p>
       </header>
       <main className="">
@@ -81,6 +92,76 @@ function AddContrato() {
             onSubmit={form.handleSubmit(onSubimit)}
             className="flex flex-col gap-4"
           >
+            <div className="flex gap-4 flex-wrap">
+              <FormField
+                control={form.control}
+                name="cliente"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cliente</FormLabel>
+                    <FormMessage />
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-[300px]">
+                          <SelectValue placeholder="Selecionar cliente" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="w-[300px]">
+                        <SelectGroup>
+                          <SelectLabel>Clientes</SelectLabel>
+                          {clientes?.map((cliente) => (
+                            <SelectItem
+                              key={cliente.cliente}
+                              value={cliente.cliente}
+                            >
+                              {cliente.cliente}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="proposta"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Proposta</FormLabel>
+                    <FormMessage />
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-[300px]">
+                          <SelectValue placeholder="Selecionar Proposta" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="w-[300px]">
+                        <SelectGroup>
+                          <SelectLabel>Proposta</SelectLabel>
+                          <SelectItem value="sim">sim</SelectItem>
+                          <SelectItem value="não">não</SelectItem>
+                          {/* {clientes?.map((proposta) => (
+                            <SelectItem
+                              key={proposta.proposta}
+                              value={proposta.proposta}
+                            >
+                              {proposta.proposta}
+                            </SelectItem>
+                          ))} */}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
               name="titulo"
@@ -94,39 +175,6 @@ function AddContrato() {
                   <FormDescription>
                     Insira o título do contrato.
                   </FormDescription>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="cliente"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cliente</FormLabel>
-                  <FormMessage />
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-[300px]">
-                        <SelectValue placeholder="Selecionar cliente" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="w-[300px]">
-                      <SelectGroup>
-                        <SelectLabel>Clientes</SelectLabel>
-                        {clientes?.map((cliente) => (
-                          <SelectItem
-                            key={cliente.cliente}
-                            value={cliente.cliente}
-                          >
-                            {cliente.cliente}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
                 </FormItem>
               )}
             />

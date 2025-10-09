@@ -251,6 +251,22 @@ function Versionamento() {
     },
   });
 
+  const { mutateAsync: updateProposta } = useMutation({
+    mutationKey: ["updateProposta"],
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const response = await fetch(`${url}/proposta/${id}`, {
+        method: "PUT", // ou PATCH, dependendo da sua API
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: status,
+        }),
+      });
+      if (!response.ok) throw new Error("Proposta não encontrada");
+    },
+  });
+
   const [novoVersionamento, setNovoVersionamento] =
     useState<formularioComImagem>({
       files: null,
@@ -333,6 +349,8 @@ function Versionamento() {
         status: "APROVADA",
       });
 
+      await updateProposta({ id: id!, status: "APROVADA" });
+
       await fetch(`${url}/quantitativa`, {
         method: "POST",
         headers: {
@@ -367,8 +385,8 @@ function Versionamento() {
       ) : (
         <span>Nenhum item encontrado.</span>
       )} */}
-      <div className="h-max-[800px] border-1 border-gray-400 rounded-2xl">
-        <Table className="h-[100%]">
+      <div className="h-max-[800px] border-1 border-gray-400 rounded-2xl space-x-2 py-4">
+        <Table className="h-[100%] space-x-2 py-4">
           <TableHeader>
             <TableRow>
               <TableHead>Versão</TableHead>
