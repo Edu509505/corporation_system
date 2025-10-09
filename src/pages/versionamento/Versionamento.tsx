@@ -405,7 +405,7 @@ function Versionamento() {
                     .join("/")}
                 </TableCell>
                 <TableCell>
-                  <StatusDeAprovacao prop={itemVersionamento.status} />
+                  <StatusDeAprovacao status={itemVersionamento.status} />
                 </TableCell>
                 <TableCell className="flex flex-col justify-center items-center">
                   <Dialog defaultOpen={openDialog}>
@@ -424,7 +424,7 @@ function Versionamento() {
                       </DialogHeader>
                       <DialogDescription className="flex flex-col gap-4 text-black">
                         Situação da proposta
-                        <StatusDeAprovacao prop={itemVersionamento.status} />
+                        <StatusDeAprovacao status={itemVersionamento.status} />
                         <DialogDescription className="font-bold text-2xl flex items-center justify-start gap-3">
                           Itens anexados <Paperclip />
                         </DialogDescription>

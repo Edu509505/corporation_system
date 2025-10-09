@@ -23,6 +23,8 @@ export default function VerClientes() {
   const [loading, setLoading] = useState(true);
   const [responseOk, setResponseOk] = useState(true);
 
+  console.log(clientes);
+
   useEffect(() => {
     async function verClientes() {
       try {
@@ -112,7 +114,7 @@ export default function VerClientes() {
             className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 bg-white gap-3 "
           >
             <section className="flex flex-col items-center justify-between w-full gap-2">
-              {c.status === "Ativo" ? (
+              {c.status === "ATIVO" ? (
                 <div className="w-[8rem] h-[8rem] border-4 flex justify-center items-center border-ring rounded-full text-center">
                   <h1 className="text-5xl ">
                     {
@@ -127,21 +129,7 @@ export default function VerClientes() {
                     }
                   </h1>
                 </div>
-              ) : c.status === "Pendente" ? (
-                <div className="w-[8rem] h-[8rem] border-4 flex justify-center items-center border-chart-1 rounded-full text-center">
-                  <h1 className="text-5xl ">
-                    {
-                      c.cliente
-                        ?.split(" ")
-                        .slice(0, 2)
-                        .map((palavra) => palavra[0])
-                        .join("")
-                        .toUpperCase()
-                      //Essa função pega o nome do cliente, elimina os espaços dividindo em 2 textos, depois pega a primeira letra de cada um e no final junta
-                    }
-                  </h1>
-                </div>
-              ) : c.status === "Inativo" ? (
+              ) : c.status === "INATIVO" ? (
                 <div className="w-[8rem] h-[8rem] border-4 flex justify-center items-center border-destructive rounded-full text-center">
                   <h1 className="text-5xl ">
                     {

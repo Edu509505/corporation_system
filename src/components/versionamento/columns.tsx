@@ -17,14 +17,17 @@ export type Propostas = {
 
 export const columns: ColumnDef<Propostas>[] = [
   {
+    id: 'id',
     accessorKey: "id",
     header: "Número",
   },
   {
+    id: 'cliente.cliente',
     accessorKey: "cliente.cliente",
     header: "Empresa",
   },
   {
+    id: 'nomeDaProposta',
     accessorKey: "nomeDaProposta",
     header: "Nome Da Proposta",
   },
@@ -34,7 +37,7 @@ export const columns: ColumnDef<Propostas>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex items-center justify-center">
-          <StatusDeAprovacao prop={row.getValue("statusProposta")} />
+          <StatusDeAprovacao status={row.getValue("statusProposta")} />
         </div>
       );
     },
