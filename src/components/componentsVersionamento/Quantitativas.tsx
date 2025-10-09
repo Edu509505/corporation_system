@@ -1,6 +1,7 @@
 import { Trash2 } from "lucide-react";
 import { Button } from "../ui/button";
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -8,17 +9,20 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Form, useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import {
+  Dialog,
   DialogClose,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "../ui/dialog";
 import { useMutation } from "@tanstack/react-query";
+import { DialogContent } from "@radix-ui/react-dialog";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -97,14 +101,6 @@ function Quantitativa({ itemVersionamento }: funcoesQuantitativa) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-3">
-          <DialogHeader>
-            <DialogTitle>Adocionar quantitativa</DialogTitle>
-            <DialogDescription>
-              Para proseguir, é necessário adicionar a quantitativa dessa
-              proposta, item, unidade e preço
-            </DialogDescription>
-          </DialogHeader>
-
           <div className="flex gap-3 items-center border-1 border-gray-500 rounded-2xl p-4 scroll-auto">
             <div className="space-y-4">
               <div className="flex flex-col gap-4">
@@ -192,31 +188,6 @@ function Quantitativa({ itemVersionamento }: funcoesQuantitativa) {
               </Button>
             </div>
           </div>
-          <DialogFooter className="flex gap-3">
-            <DialogClose>
-              <Button
-                variant="outline"
-                type="button"
-                className="cursor-pointer"
-              >
-                Fechar
-              </Button>
-            </DialogClose>
-            <DialogClose>
-              <Button
-                className="cursor-pointer"
-                type="submit"
-                onClick={async () => {
-                  await updateVersionamento({
-                    id: itemVersionamento,
-                    status: "APROVADA",
-                  });
-                }}
-              >
-                Definir Quantitativa
-              </Button>
-            </DialogClose>
-          </DialogFooter>
         </div>
       </form>
     </Form>

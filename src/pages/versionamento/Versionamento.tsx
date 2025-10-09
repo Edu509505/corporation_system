@@ -197,6 +197,8 @@ function Versionamento() {
 
   const [test, setTest] = useState<Versionamento | null>(null);
 
+  const [blockCriarQuantitativa, setBlockCriarQuantitativa] = useState(false);
+
   const {
     //isPending: versionamentoLoading,
     //error: versionamentoError,
@@ -209,12 +211,9 @@ function Versionamento() {
       if (!response.ok) throw new Error("Versionamento Não encontrado");
       const data = await response.json();
       setTest(data);
-
       return data as Versionamento[];
     },
   });
-
-  console.log(test);
 
   const {
     //isPending: quantidadeLoading,
@@ -318,10 +317,10 @@ function Versionamento() {
       itens: [],
     },
   });
-  // const { fields, append, remove } = useFieldArray({
-  //   control: form.control,
-  //   name: "itens",
-  // });
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "itens",
+  });
 
   console.log(form.formState.errors);
 
@@ -329,6 +328,11 @@ function Versionamento() {
     console.log(data);
 
     try {
+      await updateVersionamento({
+        id: idRealVersinamento!,
+        status: "APROVADA",
+      });
+
       await fetch(`${url}/quantitativa`, {
         method: "POST",
         headers: {
@@ -336,6 +340,7 @@ function Versionamento() {
         },
         body: JSON.stringify(data),
       });
+      refetchVersionamentos();
     } catch {}
   };
 
@@ -501,10 +506,170 @@ function Versionamento() {
                                   </AlertDialogCancel>
 
                                   {/* A baixo está o Dialog para adicionar as quantitativas */}
-
-                                  <Quantitativa
-                                    itemVersionamento={itemVersionamento.id}
-                                  />
+                                  <Dialog>
+                                    <DialogTrigger asChild>
+                                      <Button className="cursor-pointer">
+                                        Aprovar
+                                      </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                      <DialogHeader>
+                                        <DialogTitle>
+                                          Adocionar quantitativa
+                                        </DialogTitle>
+                                        <DialogDescription>
+                                          Para proseguir, é necessário adicionar
+                                          a quantitativa dessa proposta, item,
+                                          unidade e preço
+                                        </DialogDescription>
+                                      </DialogHeader>
+                                      <Form {...form}>
+                                        <form
+                                          onSubmit={form.handleSubmit(onSubmit)}
+                                        >
+                                          <div className="flex flex-col gap-3">
+                                            <div className="flex gap-3 items-center border-1 border-gray-500 rounded-2xl p-4 scroll-auto">
+                                              <div className="space-y-4">
+                                                <div className="flex flex-col gap-4">
+                                                  {fields.map(
+                                                    (field, index) => (
+                                                      <div
+                                                        key={field.id}
+                                                        className="flex items-start gap-1"
+                                                      >
+                                                        <FormField
+                                                          control={form.control}
+                                                          name={`itens.${index}.descricao`}
+                                                          render={({
+                                                            field,
+                                                          }) => (
+                                                            <FormItem>
+                                                              <FormLabel>
+                                                                Nome
+                                                              </FormLabel>
+                                                              <FormControl>
+                                                                <Input
+                                                                  placeholder="Nome do item"
+                                                                  {...field}
+                                                                />
+                                                              </FormControl>
+                                                              <FormMessage />
+                                                            </FormItem>
+                                                          )}
+                                                        />
+                                                        <FormField
+                                                          control={form.control}
+                                                          name={`itens.${index}.unidadeDeMedida`}
+                                                          render={({
+                                                            field,
+                                                          }) => (
+                                                            <FormItem>
+                                                              <FormLabel>
+                                                                Unidade
+                                                              </FormLabel>
+                                                              <FormControl>
+                                                                <Input
+                                                                  placeholder="Unidade de medidKa"
+                                                                  {...field}
+                                                                />
+                                                              </FormControl>
+                                                              <FormMessage />
+                                                            </FormItem>
+                                                          )}
+                                                        />
+                                                        <FormField
+                                                          control={form.control}
+                                                          name={`itens.${index}.quantidade`}
+                                                          render={({
+                                                            field,
+                                                          }) => (
+                                                            <FormItem>
+                                                              <FormLabel>
+                                                                Quantidade
+                                                              </FormLabel>
+                                                              <FormControl>
+                                                                <Input
+                                                                  placeholder="Quantidade"
+                                                                  {...field}
+                                                                />
+                                                              </FormControl>
+                                                              <FormMessage />
+                                                            </FormItem>
+                                                          )}
+                                                        />
+                                                        <FormField
+                                                          control={form.control}
+                                                          name={`itens.${index}.valorUnitario`}
+                                                          render={({
+                                                            field,
+                                                          }) => (
+                                                            <FormItem>
+                                                              <FormLabel>
+                                                                Valor
+                                                              </FormLabel>
+                                                              <FormControl>
+                                                                <Input
+                                                                  placeholder="R$ -"
+                                                                  {...field}
+                                                                />
+                                                              </FormControl>
+                                                              <FormMessage />
+                                                            </FormItem>
+                                                          )}
+                                                        />
+                                                        <Button
+                                                          type="button"
+                                                          variant="ghost"
+                                                          size="icon"
+                                                          onClick={() =>
+                                                            remove(index)
+                                                          }
+                                                        >
+                                                          <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                      </div>
+                                                    )
+                                                  )}
+                                                </div>
+                                                <Button
+                                                  type="button"
+                                                  onClick={() =>
+                                                    append({
+                                                      idVersionamento:
+                                                        itemVersionamento.id,
+                                                      descricao: "",
+                                                      unidadeDeMedida: "",
+                                                      quantidade: "",
+                                                      valorUnitario: "",
+                                                    })
+                                                  }
+                                                >
+                                                  Adicionar item
+                                                </Button>
+                                                <DialogFooter className="flex gap-3">
+                                                  <DialogClose>
+                                                    <Button
+                                                      variant="outline"
+                                                      type="button"
+                                                      className="cursor-pointer"
+                                                    >
+                                                      Fechar
+                                                    </Button>
+                                                  </DialogClose>
+                                                  <Button
+                                                    className="cursor-pointer"
+                                                    type="submit"
+                                                  >
+                                                    Definir Quantitativa
+                                                  </Button>
+                                                </DialogFooter>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </form>
+                                      </Form>
+                                    </DialogContent>
+                                  </Dialog>
                                   {/* fim */}
                                 </AlertDialogFooter>
                               </AlertDialogContent>
@@ -536,7 +701,13 @@ function Versionamento() {
                   <div>
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="outline" className="cursor-pointer">
+                        <Button
+                          variant="outline"
+                          className="cursor-pointer"
+                          disabled={versionamentos?.some(
+                            (item) => item.status === "APROVADA"
+                          )}
+                        >
                           <CirclePlus />
                           Criar Nova Proposta
                         </Button>
