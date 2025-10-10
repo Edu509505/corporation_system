@@ -1,6 +1,7 @@
 import {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -11,14 +12,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  CircleAlert,
   CircleArrowLeftIcon,
   CircleCheck,
   CircleX,
   Edit,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { cnpj } from "cpf-cnpj-validator";
 import {
   Select,
@@ -29,8 +29,11 @@ import {
   SelectGroup,
   SelectLabel,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Label } from "@/components/ui/label";
+import z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 interface Cliente {
   cliente: string;
@@ -42,279 +45,232 @@ interface Cliente {
 
 const url = import.meta.env.VITE_API_URL;
 
+const editarClienteSchema = z.object({
+  cliente: z
+    .string()
+    .min(3, "Escreva um nome válido")
+    .nonempty("Campo Obrigatório"),
+  cnpj: z
+    .string()
+    .min(18, "Escreva um cnpj válido")
+    .refine((val) => cnpj.isValid(val), "Cnpj Inválido")
+    .nonempty("Campo Obrigatório"),
+  local: z
+    .string()
+    .min(3, "Escreva um nome válido")
+    .nonempty("Campo Obrigatório"),
+  status: z.literal(["ATIVO", "INATIVO"], "Campo Obrigatório"),
+});
+
 export default function EditarCliente() {
   const { id } = useParams<{ id: string }>(); // Pega o ID da URL
-  const navigate = useNavigate();
 
-  const [cliente, setCliente] = useState<Cliente>({
-    cliente: "",
-    cnpj: "",
-    local: "",
-    status: "",
-    // file: null
-  });
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [responseOk, setResponseOk] = useState(true);
-
-  // Buscar cliente ao carregar
-  useEffect(() => {
-    async function fetchCliente() {
-      try {
-        const response = await fetch(`${url}/cliente/${id}`);
+  const { data: cliente } = useQuery({
+    queryKey: ["cliente", id],
+    queryFn: async () => {
+      const response = await fetch(`${url}/cliente/${id}`);
         if (!response.ok) throw new Error("Cliente não encontrado");
         const data = await response.json();
-        setCliente({
-          cliente: data.cliente || "",
-          cnpj: cnpj.format(data.cnpj || ""),
-          local: data.local || "",
-          status: data.status || "",
-        });
-      } catch (err) {
-        setError((err as Error).message);
-      } finally {
-        setLoading(false);
-      }
+
+        return data as Cliente;
     }
+  });
 
-    if (id) fetchCliente();
-    else {
-      setError("ID inválido");
-      setLoading(false);
-    }
-  }, [id]);
-
-  // Atualizar cliente
-  async function atualizarCliente(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (
-      cliente.cliente.length < 3 ||
-      !cnpj.isValid(cliente.cnpj) ||
-      cliente.local.length < 3 ||
-      cliente.status === ""
-    )
-      return;
-    try {
+const formCliente = useForm<z.infer<typeof editarClienteSchema>>({
+    resolver: zodResolver(editarClienteSchema),
+    defaultValues: {
+      cliente: cliente?.cliente,
+      cnpj: cliente?.cnpj,
+      local: cliente?.local,
+      status: "ATIVO" as "ATIVO" | "INATIVO",
+    },
+  });
+  
+  const { mutateAsync: updateUsuario } = useMutation({
+    mutationKey: ["editar-cliente", id],
+    mutationFn: async ({id, cliente, cnpj, local, status}: {id: number, cliente: string, cnpj: string, local: string, status: string}) => {
       const response = await fetch(`${url}/clientes/${id}`, {
         method: "PUT", // ou PATCH, dependendo da sua API
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          cliente: cliente.cliente,
-          cnpj: cnpj.strip(cliente.cnpj),
-          local: cliente.local,
-          status: cliente.status,
-        }),
-      });
-
-      if (!response.ok) {
-        setResponseOk(false);
-        const errorText = await response.text();
-        throw new Error(`Erro ${response.status}: ${errorText}`);
-      }
-
+          cliente,
+          cnpj,
+          local,
+          status,
+        })
+      })
+      if (!response.ok) throw new Error("Erro ao atualizar cliente");
       setResponseOk(true);
-    } catch (err) {
-      console.error("Falha ao atualizar cliente:", err);
-      setResponseOk(false);
-    }
-  }
+    }})
+      
+      const onSubmit = async (data: z.infer<typeof editarClienteSchema>) => {
+        console.log(data);
+        
+        await updateUsuario({id: Number(id), cliente: data.cliente, cnpj: data.cnpj, local: data.local, status: data.status});
+      }
+  
 
-  if (loading)
-    return (
-      <div className="p-5 gap-5 flex flex-col">
-        <Skeleton className="h-9 w-58" />
-        <Skeleton className="h-9" />
-        <Skeleton className="h-9" />
-        <Skeleton className="h-9" />
-        <Skeleton className="h-9 w-48" />
-        <div className="flex gap-3">
-          <Skeleton className="h-9 w-25" />
-          <Skeleton className="h-9 w-50" />
-        </div>
-      </div>
-    );
+  const [responseOk, setResponseOk] = useState(false);
+  // Buscar cliente ao carregar
 
-  if (error) return <div className="p-5 text-destructive">Erro: {error}</div>;
+  // Atualizar cliente
+  // if (loading)
+  //   return (
+  //     <div className="p-5 gap-5 flex flex-col">
+  //       <Skeleton className="h-9 w-58" />
+  //       <Skeleton className="h-9" />
+  //       <Skeleton className="h-9" />
+  //       <Skeleton className="h-9" />
+  //       <Skeleton className="h-9 w-48" />
+  //       <div className="flex gap-3">
+  //         <Skeleton className="h-9 w-25" />
+  //         <Skeleton className="h-9 w-50" />
+  //       </div>
+  //     </div>
+  //   );
+
+  // if (error) return <div className="p-5 text-destructive">Erro: {error}</div>;
 
   return (
-    <div className="w-full h-screen flex flex-col bg-gray-50">
-      <form onSubmit={atualizarCliente} className="flex gap-3 flex-col p-5">
-        <div className="flex gap-3 items-center">
-          <Edit className="size-6" />
-          <h1 className="text-2xl font-bold">Editar Cliente</h1>
-        </div>
-
-        <Label>Insira o nome do cliente</Label>
-        <Input
-          type="text"
-          name="cliente"
-          placeholder="Nome do cliente"
-          value={cliente.cliente}
-          onChange={(e) =>
-            setCliente({
-              ...cliente,
-              cliente: e.target.value,
-            })
-          }
-          className="bg-white"
-        />
-
-        {/* Validação CNPJ */}
-        <Label>Insira o cnpj do cliente</Label>
-        {cliente.cnpj.length === 18 && !cnpj.isValid(cliente.cnpj) && (
-          <div className="text-destructive flex items-center gap-3 text-sm leading-none font-medium">
-            <CircleX className="size-[18px]" />
-            <h2>CNPJ Inválido</h2>
-          </div>
-        )}
-
-        <Input
-          type="text"
-          name="cnpj"
-          maxLength={18}
-          placeholder="CNPJ do cliente"
-          value={cliente.cnpj}
-          onChange={(e) =>
-            setCliente({
-              ...cliente,
-              cnpj: cnpj.format(e.target.value),
-            })
-          }
-          className="bg-white"
-        />
-
-        <Label>Insira o local do cliente</Label>
-        <Input
-          type="text"
-          name="local"
-          placeholder="Local do cliente"
-          value={cliente.local}
-          onChange={(e) =>
-            setCliente({
-              ...cliente,
-              local: e.target.value,
-            })
-          }
-          className="bg-white"
-        />
-
-        <Label>Insira a situação inicial</Label>
-        <Select
-          value={cliente.status}
-          onValueChange={(value) =>
-            setCliente({
-              ...cliente,
-              status: value,
-            })
-          }
+    <div className="w-full h-screen flex flex-col p-4 gap-3 bg-gray-50">
+      <div className="flex gap-3 items-center">
+        <Edit className="size-10" />
+        <h1 className="text-2xl font-bold">Editar Cliente</h1>
+      </div>
+      <Form {...formCliente}>
+        <form
+          onSubmit={formCliente.handleSubmit(onSubmit)}
+          className="flex gap-3 flex-col"
         >
-          <SelectTrigger className="bg-white cursor-pointer w-48">
-            <SelectValue placeholder="Selecione o Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Status</SelectLabel>
-              <SelectItem className="cursor-pointer" value="Ativo">
-                Ativo
-              </SelectItem>
-              <SelectItem className="cursor-pointer" value="Pendente">
-                Pendente
-              </SelectItem>
-              <SelectItem className="cursor-pointer" value="Inativo">
-                Inativo
-              </SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-
-        <div className="flex gap-3">
-          <Button
-            className="cursor-pointer"
-            type="button"
-            variant="destructive"
-            onClick={() => navigate(-1)}
-          >
-            <CircleArrowLeftIcon /> Voltar
-          </Button>
-
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
+          <FormField
+            control={formCliente.control}
+            name="cliente"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nome do Cliente</FormLabel>
+                <FormControl>
+                  <Input placeholder="Nome do cliente" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={formCliente.control}
+            name="cnpj"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Insira o CNPJ</FormLabel>
+                <FormControl>
+                  <Input placeholder="CNPJ" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={formCliente.control}
+            name="local"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Escolha um Local</FormLabel>
+                <FormControl>
+                  <Input placeholder="Local" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={formCliente.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-[300px]">
+                      <SelectValue placeholder="Selecionar Proposta" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="w-[300px]">
+                    <SelectGroup>
+                      <SelectLabel>Proposta</SelectLabel>
+                      <SelectItem value="ATIVO">Ativo</SelectItem>
+                      <SelectItem value="INATIVO">Inativo</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex gap-3">
+            <Link to={"/clientes"}>
               <Button
-                type="submit"
-                variant="default"
+                type="button"
+                variant="destructive"
                 className="cursor-pointer"
               >
-                <CircleCheck /> Salvar Alterações
+                <CircleArrowLeftIcon /> Voltar
               </Button>
-            </AlertDialogTrigger>
-
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                {cliente.cliente.length < 3 ||
-                !cnpj.isValid(cliente.cnpj) ||
-                cliente.local.length < 3 ||
-                cliente.status === "" ||
-                !responseOk ? (
-                  <>
+            </Link>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  type="submit"
+                  variant="default"
+                  className="cursor-pointer"
+                >
+                  <CircleCheck /> Cadastrar
+                </Button>
+              </AlertDialogTrigger>
+              {!responseOk ? (
+                <AlertDialogContent>
+                  <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-3 text-destructive">
-                      <CircleX /> Erro ao atualizar
-                    </AlertDialogTitle>
-                    <AlertDialogDescription className="flex items-center gap-3">
-                      {cliente.cliente.length < 3 ? (
-                        <>
-                          <CircleAlert /> Nome do cliente inválido
-                        </>
-                      ) : !cnpj.isValid(cliente.cnpj) ? (
-                        <>
-                          <CircleAlert /> CNPJ inválido
-                        </>
-                      ) : cliente.local.length < 3 ? (
-                        <>
-                          <CircleAlert /> Local inválido
-                        </>
-                      ) : cliente.status === "" ? (
-                        <>
-                          <CircleAlert /> Selecione um status
-                        </>
-                      ) : (
-                        <>
-                          <CircleX /> Erro interno no servidor
-                        </>
-                      )}
-                    </AlertDialogDescription>
-                    <AlertDialogFooter>
-                      <AlertDialogAction className="cursor-pointer">
-                        Retornar
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </>
-                ) : (
-                  <>
-                    <AlertDialogTitle className="flex items-center gap-3 text-green-600">
-                      <CircleCheck /> Cliente atualizado com sucesso!
+                      <CircleX />
+                      Não foi possível cadastrar o usuário
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                      As alterações foram salvas no sistema.
+                      Tente novamente mais tarde
                     </AlertDialogDescription>
                     <AlertDialogFooter>
-                      <AlertDialogAction
-                        className="cursor-pointer"
-                        onClick={() => navigate(-1)}
-                      >
+                      <AlertDialogCancel className="cursor-pointer">
                         Continuar
-                      </AlertDialogAction>
+                      </AlertDialogCancel>
                     </AlertDialogFooter>
-                  </>
-                )}
-              </AlertDialogHeader>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      </form>
+                  </AlertDialogHeader>
+                </AlertDialogContent>
+              ) : (
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-3 text-ring">
+                      <CircleCheck />
+                      Usuário cadastrado com sucesso
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Usuário cadastrado e inserido no sistema
+                    </AlertDialogDescription>
+                    <AlertDialogFooter>
+                      <Link to={"/clientes"}>
+                        <AlertDialogAction className="cursor-pointer">
+                          Continuar
+                        </AlertDialogAction>
+                      </Link>
+                    </AlertDialogFooter>
+                  </AlertDialogHeader>
+                </AlertDialogContent>
+              )}
+            </AlertDialog>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }

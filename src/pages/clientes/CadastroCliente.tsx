@@ -62,7 +62,7 @@ const criarClienteSchema = z.object({
 });
 
 export default function CriarCliente() {
-  type CriarClienteFromData = z.infer<typeof criarClienteSchema>;
+  //type CriarClienteFromData = z.infer<typeof criarClienteSchema>;
 
   const formCliente = useForm<z.infer<typeof criarClienteSchema>>({
     resolver: zodResolver(criarClienteSchema),
