@@ -3,7 +3,7 @@ export type Cliente = {
     cliente: string,
     cnpj: string,
     local: string,
-    status: string;
+    status: "ATIVO" | "INATIVO",
 }
 
 export type Contrato = {

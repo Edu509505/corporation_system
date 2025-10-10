@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import {
   Building,
+  Car,
   CircleAlert,
   CircleCheck,
   CirclePlusIcon,
@@ -11,7 +12,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { Cliente } from "../Tipagens";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cnpj } from "cpf-cnpj-validator";
+import CardClientes from "../components/clientes/card";
 
 export default function VerClientes() {
   const navigate = useNavigate();
@@ -109,80 +110,14 @@ export default function VerClientes() {
         }
 
         {clientes.map((c) => (
-          <div
+          <CardClientes
             key={c.id}
-            className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 bg-white gap-3 "
-          >
-            <section className="flex flex-col items-center justify-between w-full gap-2">
-              {c.status === "ATIVO" ? (
-                <div className="w-[8rem] h-[8rem] border-4 flex justify-center items-center border-ring rounded-full text-center">
-                  <h1 className="text-5xl ">
-                    {
-                      c.cliente
-                        ?.split(" ")
-                        .slice(0, 2)
-                        .map((palavra) => palavra[0])
-                        .join("")
-                        .toUpperCase()
-
-                      //Essa função pega o nome do cliente, elimina os espaços dividindo em 2 textos, depois pega a primeira letra de cada um e no final junta
-                    }
-                  </h1>
-                </div>
-              ) : c.status === "INATIVO" ? (
-                <div className="w-[8rem] h-[8rem] border-4 flex justify-center items-center border-destructive rounded-full text-center">
-                  <h1 className="text-5xl ">
-                    {
-                      c.cliente
-                        ?.trim()
-                        .split(" ")
-                        .slice(0, 2) //função que pega as duas primeiras palavras
-                        .map((palavra) => palavra[0].toUpperCase())
-                        .join("")
-                      //Essa função pega o nome do cliente, elimina os espaços dividindo em 2 textos, depois pega a primeira letra de cada um e no final junta
-                    }
-                  </h1>
-                </div>
-              ) : (
-                ""
-              )}
-              <p>
-                <strong>Cliente:</strong> {c.cliente}
-              </p>
-              <div className="w-full flex flex-col gap-2">
-                <p>
-                  <strong>CNPJ:</strong> {cnpj.format(c.cnpj)}
-                </p>
-                <p>
-                  <strong>Local:</strong> {c.local}
-                </p>
-                {c.status === "Ativo" ? (
-                  <p className="flex itens-center gap-2 font-bold text-ring">
-                    <CircleCheck /> {c.status}
-                  </p>
-                ) : c.status === "Pendente" ? (
-                  <p className="flex itens-center gap-2 font-bold text-chart-1">
-                    <CircleAlert /> {c.status}
-                  </p>
-                ) : c.status === "Inativo" ? (
-                  <p className="flex itens-center gap-2 font-bold text-destructive">
-                    <CircleX /> {c.status}
-                  </p>
-                ) : (
-                  ""
-                )}
-              </div>
-            </section>
-            <div className="w-full flex justify-end">
-              <Button
-                variant="outline"
-                className="flex itens-center gap-2 font-bold cursor-pointer"
-                onClick={() => editarCliente(c.id)}
-              >
-                <Edit /> Editar
-              </Button>
-            </div>
-          </div>
+            id={c.id}
+            cliente={c.cliente}
+            cnpjCliente={c.cnpj}
+            local={c.local}
+            status={c.status}
+          />
         ))}
       </section>
     </div>
