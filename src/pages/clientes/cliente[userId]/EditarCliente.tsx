@@ -11,13 +11,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  CircleArrowLeftIcon,
-  CircleCheck,
-  CircleX,
-  Edit,
-} from "lucide-react";
-import { useState } from "react";
+import { CircleArrowLeftIcon, CircleCheck, CircleX, Edit } from "lucide-react";
+import { Suspense, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { cnpj } from "cpf-cnpj-validator";
 import {
@@ -32,15 +27,28 @@ import {
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  useMutation,
+  useQuery,
+  useQueryErrorResetBoundary,
+} from "@tanstack/react-query";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorBoundary } from "react-error-boundary";
 
 interface Cliente {
   cliente: string;
   cnpj: string;
   local: string;
   status: string;
-  // file: File | null; // opcional, caso use upload
+  path: string;
 }
 
 const url = import.meta.env.VITE_API_URL;
@@ -60,36 +68,64 @@ const editarClienteSchema = z.object({
     .min(3, "Escreva um nome válido")
     .nonempty("Campo Obrigatório"),
   status: z.literal(["ATIVO", "INATIVO"], "Campo Obrigatório"),
+  path: z.string(),
 });
+// Buscar cliente ao carregar
 
-export default function EditarCliente() {
+function UpdateCliente() {
   const { id } = useParams<{ id: string }>(); // Pega o ID da URL
 
   const { data: cliente } = useQuery({
     queryKey: ["cliente", id],
     queryFn: async () => {
       const response = await fetch(`${url}/cliente/${id}`);
-        if (!response.ok) throw new Error("Cliente não encontrado");
-        const data = await response.json();
-
-        return data as Cliente;
-    }
+      if (!response.ok) throw new Error("Cliente não encontrado");
+      const data = await response.json();
+      return data as Cliente;
+    },
   });
-
-const formCliente = useForm<z.infer<typeof editarClienteSchema>>({
+  const formCliente = useForm<z.infer<typeof editarClienteSchema>>({
     resolver: zodResolver(editarClienteSchema),
     defaultValues: {
       cliente: cliente?.cliente,
       cnpj: cliente?.cnpj,
       local: cliente?.local,
       status: "ATIVO" as "ATIVO" | "INATIVO",
+      path: cliente?.path,
     },
   });
-  
+
+  useEffect(() => {
+    console.log(cliente);
+    if (cliente) {
+      formCliente.reset({
+        cliente: cliente?.cliente,
+        cnpj: cliente?.cnpj,
+        local: cliente?.local,
+        status: cliente.status as "ATIVO",
+        path: cliente?.path,
+      });
+    }
+  }, [cliente, formCliente.reset]);
+
   const { mutateAsync: updateUsuario } = useMutation({
     mutationKey: ["editar-cliente", id],
-    mutationFn: async ({id, cliente, cnpj, local, status}: {id: number, cliente: string, cnpj: string, local: string, status: string}) => {
-      const response = await fetch(`${url}/clientes/${id}`, {
+    mutationFn: async ({
+      id,
+      cliente,
+      cnpj,
+      local,
+      status,
+      path,
+    }: {
+      id: number;
+      cliente: string;
+      cnpj: string;
+      local: string;
+      status: string;
+      path: string;
+    }) => {
+      const response = await fetch(`${url}/cliente/${id}`, {
         method: "PUT", // ou PATCH, dependendo da sua API
         headers: {
           "Content-Type": "application/json",
@@ -99,40 +135,30 @@ const formCliente = useForm<z.infer<typeof editarClienteSchema>>({
           cnpj,
           local,
           status,
-        })
-      })
+          path,
+        }),
+      });
+      console.log("parei aqui", response);
       if (!response.ok) throw new Error("Erro ao atualizar cliente");
+      console.log("cheguei aqui");
       setResponseOk(true);
-    }})
-      
-      const onSubmit = async (data: z.infer<typeof editarClienteSchema>) => {
-        console.log(data);
-        
-        await updateUsuario({id: Number(id), cliente: data.cliente, cnpj: data.cnpj, local: data.local, status: data.status});
-      }
-  
+    },
+  });
+
+  const onSubmit = async (data: z.infer<typeof editarClienteSchema>) => {
+    console.log(data);
+
+    await updateUsuario({
+      id: Number(id),
+      cliente: data.cliente,
+      cnpj: data.cnpj,
+      local: data.local,
+      status: data.status,
+      path: data.path,
+    });
+  };
 
   const [responseOk, setResponseOk] = useState(false);
-  // Buscar cliente ao carregar
-
-  // Atualizar cliente
-  // if (loading)
-  //   return (
-  //     <div className="p-5 gap-5 flex flex-col">
-  //       <Skeleton className="h-9 w-58" />
-  //       <Skeleton className="h-9" />
-  //       <Skeleton className="h-9" />
-  //       <Skeleton className="h-9" />
-  //       <Skeleton className="h-9 w-48" />
-  //       <div className="flex gap-3">
-  //         <Skeleton className="h-9 w-25" />
-  //         <Skeleton className="h-9 w-50" />
-  //       </div>
-  //     </div>
-  //   );
-
-  // if (error) return <div className="p-5 text-destructive">Erro: {error}</div>;
-
   return (
     <div className="w-full h-screen flex flex-col p-4 gap-3 bg-gray-50">
       <div className="flex gap-3 items-center">
@@ -210,6 +236,22 @@ const formCliente = useForm<z.infer<typeof editarClienteSchema>>({
               </FormItem>
             )}
           />
+          <FormField
+            control={formCliente.control}
+            name="path"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Domínio Opicional</FormLabel>
+                <FormControl>
+                  <Input placeholder="Domínio" {...field} />
+                </FormControl>
+                <FormLabel className="text-gray-500">
+                  O cliente possui algum domínio? Exemplo: cliente.com.br
+                </FormLabel>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="flex gap-3">
             <Link to={"/clientes"}>
               <Button
@@ -272,5 +314,46 @@ const formCliente = useForm<z.infer<typeof editarClienteSchema>>({
         </form>
       </Form>
     </div>
+  );
+}
+
+function UpdateClienteLoading() {
+  return (
+    <div className="p-5 gap-5 flex flex-col">
+      <Skeleton className="h-9 w-58" />
+      <Skeleton className="h-9" />
+      <Skeleton className="h-9" />
+      <Skeleton className="h-9" />
+      <Skeleton className="h-9 w-48" />
+      <div className="flex gap-3">
+        <Skeleton className="h-9 w-25" />
+        <Skeleton className="h-9 w-50" />
+      </div>
+    </div>
+  );
+}
+function ErrorFallback({
+  error,
+  resetErrorBoundary,
+}: {
+  error: Error;
+  resetErrorBoundary: () => void;
+}) {
+  return <div className="p-5 text-destructive">Erro: {error.message}</div>;
+}
+
+export default function EditarCliente() {
+  const { reset } = useQueryErrorResetBoundary();
+  return (
+    <ErrorBoundary
+      onReset={reset}
+      fallbackRender={({ error, resetErrorBoundary }) => (
+        <ErrorFallback error={error} resetErrorBoundary={resetErrorBoundary} />
+      )}
+    >
+      <Suspense fallback={<UpdateClienteLoading />}>
+        <UpdateCliente />
+      </Suspense>
+    </ErrorBoundary>
   );
 }

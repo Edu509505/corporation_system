@@ -59,6 +59,7 @@ const criarClienteSchema = z.object({
     .min(3, "Escreva um nome válido")
     .nonempty("Campo Obrigatório"),
   status: z.literal(["ATIVO", "INATIVO"], "Campo Obrigatório"),
+  path: z.string(),
 });
 
 export default function CriarCliente() {
@@ -71,6 +72,7 @@ export default function CriarCliente() {
       cnpj: "",
       local: "",
       status: "" as "ATIVO" | "INATIVO",
+      path: "",
     },
   });
 
@@ -86,13 +88,15 @@ export default function CriarCliente() {
         body: JSON.stringify(data),
       });
 
+      console.log("parei aqui");
+
       if (!response.ok) {
         // Aqui você lida com o erro de forma clara
         setResponseOk(false);
         const errorText = await response.text();
         throw new Error(`Erro ${response.status}: ${errorText}`);
       }
-
+      console.log("estou aqui");
       const body = await response.json();
       setResponseOk(true);
       console.log("Cliente criado com sucesso:", body);
@@ -179,6 +183,22 @@ export default function CriarCliente() {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={formCliente.control}
+            name="path"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Domínio Opicional</FormLabel>
+                <FormControl>
+                  <Input placeholder="Domínio" {...field} />
+                </FormControl>
+                <FormLabel className="text-gray-500">
+                  O cliente possui algum domínio? Exemplo: cliente.com.br
+                </FormLabel>
                 <FormMessage />
               </FormItem>
             )}

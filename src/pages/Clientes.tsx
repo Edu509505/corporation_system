@@ -117,6 +117,7 @@ export default function VerClientes() {
             cnpjCliente={c.cnpj}
             local={c.local}
             status={c.status}
+            path={c.path}
           />
         ))}
       </section>

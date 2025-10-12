@@ -1,17 +1,18 @@
 export type Cliente = {
-    id: number,
-    cliente: string,
-    cnpj: string,
-    local: string,
-    status: "ATIVO" | "INATIVO",
-}
+  id: number;
+  cliente: string;
+  cnpj: string;
+  local: string;
+  status: "ATIVO" | "INATIVO";
+  path: string;
+};
 
 export type Contrato = {
-    id: number,
-    idCliente: number,
-    contrato: string,
-    nome: string,
-    descricao: string,
-    status: string,
-    local: string,
-}
+  id: number;
+  idCliente: number;
+  contrato: string;
+  nome: string;
+  descricao: string;
+  status: string;
+  local: string;
+};
