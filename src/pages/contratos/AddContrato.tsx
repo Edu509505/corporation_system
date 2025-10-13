@@ -22,6 +22,7 @@ import {
   SelectLabel,
   SelectGroup,
 } from "@/components/ui/select";
+import { useState } from "react";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -50,8 +51,28 @@ function AddContrato() {
     },
   });
 
+  const [idCliente, setIdCliente] = useState({ id: "" });
+  console.log("idCliente", idCliente);
+  const { data: propostasAprovadas } = useQuery({
+    queryKey: ["cliente", idCliente, "propostasAprovadas"],
+    queryFn: async () => {
+      const response = await fetch(
+        `${url}/cliente/${idCliente.id}/propostasAprovadas`
+      );
+      console.log("response", response);
+      if (!response.ok) throw new Error("Propostas não encontradas");
+      const data = await response.json();
+      console.log("Testando o Refetch", data);
+      return data as Propostas[];
+    },
+  });
+  console.log("teste", propostasAprovadas);
+
   //console.log("Estou aqui", propostasAprovadas);
 
+  const propostas = propostasAprovadas
+    ? propostasAprovadas.map((p) => p.nomeDaProposta)
+    : [];
   const clienteNomes = clientes ? clientes.map((c) => c.cliente) : [];
 
   const contratoSchema = z.object({
@@ -63,7 +84,7 @@ function AddContrato() {
       clienteNomes as [string, ...string[]],
       "Selecione um cliente válido"
     ),
-    proposta: z.string(),
+    proposta: z.enum(propostas as [string, ...string[]], "Selcione a Proposta"),
   });
 
   console.log(clientes);
@@ -78,25 +99,9 @@ function AddContrato() {
     },
   });
 
-  const idCliente = form.watch("id");
-  console.log(idCliente);
   function onSubimit(data: z.infer<typeof contratoSchema>) {
     console.log(data);
   }
-
-  const { data: propostasAprovadas } = useQuery({
-    queryKey: ["propostas", idCliente],
-    queryFn: async () => {
-      const response = await fetch(
-        `${url}/cliente/${idCliente}/propostasAprovadas`
-      );
-      if (response.ok) throw new Error("Propostas não encontradas");
-      const data = await response.json();
-      return data as Propostas;
-    },
-  });
-
-  console.log("teste", propostasAprovadas);
 
   return (
     <div className="flex flex-col bg-gray-50 h-full gap-3 p-4">
@@ -129,7 +134,15 @@ function AddContrato() {
                     <FormLabel>Cliente</FormLabel>
                     <FormMessage />
                     <Select
-                      onValueChange={field.onChange}
+                      value={idCliente.id}
+                      onValueChange={(value) => {
+                        field.onChange;
+                        setIdCliente({
+                          ...idCliente,
+                          id: value.toString(),
+                        });
+                        propostasAprovadas;
+                      }}
                       defaultValue={field.value}
                     >
                       <FormControl>
@@ -143,7 +156,7 @@ function AddContrato() {
                           {clientes?.map((cliente) => (
                             <SelectItem
                               key={cliente.id}
-                              value={cliente.cliente}
+                              value={cliente.id.toString()}
                             >
                               {cliente.cliente}
                             </SelectItem>
@@ -164,7 +177,7 @@ function AddContrato() {
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      disabled={true}
+                      disabled={false}
                     >
                       <FormControl>
                         <SelectTrigger className="w-[300px]">
@@ -174,16 +187,14 @@ function AddContrato() {
                       <SelectContent className="w-[300px]">
                         <SelectGroup>
                           <SelectLabel>Proposta</SelectLabel>
-                          <SelectItem value="sim">sim</SelectItem>
-                          <SelectItem value="não">não</SelectItem>
-                          {/* {clientes?.map((proposta) => (
+                          {propostasAprovadas?.map((proposta) => (
                             <SelectItem
-                              key={proposta.proposta}
-                              value={proposta.proposta}
+                              key={proposta.id}
+                              value={proposta.nomeDaProposta}
                             >
-                              {proposta.proposta}
+                              {proposta.nomeDaProposta}
                             </SelectItem>
-                          ))} */}
+                          ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
