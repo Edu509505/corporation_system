@@ -26,9 +26,17 @@ import {
 const url = import.meta.env.VITE_API_URL;
 
 interface Cliente {
+  id: number;
   cliente: string;
   cnpj: string;
   proposta: string;
+}
+
+interface Propostas {
+  id: number;
+  idCliente: number;
+  nomeDaProposta: string;
+  statusProposta: string;
 }
 
 function AddContrato() {
@@ -42,9 +50,12 @@ function AddContrato() {
     },
   });
 
+  //console.log("Estou aqui", propostasAprovadas);
+
   const clienteNomes = clientes ? clientes.map((c) => c.cliente) : [];
 
   const contratoSchema = z.object({
+    id: z.number(),
     titulo: z.string().min(1, "Título é obrigatório"),
     descricao: z.string().min(1, "Descrição é obrigatória"),
     //local: z.string().min(1, "Local é obrigatório"),
@@ -52,7 +63,7 @@ function AddContrato() {
       clienteNomes as [string, ...string[]],
       "Selecione um cliente válido"
     ),
-    proposta: z.literal(["sim", "não"]),
+    proposta: z.string(),
   });
 
   console.log(clientes);
@@ -62,14 +73,31 @@ function AddContrato() {
     defaultValues: {
       titulo: "",
       descricao: "",
-      proposta: "" as "sim" | "não",
+      proposta: "",
       //local: "",
     },
   });
 
+  const idCliente = form.watch("id");
+  console.log(idCliente);
   function onSubimit(data: z.infer<typeof contratoSchema>) {
     console.log(data);
   }
+
+  const { data: propostasAprovadas } = useQuery({
+    queryKey: ["propostas", idCliente],
+    queryFn: async () => {
+      const response = await fetch(
+        `${url}/cliente/${idCliente}/propostasAprovadas`
+      );
+      if (response.ok) throw new Error("Propostas não encontradas");
+      const data = await response.json();
+      return data as Propostas;
+    },
+  });
+
+  console.log("teste", propostasAprovadas);
+
   return (
     <div className="flex flex-col bg-gray-50 h-full gap-3 p-4">
       <header>
@@ -114,7 +142,7 @@ function AddContrato() {
                           <SelectLabel>Clientes</SelectLabel>
                           {clientes?.map((cliente) => (
                             <SelectItem
-                              key={cliente.cliente}
+                              key={cliente.id}
                               value={cliente.cliente}
                             >
                               {cliente.cliente}
@@ -136,6 +164,7 @@ function AddContrato() {
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      disabled={true}
                     >
                       <FormControl>
                         <SelectTrigger className="w-[300px]">

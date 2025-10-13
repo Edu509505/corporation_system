@@ -294,10 +294,11 @@ function UpdateCliente() {
                   <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-3 text-ring">
                       <CircleCheck />
-                      Usuário cadastrado com sucesso
+                      Cadastro de Usuario atualizado com sucesso
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                      Usuário cadastrado e inserido no sistema
+                      As informações do usario foram atualizados e inserido no
+                      sistema
                     </AlertDialogDescription>
                     <AlertDialogFooter>
                       <Link to={"/clientes"}>
@@ -334,7 +335,6 @@ function UpdateClienteLoading() {
 }
 function ErrorFallback({
   error,
-  resetErrorBoundary,
 }: {
   error: Error;
   resetErrorBoundary: () => void;
