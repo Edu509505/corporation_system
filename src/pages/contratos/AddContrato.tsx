@@ -80,10 +80,7 @@ function AddContrato() {
     titulo: z.string().min(1, "Título é obrigatório"),
     descricao: z.string().min(1, "Descrição é obrigatória"),
     //local: z.string().min(1, "Local é obrigatório"),
-    cliente: z.enum(
-      clienteNomes as [string, ...string[]],
-      "Selecione um cliente válido"
-    ),
+    cliente: z.enum(clienteNomes as [string, ...string[]], "Selecione um Cliente"),
     proposta: z.enum(propostas as [string, ...string[]], "Selcione a Proposta"),
   });
 
@@ -92,10 +89,10 @@ function AddContrato() {
   const form = useForm<z.infer<typeof contratoSchema>>({
     resolver: zodResolver(contratoSchema),
     defaultValues: {
+      cliente: "",
       titulo: "",
       descricao: "",
       proposta: "",
-      //local: "",
     },
   });
 
@@ -132,9 +129,8 @@ function AddContrato() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Cliente</FormLabel>
-                    <FormMessage />
                     <Select
-                      value={idCliente.id}
+                      //value={idCliente.id}
                       onValueChange={(value) => {
                         field.onChange;
                         setIdCliente({
@@ -163,6 +159,7 @@ function AddContrato() {
                           ))}
                         </SelectGroup>
                       </SelectContent>
+                      <FormMessage />
                     </Select>
                   </FormItem>
                 )}
@@ -173,7 +170,6 @@ function AddContrato() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Proposta</FormLabel>
-                    <FormMessage />
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -197,6 +193,7 @@ function AddContrato() {
                           ))}
                         </SelectGroup>
                       </SelectContent>
+                      <FormMessage />
                     </Select>
                   </FormItem>
                 )}

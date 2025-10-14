@@ -246,21 +246,21 @@ function Versionamento() {
     },
   });
 
-  const { mutateAsync: updateProposta } = useMutation({
-    mutationKey: ["updateProposta"],
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const response = await fetch(`${url}/proposta/${id}`, {
-        method: "PUT", // ou PATCH, dependendo da sua API
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          status: status,
-        }),
-      });
-      if (!response.ok) throw new Error("Proposta não encontrada");
-    },
-  });
+  // const { mutateAsync: updateProposta } = useMutation({
+  //   mutationKey: ["updateProposta"],
+  //   mutationFn: async ({ id, status }: { id: string; status: string }) => {
+  //     const response = await fetch(`${url}/proposta/${id}`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         status: status,
+  //       }),
+  //     });
+  //     if (!response.ok) throw new Error("Proposta não encontrada");
+  //   },
+  // });
 
   const [novoVersionamento, setNovoVersionamento] =
     useState<formularioComImagem>({
@@ -344,7 +344,7 @@ function Versionamento() {
         status: "APROVADA",
       });
 
-      await updateProposta({ id: id!, status: "APROVADA" });
+      //await updateProposta({ id: id!, status: "APROVADA" });
 
       await fetch(`${url}/quantitativa`, {
         method: "POST",
