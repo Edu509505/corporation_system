@@ -31,6 +31,7 @@ import {
   useMutation,
   useQuery,
   useQueryErrorResetBoundary,
+  useSuspenseQuery,
 } from "@tanstack/react-query";
 import {
   Form,
@@ -75,7 +76,7 @@ const editarClienteSchema = z.object({
 function UpdateCliente() {
   const { id } = useParams<{ id: string }>(); // Pega o ID da URL
 
-  const { data: cliente } = useQuery({
+  const { data: cliente } = useSuspenseQuery({
     queryKey: ["cliente", id],
     queryFn: async () => {
       const response = await fetch(`${url}/cliente/${id}`);

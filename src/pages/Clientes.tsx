@@ -1,21 +1,17 @@
 import { Button } from "@/components/ui/button";
 import {
   Building,
-  Car,
-  CircleAlert,
-  CircleCheck,
   CirclePlusIcon,
   CircleX,
-  Edit,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import type { Cliente } from "../Tipagens";
 import { Skeleton } from "@/components/ui/skeleton";
-import CardClientes from "../components/clientes/card";
+import CardClientes from "../components/clientes/Card";
 
 export default function VerClientes() {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   const url = import.meta.env.VITE_API_URL;
   //Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática
@@ -76,9 +72,9 @@ export default function VerClientes() {
       </div>
     );
 
-  const editarCliente = (clienteId: number) => {
-    navigate(`/clientes/${clienteId}`); // Navega para a rota específica do cliente
-  };
+  // const editarCliente = (clienteId: number) => {
+  //   navigate(`/clientes/${clienteId}`); // Navega para a rota específica do cliente
+  // };
 
   return (
     <div className="w-full h-screen p-2 flex flex-col bg-gray-50">

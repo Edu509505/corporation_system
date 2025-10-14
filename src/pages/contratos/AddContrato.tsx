@@ -127,7 +127,10 @@ function AddContrato() {
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          anexos: Array.from(data.anexo)
+        }),
       });
       if (!response.ok) {
         // Aqui você lida com o erro de forma clara
