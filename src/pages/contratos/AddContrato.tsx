@@ -23,6 +23,14 @@ import {
   SelectGroup,
 } from "@/components/ui/select";
 import { useState } from "react";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { Paperclip } from "lucide-react";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -52,53 +60,87 @@ function AddContrato() {
   });
 
   const [idCliente, setIdCliente] = useState({ id: "" });
-  console.log("idCliente", idCliente);
+
   const { data: propostasAprovadas } = useQuery({
-    queryKey: ["cliente", idCliente, "propostasAprovadas"],
+    queryKey: ["cliente", idCliente],
     queryFn: async () => {
-      const response = await fetch(
-        `${url}/cliente/${idCliente.id}/propostasAprovadas`
-      );
-      console.log("response", response);
-      if (!response.ok) throw new Error("Propostas não encontradas");
-      const data = await response.json();
-      console.log("Testando o Refetch", data);
-      return data as Propostas[];
+      if (idCliente.id !== "") {
+        const response = await fetch(
+          `${url}/cliente/${idCliente.id}/propostasAprovadas`
+        );
+        if (!response.ok) throw new Error("Propostas não encontradas");
+        const data = await response.json();
+        return data as Propostas[];
+      } else {
+        return;
+      }
     },
   });
-  console.log("teste", propostasAprovadas);
-
-  //console.log("Estou aqui", propostasAprovadas);
-
-  const propostas = propostasAprovadas
-    ? propostasAprovadas.map((p) => p.nomeDaProposta)
-    : [];
-  const clienteNomes = clientes ? clientes.map((c) => c.cliente) : [];
 
   const contratoSchema = z.object({
-    id: z.number(),
     titulo: z.string().min(1, "Título é obrigatório"),
-    descricao: z.string().min(1, "Descrição é obrigatória"),
-    //local: z.string().min(1, "Local é obrigatório"),
-    cliente: z.enum(clienteNomes as [string, ...string[]], "Selecione um Cliente"),
-    proposta: z.enum(propostas as [string, ...string[]], "Selcione a Proposta"),
+    idCliente: z.string().min(1, "Selecione ao menos um cliente"),
+    idProposta: z.string().min(1, "Selecione ao menos uma proposta"),
+    anexo: z
+      .any()
+      .refine(
+        (files) => files?.length >= 1,
+        "Você deve selecionar ao menos um arquivo"
+      )
+      .refine(
+        (files) => files?.[0]?.size <= 15 * 1024 * 1024,
+        "Arquivo deve ter até 50MB"
+      )
+      .refine(
+        (files) =>
+          ["image/jpeg", "image/png", "application/pdf"].includes(
+            files?.[0]?.type
+          ),
+        "Tipo de arquivo inválido"
+      ),
+    // .file()
+    // .min(1, "Selecione ao menos um arquivo")
+    // .max(50 * 1024 * 1024, "Arquivo deve ter até 50MB")
+    // .mime(
+    //   ["image/jpeg", "image/png", "application/pdf"],
+    //   "Selecione um tipo de arquivo válido"
+    // ),
   });
-
-  console.log(clientes);
 
   const form = useForm<z.infer<typeof contratoSchema>>({
     resolver: zodResolver(contratoSchema),
     defaultValues: {
-      cliente: "",
+      idCliente: "",
       titulo: "",
-      descricao: "",
-      proposta: "",
+      anexo: undefined,
+      idProposta: "",
     },
   });
 
-  function onSubimit(data: z.infer<typeof contratoSchema>) {
-    console.log(data);
-  }
+  const onSubimit = async (data: z.infer<typeof contratoSchema>) => {
+    console.log("data ", data);
+    console.log("files: ", data.anexo.length);
+
+    try {
+      const response = await fetch(`${url}/contrato`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        // Aqui você lida com o erro de forma clara
+        //setResponseOk(false);
+        const errorText = await response.text();
+        throw new Error(`Erro ${response.status}: ${errorText}`);
+      }
+      console.log("estou aqui");
+      const body = await response.json();
+      //setResponseOk(true);
+      console.log("Cliente criado com sucesso:", body);
+    } catch {}
+  };
 
   return (
     <div className="flex flex-col bg-gray-50 h-full gap-3 p-4">
@@ -125,18 +167,18 @@ function AddContrato() {
             <div className="flex gap-4 flex-wrap">
               <FormField
                 control={form.control}
-                name="cliente"
+                name="idCliente"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Cliente</FormLabel>
                     <Select
                       //value={idCliente.id}
                       onValueChange={(value) => {
-                        field.onChange;
                         setIdCliente({
                           ...idCliente,
                           id: value.toString(),
                         });
+                        field.onChange(value);
                         propostasAprovadas;
                       }}
                       defaultValue={field.value}
@@ -166,7 +208,7 @@ function AddContrato() {
               />
               <FormField
                 control={form.control}
-                name="proposta"
+                name="idProposta"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Proposta</FormLabel>
@@ -186,7 +228,7 @@ function AddContrato() {
                           {propostasAprovadas?.map((proposta) => (
                             <SelectItem
                               key={proposta.id}
-                              value={proposta.nomeDaProposta}
+                              value={proposta.id.toString()}
                             >
                               {proposta.nomeDaProposta}
                             </SelectItem>
@@ -215,7 +257,43 @@ function AddContrato() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="mt-4" variant="default">
+            <FormField
+              control={form.control}
+              name="anexo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Escolha um arquivo</FormLabel>
+                  <FormControl>
+                    <Empty className="border border-dashed">
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon">
+                          <Paperclip />
+                        </EmptyMedia>
+                        <EmptyTitle>Selecione um Arquivo</EmptyTitle>
+                        <EmptyDescription>
+                          Escolha um aruivo de seu dispositivo para realizar o
+                          Upload
+                          <Input
+                            className="cursor-pointer"
+                            //{...field}
+                            type="file"
+                            multiple
+                            accept=".jpg,.png,.pdf"
+                            onChange={(e) => field.onChange(e.target.files)}
+                          />
+                        </EmptyDescription>
+                      </EmptyHeader>
+                    </Empty>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              className="mt-4 cursor-pointer"
+              variant="default"
+            >
               Cadastrar Contrato
             </Button>
           </form>
