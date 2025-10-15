@@ -273,7 +273,7 @@ function Versionamento() {
   //FORM DA QUATITATIVA
 
   const itemSchema = z.object({
-    idVersao: z.number(),
+    idVersionamento: z.number(),
     descricao: z.string().min(2, "Nome obrigatório"),
     unidadeDeMedida: z.string().min(1, "Unidade obrigatória"),
     quantidade: z.string(),
@@ -286,7 +286,7 @@ function Versionamento() {
 
   type Quantitativas = {
     itens: {
-      idVersao: number;
+      idVersionamento: number;
       descricao: string;
       quantidade: string;
       valorUnitario: string;
@@ -615,7 +615,7 @@ function Versionamento() {
                                                 type="button"
                                                 onClick={() =>
                                                   append({
-                                                    idVersao:
+                                                    idVersionamento:
                                                       itemVersionamento.id,
                                                     descricao: "",
                                                     unidadeDeMedida: "",
