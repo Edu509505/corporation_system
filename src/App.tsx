@@ -17,6 +17,7 @@ import VerVersionamento from "./Versionamento";
 import Versionamento from "./pages/versionamento/Versionamento";
 import Contratos from "./pages/Contratos";
 import AddContrato from "./pages/contratos/AddContrato";
+import VisualizarContrato from "./pages/contratos/VisualizarContrato";
 
 function App() {
   return (
@@ -41,6 +42,10 @@ function App() {
             />
             <Route path="/contratos" element={<Contratos />} />
             <Route path="/addContrato" element={<AddContrato />} />
+            <Route
+              path="/visualizarContrato/:id"
+              element={<VisualizarContrato />}
+            />
             <Route path="/clientes/:id" element={<EditarCliente />} />
             <Route path="*" element={<NoPage />} />
           </Route>

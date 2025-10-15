@@ -24,8 +24,8 @@ interface Contrato {
   local: string;
   createdAt: string;
   clientesContratos: {
-    cliente: string
-  }
+    cliente: string;
+  };
 }
 
 function Contratos() {
@@ -100,9 +100,11 @@ function Contratos() {
                   </span>
                 </TableCell>
                 <TableCell className="py-3 px-4 text-center">
-                  <Button className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition">
-                    Visualizar
-                  </Button>
+                  <Link to={`/visualizarContrato/${contratos.id}`}>
+                    <Button className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition">
+                      Visualizar
+                    </Button>
+                  </Link>
                 </TableCell>
               </TableRow>
             ))
