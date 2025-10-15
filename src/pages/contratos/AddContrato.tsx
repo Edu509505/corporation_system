@@ -82,7 +82,7 @@ function AddContrato() {
     idCliente: z.string().min(1, "Selecione ao menos um cliente"),
     idProposta: z.string().min(1, "Selecione ao menos uma proposta"),
     anexo: z
-      .any()
+      .instanceof(FileList)
       .refine(
         (files) => files?.length >= 1,
         "Você deve selecionar ao menos um arquivo"
@@ -98,13 +98,6 @@ function AddContrato() {
           ),
         "Tipo de arquivo inválido"
       ),
-    // .file()
-    // .min(1, "Selecione ao menos um arquivo")
-    // .max(50 * 1024 * 1024, "Arquivo deve ter até 50MB")
-    // .mime(
-    //   ["image/jpeg", "image/png", "application/pdf"],
-    //   "Selecione um tipo de arquivo válido"
-    // ),
   });
 
   const form = useForm<z.infer<typeof contratoSchema>>({
@@ -120,17 +113,21 @@ function AddContrato() {
   const onSubimit = async (data: z.infer<typeof contratoSchema>) => {
     console.log("data ", data);
     console.log("files: ", data.anexo.length);
-
+    
     try {
+      const form = new FormData();
+
+      form.set("idCliente", data.idCliente);
+      form.set("idProposta", data.idProposta);
+      form.set("titulo", data.titulo);
+
+      for(let i = 0; i<data.anexo.length; i++){
+        console.log(data.anexo[i]);
+        form.append("anexo", data.anexo[i]);
+      }
       const response = await fetch(`${url}/contrato`, {
         method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({
-          ...data,
-          anexos: Array.from(data.anexo)
-        }),
+        body:form,
       });
       if (!response.ok) {
         // Aqui você lida com o erro de forma clara
@@ -278,7 +275,6 @@ function AddContrato() {
                           Upload
                           <Input
                             className="cursor-pointer"
-                            //{...field}
                             type="file"
                             multiple
                             accept=".jpg,.png,.pdf"

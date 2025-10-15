@@ -72,10 +72,6 @@ export default function VerClientes() {
       </div>
     );
 
-  // const editarCliente = (clienteId: number) => {
-  //   navigate(`/clientes/${clienteId}`); // Navega para a rota específica do cliente
-  // };
-
   return (
     <div className="w-full h-screen p-2 flex flex-col bg-gray-50">
       <div className="flex items-center gap-3">
