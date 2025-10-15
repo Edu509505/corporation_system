@@ -88,7 +88,7 @@ export function AppSidebar() {
                   </SidebarMenuButton>
 
                   {item.subMenu?.map((tituloSub, index) => (
-                    <SidebarMenuSub>
+                    <SidebarMenuSub key={index}>
                       <SidebarMenuSubItem key={index}>
                         <SidebarMenuSubButton asChild>
                           <Link to={tituloSub.url}>

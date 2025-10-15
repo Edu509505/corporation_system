@@ -3,7 +3,7 @@ import { CircleCheck, CircleX, Edit } from "lucide-react";
 import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
 
-interface Cliente {
+interface CardClientProps {
   id: number;
   cliente: string;
   cnpjCliente: string;
@@ -12,14 +12,14 @@ interface Cliente {
   path: string;
 }
 
-function cardClientes({
+function CardClient({
   id,
   cliente,
   cnpjCliente,
   local,
   status,
   path,
-}: Cliente) {
+}: CardClientProps) {
   return (
     <div>
       <div
@@ -114,4 +114,4 @@ function cardClientes({
   );
 }
 
-export default cardClientes;
+export default CardClient;

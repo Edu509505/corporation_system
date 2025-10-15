@@ -1,6 +1,11 @@
 import type { ColumnDef } from "@tanstack/react-table";
 //import { CircleAlertIcon, CircleCheck, CircleX } from "lucide-react";
 import StatusDeAprovacao from "../componentsVersionamento/StatusDeAprovaao";
+import { id } from "zod/v4/locales";
+import { Link } from "react-router-dom";
+import { TableCell } from "../ui/table";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 export type Propostas = {
   id: number;
@@ -25,6 +30,18 @@ export const columns: ColumnDef<Propostas>[] = [
     id: 'cliente.cliente',
     accessorKey: "cliente.cliente",
     header: "Empresa",
+    footer: ({ column }) => {
+      return (
+        <>
+          <Label>Nome da empresa</Label>
+          <Input
+            placeholder="Empresas"
+            value={String(column.getFilterValue() ?? '')}
+            onChange={e => column.setFilterValue(e.target.value)}
+          />
+        </>
+      )
+    },
   },
   {
     id: 'nomeDaProposta',
@@ -66,4 +83,22 @@ export const columns: ColumnDef<Propostas>[] = [
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
+  {
+    id: 'acoes',
+    header: () => <div className="text-center">Ações</div>,
+    cell: ({ row }) => {
+      return (
+        <Link to={`/proposta/versionamento/${row.original.id}`}>
+          <TableCell
+            colSpan={columns.length}
+            className="flex justify-center"
+          >
+            <div className="flex justify-center w-24 p-2 rounded-full bg-blue-200 text-blue-900 hover:bg-blue-500 hover:text-white transition">
+              <p>Visualizar</p>
+            </div>
+          </TableCell>
+        </Link>
+      )
+    },
+  }
 ];

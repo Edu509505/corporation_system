@@ -2,82 +2,14 @@ import { Button } from "@/components/ui/button";
 import {
   Building,
   CirclePlusIcon,
-  CircleX,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import type { Cliente } from "../Tipagens";
-import { Skeleton } from "@/components/ui/skeleton";
-import CardClientes from "../components/clientes/Card";
+import { ClientList } from "@/components/clientes/ClientList";
+
 
 export default function VerClientes() {
-  //const navigate = useNavigate();
-
-  const url = import.meta.env.VITE_API_URL;
-  //Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática
-
-  const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [responseOk, setResponseOk] = useState(true);
-
-  console.log(clientes);
-
-  useEffect(() => {
-    async function verClientes() {
-      try {
-        const response = await fetch(`${url}/clientes`);
-        const body = await response.json();
-        setClientes(body);
-
-        if (!response.ok) {
-          setResponseOk(true);
-          const erro = await response.text();
-          throw new Error(`Erro ${response.status}: ${erro}`);
-        }
-        setResponseOk(false);
-      } catch (error) {
-      } finally {
-        setLoading(false);
-      }
-    }
-    verClientes();
-  }, []);
-
-  if (loading)
-    return (
-      <div className="p-2 w-full h-screen gap-3 flex flex-col">
-        <Skeleton className="h-9 w-100" />
-        <div className="gap-3 flex justify-between">
-          <Skeleton className="h-9 w-50" />
-          <Skeleton className="h-9 w-30" />
-        </div>
-        <div className="w-full h-full flex flex-wrap gap-3">
-          <Skeleton className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 gap-3 " />
-          <Skeleton className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 gap-3 " />
-          <Skeleton className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 gap-3 " />
-          <Skeleton className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 gap-3 " />
-        </div>
-      </div>
-    );
-
-  if (responseOk)
-    return (
-      <div className="w-full h-screen flex flex-row items-center justify-around">
-        <div className="flex flex-col items-center justify-center gap-3 text-red-500">
-          <h1 className="text-3xl">Erro Inesperado</h1>
-          <h2>Tente novamente mais tarde</h2>
-          <CircleX className="size-20" />
-          <h1>Ops! Parece que ocorreu um erro inesperado</h1>
-        </div>
-      </div>
-    );
-
-  // const editarCliente = (clienteId: number) => {
-  //   navigate(`/clientes/${clienteId}`); // Navega para a rota específica do cliente
-  // };
-
   return (
-    <div className="w-full h-screen p-2 flex flex-col bg-gray-50">
+    <div className="w-full p-2 flex flex-col bg-gray-50">
       <div className="flex items-center gap-3">
         <Building />
         <h1 className="text-2xl font-bold">Clientes cadastrados</h1>
@@ -92,30 +24,8 @@ export default function VerClientes() {
           </Button>
         </Link>
       </div>
-      <section className="w-full h-full gap-2 flex flex-row flex-wrap overflow-x-auto">
-        {
-          //Caso a tabela donde fica cadastrado os clientes estiver vazia ele retorna essa mensagem
-          clientes.length === 0 || null ? (
-            <div className="w-full h-full flex flex-col justify-center items-center text-center gap-3 text-muted-foreground">
-              <CircleX className="size-20" />
-              <h1 className="text-4xl">Não há clientes cadastrados</h1>
-            </div>
-          ) : (
-            ""
-          )
-        }
-
-        {clientes.map((c) => (
-          <CardClientes
-            key={c.id}
-            id={c.id}
-            cliente={c.cliente}
-            cnpjCliente={c.cnpj}
-            local={c.local}
-            status={c.status}
-            path={c.path}
-          />
-        ))}
+      <section className="w-full flex flex-wrap gap-3">
+        <ClientList/>
       </section>
     </div>
   );
