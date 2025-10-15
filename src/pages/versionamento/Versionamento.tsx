@@ -7,12 +7,11 @@ import {
   Eye,
   FileImage,
   Paperclip,
-  TimerIcon,
   Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { data, Link, useParams } from "react-router-dom";
-import { cnpj } from "cpf-cnpj-validator";
+import { Link, useParams } from "react-router-dom";
+
 
 import {
   Table,
@@ -60,7 +59,6 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import StatusDeAprovacao from "@/components/componentsVersionamento/StatusDeAprovaao";
 import InfoClientes from "@/components/componentsVersionamento/informacoesCliente";
-import { Label } from "@radix-ui/react-select";
 import {
   Empty,
   EmptyContent,
@@ -69,7 +67,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import Quantitativa from "@/components/componentsVersionamento/Quantitativas";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -92,44 +89,19 @@ interface Propostas {
   };
 }
 
-interface Cliente {
-  cliente: string;
-  cnpj: string;
-  local: string;
-  status: string;
-  file: File | null;
-}
+// interface Cliente {
+//   cliente: string;
+//   cnpj: string;
+//   local: string;
+//   status: string;
+//   file: File | null;
+// }
 interface formularioComImagem {
   files: FileList | File[] | null;
 }
 function Versionamento() {
   const { id } = useParams<{ id: string }>();
 
-  // const [proposta, setProposta] = useState<Propostas>({
-  //   nomeDaProposta: "",
-  //   descricao: "",
-  //   createdAt: "",
-  //   cliente: { cliente: "" },
-  // });
-
-  // const [cliente, setCliente] = useState<Cliente>({
-  //   cliente: "",
-  //   cnpj: "",
-  //   local: "",
-  //   status: "",
-  //   file: null,
-  // });
-
-  // const [versionamento, setVersionamento] = useState<Versionamento[]>([
-  //   {
-  //     id: 0,
-  //     versao: 0,
-  //     idProposta: 0,
-  //     status: "",
-  //     createdAt: "",
-  //     anexos: "",
-  //   },
-  // ]);
   const [idVersao, setidVersao] = useState<number | null>(null);
   const [idVersionamento, setIdVersionamento] = useState<number | null>(null);
 
@@ -139,7 +111,7 @@ function Versionamento() {
 
   //ATUALIZA O STATUS DO VERSINAMENTO E JOGA PARA O BANCO
 
-  const [atualizarStatusVersionamento, setAtualiarStatusVersionamento] =
+  const [atualizarStatusVersionamento] =
     useState<string | null>(null);
   useEffect(() => {
     async function atualizarVersionamento() {
@@ -193,7 +165,7 @@ function Versionamento() {
     },
   });
 
-  const [test, setTest] = useState<Versionamento | null>(null);
+  const [, setTest] = useState<Versionamento | null>(null);
   const {
     //isPending: versionamentoLoading,
     //error: versionamentoError,

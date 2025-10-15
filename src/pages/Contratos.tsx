@@ -1,23 +1,5 @@
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
-import { Input } from "@/components/ui/input";
-import {
   Table,
   TableBody,
   TableCell,
@@ -25,9 +7,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { CirclePlus, Paperclip } from "lucide-react";
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { CirclePlus } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const url = import.meta.env.VITE_API_URL;
@@ -37,31 +18,17 @@ interface Contrato {
   idCliente: number;
   idProposta: number;
   contrato: string;
-  nome: string;
+  titulo: string;
   descricao: string;
   status: string;
   local: string;
   createdAt: string;
+  clientesContratos: {
+    cliente: string
+  }
 }
 
 function Contratos() {
-  const [contratos] = useState([
-    {
-      id: 1,
-      nome: "Contrato de Prestação de Serviços",
-      cliente: "Empresa ABC",
-      data: "10/09/2025",
-      status: "Ativo",
-    },
-    {
-      id: 2,
-      nome: "Contrato de Fornecimento",
-      cliente: "Empresa XYZ",
-      data: "22/08/2025",
-      status: "Encerrado",
-    },
-  ]);
-
   const {
     //isPending: propostaLoading,
     //error: propostaError,
@@ -78,7 +45,7 @@ function Contratos() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br bg-gray-50 flex flex-col p-8 gap-3">
-      <h1 className="text-3xl font-bold text-blue-700">Contratos</h1>
+      <h1 className="text-3xl font-bold">Contratos</h1>
       <p className="text-gray-600">
         Visualize e gerencie os contratos cadastrados no sistema.
       </p>
@@ -94,7 +61,7 @@ function Contratos() {
         <TableHeader>
           <TableRow className="bg-gray-100">
             <TableHead className="py-3 px-4 text-left rounded-tl-2xl">
-              Nome
+              Titulo
             </TableHead>
             <TableHead className="py-3 px-4 text-left">Cliente</TableHead>
             <TableHead className="py-3 px-4 text-left">Data</TableHead>
@@ -110,9 +77,9 @@ function Contratos() {
           ) : (
             contratosData.map((contratos) => (
               <TableRow key={contratos.id} className="bg-white">
-                <TableCell className="py-3 px-4">{contratos.nome}</TableCell>
+                <TableCell className="py-3 px-4">{contratos.titulo}</TableCell>
                 <TableCell className="py-3 px-4">
-                  {contratos.idCliente}
+                  {contratos.clientesContratos.cliente}
                 </TableCell>
                 <TableCell className="py-3 px-4">
                   {contratos.createdAt
@@ -124,7 +91,7 @@ function Contratos() {
                 <TableCell className="py-3 px-4">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      contratos.status === "Ativo"
+                      contratos.status === "ATIVO"
                         ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-700"
                     }`}
