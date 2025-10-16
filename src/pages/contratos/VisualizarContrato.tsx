@@ -24,6 +24,13 @@ interface Contratos {
   };
 }
 
+interface Versionamento {
+  id: number;
+  idProposta: number;
+  status: string;
+  updateAt: string;
+}
+
 function VisualizarContrato() {
   const { id } = useParams<{ id: string }>();
 
@@ -39,18 +46,42 @@ function VisualizarContrato() {
   });
 
   const { data: versionamento } = useQuery({
-    queryKey: ["anexoVersionamento"],
+    queryKey: ["versionamento"],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/proposta/${dadosCliente?.proposta.id.toString()}/versionamentos`
+        `${url}/proposta/${dadosCliente?.proposta.id.toString()}/versionamentoAprovado`
       );
       if (!response.ok) throw new Error("Versionamento não encontrada");
       const data = await response.json();
-      return data;
+      return data as Versionamento;
     },
   });
 
-  console.log(versionamento);
+  console.log("Versionamento", versionamento)
+
+  console.log("teste", versionamento?.id.toString())
+
+  const { data: anexoVersionamento } = useQuery({
+    queryKey: ["anexoVersionamento"],
+    queryFn: async () => {
+      if (versionamento?.id !== undefined) {
+        const response = await fetch(
+          `${url}/versionamento/${versionamento?.id.toString()}/anexos/urls`
+        )
+        if (!response.ok) throw new Error("Anexo não encontrada");
+        const data = await response.json();
+        return data
+      }
+    }
+  }
+  )
+
+  
+
+  console.log("anexoVersionamento", anexoVersionamento)
+
+
+  console.log("Versionamento Aprovado: ", versionamento);
 
   console.log("idCliente", dadosCliente?.clientesContratos.id);
 
@@ -110,7 +141,7 @@ function VisualizarContrato() {
       <div className="w-1/2 flex bg-amber-50 flex-col gap-3">
         <div className="gap-3 flex flex-col border-1 border-gray-500">
           <h1 className="text-2xl">Anexos da Proposta</h1>
-          {}
+          { }
           <div className="rounded-2xl bg-emerald-400 flex gap-3 p-3"></div>
         </div>
       </div>
