@@ -18,6 +18,8 @@ import Versionamento from "./pages/versionamento/Versionamento";
 import Contratos from "./pages/Contratos";
 import AddContrato from "./pages/contratos/AddContrato";
 import VisualizarContrato from "./pages/contratos/VisualizarContrato";
+import DiarioDeObra from "./pages/DiarioDeObra";
+import CriarDiarioDeObra from "./pages/diarioDeObra/Create";
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function App() {
             <Route path="/cadastro" element={<CadastroCliente />} />
             <Route path="/clientes" element={<Clientes />} />
             <Route path="/propostas" element={<VerPropostas />} />
+            <Route path="/diarioDeObra" element={<DiarioDeObra />} />
+            <Route path="/criarDiarioDeObra" element={<CriarDiarioDeObra />} />
             <Route
               path="/proposta/versionamento/:id"
               element={<Versionamento />}
