@@ -70,13 +70,18 @@ function VisualizarContrato() {
         )
         if (!response.ok) throw new Error("Anexo não encontrada");
         const data = await response.json();
-        return data
+        return data 
       }
     }
   }
   )
 
-  
+  const { data: quantitativa } = useQuery({
+    queryKey: ["quantitativa"],
+    queryFn: async () => {
+      const response = await fetch(`${url}/`)
+    }
+  })
 
   console.log("anexoVersionamento", anexoVersionamento)
 
