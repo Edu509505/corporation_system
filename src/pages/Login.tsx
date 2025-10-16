@@ -1,30 +1,23 @@
-function Login() {
-  return (
-    <>
-      <div className="w-screen h-screen bg-white flex justify-center items-center">
-        <div className="w-1/4 h-1/2 bg-gray-200 rounded-2xl shadow-lg">
-          <form
-            action=""
-            className="flex justify-start itens-center p-5 h-full flex-col gap-5"
-          >
-            <legend className="text-2xl text-center">
-              Seja muito Bem-Vindo
-            </legend>
-            <h2 className="text-center text-[0.8rem]">
-              Para começarmos digite seu E-Mail e Senha
-            </h2>
-            <div className=" flex flex-col justify-center h-full">
-              <label typeof="email">E-Mail: </label>
-              <input type="text" className="w-full h-1/8 p-3 rounded-4xl bg-white" />
+import { LoginForm } from "@/components/login-form"
+import ImagemLogin from "../assets/img/IMG-20240823-WA0208.jpg"
 
-              <label typeof="password">Senha: </label>
-              <input type="text" className="w-full h-1/8 p-3 rounded-4xl bg-white" />
+export default function LoginPage() {
+    return (
+        <div className="grid min-h-svh lg:grid-cols-2">
+            <div className="flex flex-col gap-4 p-6 md:p-10">
+                <div className="flex flex-1 items-center justify-center">
+                    <div className="w-full max-w-xs">
+                        <LoginForm />
+                    </div>
+                </div>
             </div>
-          </form>
+            <div className="bg-muted relative hidden lg:block">
+                <img
+                    src={ImagemLogin}
+                    alt="Imagem"
+                    className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+                />
+            </div>
         </div>
-      </div>
-    </>
-  );
+    )
 }
-
-export default Login;

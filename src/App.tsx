@@ -7,7 +7,7 @@ import NoPage from "./pages/NoPage";
 import NotasFiscais from "./pages/NotasFiscais";
 import Medicao from "./pages/Medicao";
 import AddMedicao from "./pages/addMedicao/AddMedicaoPasso1";
-import Login from "./pages/Login";
+import LoginForm from "./pages/Login";
 import CadastroCliente from "./pages/clientes/CadastroCliente";
 import Clientes from "./pages/Clientes";
 import EditarCliente from "./pages/clientes/cliente[userId]/EditarCliente";
@@ -26,7 +26,7 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<LoginForm />} />
           <Route path="/" element={<Layout children={undefined} />}>
             <Route index element={<Home />} />
             <Route path="/criarProposta" element={<CriarProposta />} />

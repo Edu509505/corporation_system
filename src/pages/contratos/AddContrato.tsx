@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
+import { useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query";
 import {
   Select,
   SelectContent,
@@ -22,7 +22,7 @@ import {
   SelectLabel,
   SelectGroup,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import {
   Empty,
   EmptyDescription,
@@ -30,7 +30,12 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { Paperclip } from "lucide-react";
+import { CircleArrowLeftIcon, CircleCheckBigIcon, CircleX, Paperclip } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
+import { Link } from "react-router";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorBoundary } from "react-error-boundary";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -48,9 +53,12 @@ interface Propostas {
   statusProposta: string;
 }
 
-function AddContrato() {
-  const { data: clientes } = useQuery({
-    queryKey: ["clientes"],
+
+
+
+function AdicionarContrato() {
+  const { data: clientes } = useSuspenseQuery({
+    queryKey: ["clientes", ""],
     queryFn: async () => {
       const response = await fetch(`${url}/clientes/`);
       if (!response.ok) throw new Error("Clientes não encontrados");
@@ -59,14 +67,14 @@ function AddContrato() {
     },
   });
 
-  const [idCliente, setIdCliente] = useState({ id: "" });
-
-  const { data: propostasAprovadas } = useQuery({
-    queryKey: ["cliente", idCliente],
+  const [idCliente, setIdCliente] = useState<string | undefined>(undefined );
+  
+  const { data: propostasAprovadas } = useSuspenseQuery({
+    queryKey: ["propostasAprovadas", idCliente],
     queryFn: async () => {
-      if (idCliente.id !== "") {
+      if (idCliente !== "") {
         const response = await fetch(
-          `${url}/cliente/${idCliente.id}/propostasAprovadas`
+          `${url}/cliente/${idCliente}/propostasAprovadas`
         );
         if (!response.ok) throw new Error("Propostas não encontradas");
         const data = await response.json();
@@ -110,10 +118,12 @@ function AddContrato() {
     },
   });
 
+  const [responseOk, setResponseOk] = useState(false)
+
   const onSubimit = async (data: z.infer<typeof contratoSchema>) => {
     console.log("data ", data);
     console.log("files: ", data.anexo.length);
-    
+
     try {
       const form = new FormData();
 
@@ -121,30 +131,32 @@ function AddContrato() {
       form.set("idProposta", data.idProposta);
       form.set("titulo", data.titulo);
 
-      for(let i = 0; i<data.anexo.length; i++){
+      for (let i = 0; i < data.anexo.length; i++) {
         console.log(data.anexo[i]);
         form.append("anexo", data.anexo[i]);
       }
       const response = await fetch(`${url}/contrato`, {
         method: "POST",
-        body:form,
+        body: form,
       });
       if (!response.ok) {
         // Aqui você lida com o erro de forma clara
-        //setResponseOk(false);
+        setResponseOk(false);
         const errorText = await response.text();
         throw new Error(`Erro ${response.status}: ${errorText}`);
       }
       console.log("estou aqui");
       const body = await response.json();
-      //setResponseOk(true);
+      setResponseOk(true);
       console.log("Cliente criado com sucesso:", body);
-    } catch {}
+    } catch { }
   };
-
   return (
-    <div className="flex flex-col bg-gray-50 h-full gap-3 p-4">
+    <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
       <header>
+        <Link to='/contratos'>
+        <Button><CircleArrowLeftIcon/> Retornar</Button>
+        </Link>
         <h1 className="text-2xl font-bold">Adicionar Contrato</h1>
         <p className="text-gray-600">
           Preencha os detalhes do novo contrato abaixo.
@@ -174,10 +186,7 @@ function AddContrato() {
                     <Select
                       //value={idCliente.id}
                       onValueChange={(value) => {
-                        setIdCliente({
-                          ...idCliente,
-                          id: value.toString(),
-                        });
+                        setIdCliente(value.toString(),);
                         field.onChange(value);
                         propostasAprovadas;
                       }}
@@ -288,17 +297,111 @@ function AddContrato() {
                 </FormItem>
               )}
             />
-            <Button
-              type="submit"
-              className="mt-4 cursor-pointer"
-              variant="default"
-            >
-              Cadastrar Contrato
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger>
+                <Button
+                  type="submit"
+                  className="mt-4 cursor-pointer"
+                  variant="default"
+                >
+                  Cadastrar Contrato
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+
+                {responseOk === true ? (
+                  <>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-ring flex items-center gap-3"><CircleCheckBigIcon /> Contrato cadastrado com sucesso</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Seu contrato foi cadastrado e inserido no sistema
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <Link to='/contratos'>
+                        <AlertDialogAction>Continuar</AlertDialogAction>
+                      </Link>
+                    </AlertDialogFooter>
+                  </>
+                ) : (
+                  <>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-destructive flex items-center gap-3"><CircleX /> Erro ao cadastrar contrato</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        A ação de cadastrar o contrato foi mal-sucedida
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Voltar</AlertDialogCancel>
+                    </AlertDialogFooter>
+                  </>
+                )}
+
+              </AlertDialogContent>
+            </AlertDialog>
           </form>
         </Form>
       </main>
     </div>
+  );
+}
+
+function AddContratoIsLoading() {
+  return (
+    <div className="w-full flex flex-col flex-wrap gap-2 p-4 ">
+      <Skeleton className="h-9 w-25"/>
+      <Skeleton className="h-9 w-80"/>
+      <Skeleton className="h-5 w-115"/>
+      <Skeleton className="h-5 w-full"/>
+      <Skeleton className="h-5 w-full"/>
+      <Skeleton className="h-5 w-75"/>
+      <div className="flex gap-3 flex-wrap">
+        <div className="flex flex-col gap-3">
+        <Skeleton className="h-5 w-40"/>
+        <Skeleton className="h-12 w-90" />
+        </div>
+        <div className="flex flex-col gap-3">
+        <Skeleton className="h-5 w-40"/>
+        <Skeleton className="h-12 w-90" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-3">
+        <Skeleton className="h-5 w-25"/>
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-5 w-50"/>
+        </div>
+      <div className=" flex flex-wrap gap-3">
+        <Skeleton className="h-5 w-25"/>
+        <Skeleton className="h-100 w-full" />
+      </div>
+      <div className="w-full flex justify-center items-center flex-wrap gap-3">
+        <Skeleton className="h-12 w-100" />
+      </div>
+    </div>
+  )
+}
+function ErrorFallback({
+  error,
+}: {
+  error: Error;
+  resetErrorBoundary: () => void;
+}) {
+  return <div className="p-5 text-destructive">Erro: {error.message}</div>;
+}
+
+function AddContrato() {
+     const { reset } = useQueryErrorResetBoundary();
+  return (
+    <ErrorBoundary
+      onReset={reset}
+      fallbackRender={({ error, resetErrorBoundary }) => (
+        <ErrorFallback error={error} resetErrorBoundary={resetErrorBoundary} />
+      )}
+    >
+      <Suspense fallback={<AddContratoIsLoading />}>
+        <AdicionarContrato />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
