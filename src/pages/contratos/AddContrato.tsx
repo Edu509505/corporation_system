@@ -32,7 +32,6 @@ import {
 } from "@/components/ui/empty";
 import { CircleArrowLeftIcon, CircleCheckBigIcon, CircleX, Paperclip } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
 import { Link } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
@@ -96,7 +95,8 @@ function AdicionarContrato() {
         "Você deve selecionar ao menos um arquivo"
       )
       .refine(
-        (files) => files?.[0]?.size <= 15 * 1024 * 1024,
+        (files) =>
+          files?.[0]?.size <= 15 * 1024 * 1024,
         "Arquivo deve ter até 50MB"
       )
       .refine(
@@ -119,6 +119,7 @@ function AdicionarContrato() {
   });
 
   const [responseOk, setResponseOk] = useState<boolean>(false)
+  const [responseNotOk, setResponseNotOk] = useState<boolean>(false)
 
   const onSubmit = async (data: z.infer<typeof contratoSchema>) => {
     console.log("data ", data);
@@ -136,21 +137,23 @@ function AdicionarContrato() {
         form.append("anexo", data.anexo[i]);
       }
       setResponseOk(true);
-    //   const response = await fetch(`${url}/contrato`, {
-    //     method: "POST",
-    //     body: form,
-    //   });
-    //   console.log('response', response);
-    //   if (!response.ok) {
-    //     // Aqui você lida com o erro de forma clara
-    //     setResponseOk(false);
-    //     const errorText = await response.text();
-    //     throw new Error(`Erro ${response.status}: ${errorText}`);
-    //   }
-    //   console.log("estou aqui");
-    //   const body = await response.json();
-    //   setResponseOk(true);
-    //   console.log("Cliente criado com sucesso:", body);
+      const response = await fetch(`${url}/contrato`, {
+        method: "POST",
+        body: form,
+      });
+      console.log('response', response);
+      if (!response.ok) {
+        // Aqui você lida com o erro de forma clara
+        setResponseNotOk(true)
+        setResponseOk(false);
+        const errorText = await response.text();
+        throw new Error(`Erro ${response.status}: ${errorText}`);
+      }
+      console.log("estou aqui");
+      const body = await response.json();
+      setResponseOk(true);
+      setResponseNotOk(false)
+      console.log("Cliente criado com sucesso:", body);
     } catch { }
   };
   return (
@@ -306,39 +309,32 @@ function AdicionarContrato() {
             >
               Cadastrar Contrato
             </Button>
-            <AlertDialog open={responseOk} onOpenChange={(open) => {
-              setResponseOk(open);
-            }}>
+            <AlertDialog open={responseOk} onOpenChange={(open) => { setResponseOk(open) }}>
               <AlertDialogContent>
-                {responseOk === true && (
-                  <>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="text-ring flex items-center gap-3"><CircleCheckBigIcon /> Contrato cadastrado com sucesso</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Seu contrato foi cadastrado e inserido no sistema
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <Link to='/contratos'>
-                        <AlertDialogAction>Continuar</AlertDialogAction>
-                      </Link>
-                    </AlertDialogFooter>
-                  </>
-                )}
-                {responseOk === false && (
-                  <>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="text-destructive flex items-center gap-3"><CircleX /> Erro ao cadastrar contrato</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        A ação de cadastrar o contrato foi mal-sucedida
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Voltar</AlertDialogCancel>
-                    </AlertDialogFooter>
-                  </>
-                )}
-
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-ring flex items-center gap-3"><CircleCheckBigIcon /> Contrato cadastrado com sucesso</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Seu contrato foi cadastrado e inserido no sistema
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <Link to='/contratos'>
+                    <AlertDialogAction>Continuar</AlertDialogAction>
+                  </Link>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <AlertDialog open={responseNotOk} onOpenChange={(open) => { setResponseNotOk(open) }}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-destructive flex items-center gap-3"><CircleX /> Erro ao cadastrar contrato</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    A ação de cadastrar o contrato foi mal-sucedida
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Voltar</AlertDialogCancel>
+                </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
           </form>

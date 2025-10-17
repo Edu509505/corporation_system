@@ -67,6 +67,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { formatToBRL, formatToNumber } from "brazilian-values";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -79,7 +80,15 @@ interface Versionamento {
   anexos: string;
 }
 
+interface versionamentoAprovado {
+  id: number;
+  idProposta: number;
+  status: string;
+  updateAt: string;
+}
+
 interface Propostas {
+  id: number;
   nomeDaProposta: string;
   descricao: string;
   createdAt: string;
@@ -87,6 +96,15 @@ interface Propostas {
     cliente: string;
     cnpj: string;
   };
+}
+
+interface Quantitativa {
+  id: number;
+  idVersionamento: number;
+  descricao: string;
+  quantidade: number;
+  valorUnitario: number;
+  unidadeDeMedida: string;
 }
 
 // interface Cliente {
@@ -167,8 +185,6 @@ function Versionamento() {
 
   const [, setTest] = useState<Versionamento | null>(null);
   const {
-    //isPending: versionamentoLoading,
-    //error: versionamentoError,
     data: versionamentos,
     refetch: refetchVersionamentos,
   } = useQuery({
@@ -182,25 +198,32 @@ function Versionamento() {
     },
   });
 
-  const {
-    //isPending: quantidadeLoading,
-    //error: quantitativaError,
-    data: quantitativa,
-    //refetch: refetchQuantitativa,
-  } = useQuery({
-    queryKey: ["quantitativa", idVersionamento],
+   const { data: versionamentoAprovado } = useQuery({
+    queryKey: ["versionamento", proposta?.id],
     queryFn: async () => {
-      const response = await fetch(`${url}/quantitativa/${idVersionamento}`);
-      if (!response.ok) throw new Error("Quantitativa Não encontrado");
+      const response = await fetch(
+        `${url}/proposta/${proposta?.id.toString()}/verAprovado`
+      );
+      if (!response.ok) throw new Error("Versionamento não encontrada");
       const data = await response.json();
-      console.log("quantitativa: ", data);
-      return data as Quantitativas;
+      return data as Versionamento[];
     },
-
-    enabled: idVersionamento != null,
   });
 
-  console.log(quantitativa);
+  console.log("Versionamento Aprovado ", versionamentoAprovado?.map((ver) => ver.id))
+
+
+  const { data: quantitativa } = useQuery({
+    queryKey: ["quantitativa", versionamentoAprovado?.map((ver) => ver.id)],
+    queryFn: async () => {
+      const response = await fetch(`${url}/quantitativa/${versionamentoAprovado?.map((ver) => ver.id.toString())}`)
+      if (!response.ok) throw new Error("Não foi encontrato nenhuma quantitativa")
+      const data = await response.json()
+      return data as Quantitativa[]
+    }
+  })
+
+  console.log("Quantitativa", quantitativa);
 
   const { mutateAsync: updateVersionamento } = useMutation({
     mutationKey: ["updateVersionamento"],
@@ -326,7 +349,7 @@ function Versionamento() {
         body: JSON.stringify(data),
       });
       refetchVersionamentos();
-    } catch {}
+    } catch { }
   };
 
   return (
@@ -345,13 +368,6 @@ function Versionamento() {
           cnpjCliente={proposta.cliente.cnpj}
         />
       )}
-      {/* {Array.isArray(quantitativa?.itens) && quantitativa.itens.length > 0 ? (
-        quantitativa.itens.map((item) => (
-          <h1 key={item.descricao}>{item.descricao}</h1>
-        ))
-      ) : (
-        <span>Nenhum item encontrado.</span>
-      )} */}
       <div className="h-max-[800px] border-1 border-gray-400 rounded-2xl space-x-2 py-4">
         <Table className="h-[100%] space-x-2 py-4">
           <TableHeader>
@@ -750,6 +766,36 @@ function Versionamento() {
           </TableFooter>
         </Table>
       </div>
+      <div className="flex flex-col gap-3">
+        {quantitativa === undefined ? (
+          <span></span>
+        ) : (
+          <>
+          <h1 className="font-bold">Quantitativa</h1>
+          <Table className="rounded-2xl">
+            <TableHeader className="bg-gray-300">
+              <TableRow>
+                <TableHead>item:</TableHead>
+                <TableHead>Quantidade:</TableHead>
+                <TableHead>Unidade de Medida:</TableHead>
+                <TableHead>Valor Unitário:</TableHead> 
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+          {quantitativa.map((item) => (
+            <TableRow>
+            <TableCell > {item.descricao}</TableCell>
+            <TableCell > {formatToNumber(item.quantidade)}</TableCell>
+            <TableCell > {item.unidadeDeMedida}</TableCell>
+            <TableCell >{formatToBRL(item.valorUnitario)}</TableCell>
+            </TableRow>
+          ))
+          }
+            </TableBody>
+          </Table>
+          </>
+        )}
+        </div>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
 import { Suspense } from "react";
+import { formatToBRL, formatToNumber } from 'brazilian-values';
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -66,11 +67,13 @@ function GetInfoContratos() {
     },
   });
 
+  console.log("dadosCliente", dadosCliente)
+
   const { data: versionamento } = useSuspenseQuery({
     queryKey: ["versionamento", dadosCliente?.proposta.id],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/proposta/${dadosCliente?.proposta.id.toString()}/versionamentoAprovado`
+        `${url}/proposta/${dadosCliente?.proposta.id}/verAprovado`
       );
       if (!response.ok) throw new Error("Versionamento não encontrada");
       const data = await response.json();
@@ -78,12 +81,13 @@ function GetInfoContratos() {
     },
   });
 
+  console.log("versionamento", versionamento)
+
   const { data: anexoVersionamento } = useSuspenseQuery({
     queryKey: ["anexoVersionamento", versionamento?.id],
     queryFn: async () => {
-
       const response = await fetch(
-        `${url}/versionamento/${versionamento?.id.toString()}/anexos/urls`
+        `${url}/versionamento/${versionamento?.id}/anexos/urls`
       )
       if (!response.ok) throw new Error("Anexo não encontrada");
       const data = await response.json();
@@ -97,22 +101,22 @@ function GetInfoContratos() {
       const response = await fetch(`${url}/contrato/${id}/anexoContrato/url`)
       if (!response.ok) throw new Error("Não foi encontrado o Anexo do contrato")
       const data = await response.json()
-      console.log("data ", data)
       return (data.url || []) as AnexoContrato[]
     }
   })
 
-  console.log(anexoContrato)
 
   const { data: quantitativa } = useSuspenseQuery({
     queryKey: ["quantitativa", versionamento?.id],
     queryFn: async () => {
-      const response = await fetch(`${url}/quantitativa/${versionamento?.id.toString()}`)
+      const response = await fetch(`${url}/quantitativa/${0}`)
       if (!response.ok) throw new Error("Não foi encontrato nenhuma quantitativa")
       const data = await response.json()
       return data as Quantitativa[]
     }
   })
+
+
   return (
     <div className="w-full flex flex-col flex-wrap gap-3 p-4 bg-gray-50">
       <Link to={'/contratos'}>
@@ -218,9 +222,9 @@ function GetInfoContratos() {
         ) : (quantitativa.map((item) => (
           <div key={item.id} className="flex flex-wrap gap-3 border-1 rounded-2xl border-ring p-3 bg-white">
             <h1 ><strong>item:</strong> {item.descricao}</h1>
-            <h1 ><strong>Quantidade:</strong> {item.quantidade}</h1>
+            <h1 ><strong>Quantidade:</strong> {formatToNumber(item.quantidade)}</h1>
             <h1 ><strong>Unidade de Medida:</strong> {item.unidadeDeMedida}</h1>
-            <h1 ><strong>Valor Unitário:</strong> R$ {item.valorUnitario}</h1>
+            <h1 ><strong>Valor Unitário:</strong> {formatToBRL(item.valorUnitario)}</h1>
           </div>
         )))}
       </div>
