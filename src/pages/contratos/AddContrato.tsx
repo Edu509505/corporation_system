@@ -67,8 +67,8 @@ function AdicionarContrato() {
     },
   });
 
-  const [idCliente, setIdCliente] = useState<string | undefined>(undefined );
-  
+  const [idCliente, setIdCliente] = useState<string | undefined>(undefined);
+
   const { data: propostasAprovadas } = useSuspenseQuery({
     queryKey: ["propostasAprovadas", idCliente],
     queryFn: async () => {
@@ -118,9 +118,9 @@ function AdicionarContrato() {
     },
   });
 
-  const [responseOk, setResponseOk] = useState(false)
+  const [responseOk, setResponseOk] = useState<boolean>(false)
 
-  const onSubimit = async (data: z.infer<typeof contratoSchema>) => {
+  const onSubmit = async (data: z.infer<typeof contratoSchema>) => {
     console.log("data ", data);
     console.log("files: ", data.anexo.length);
 
@@ -135,27 +135,29 @@ function AdicionarContrato() {
         console.log(data.anexo[i]);
         form.append("anexo", data.anexo[i]);
       }
-      const response = await fetch(`${url}/contrato`, {
-        method: "POST",
-        body: form,
-      });
-      if (!response.ok) {
-        // Aqui você lida com o erro de forma clara
-        setResponseOk(false);
-        const errorText = await response.text();
-        throw new Error(`Erro ${response.status}: ${errorText}`);
-      }
-      console.log("estou aqui");
-      const body = await response.json();
       setResponseOk(true);
-      console.log("Cliente criado com sucesso:", body);
+    //   const response = await fetch(`${url}/contrato`, {
+    //     method: "POST",
+    //     body: form,
+    //   });
+    //   console.log('response', response);
+    //   if (!response.ok) {
+    //     // Aqui você lida com o erro de forma clara
+    //     setResponseOk(false);
+    //     const errorText = await response.text();
+    //     throw new Error(`Erro ${response.status}: ${errorText}`);
+    //   }
+    //   console.log("estou aqui");
+    //   const body = await response.json();
+    //   setResponseOk(true);
+    //   console.log("Cliente criado com sucesso:", body);
     } catch { }
   };
   return (
     <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
       <header>
         <Link to='/contratos'>
-        <Button><CircleArrowLeftIcon/> Retornar</Button>
+          <Button><CircleArrowLeftIcon /> Retornar</Button>
         </Link>
         <h1 className="text-2xl font-bold">Adicionar Contrato</h1>
         <p className="text-gray-600">
@@ -173,7 +175,7 @@ function AdicionarContrato() {
       <main className="">
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onSubimit)}
+            onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-4"
           >
             <div className="flex gap-4 flex-wrap">
@@ -297,19 +299,18 @@ function AdicionarContrato() {
                 </FormItem>
               )}
             />
-            <AlertDialog>
-              <AlertDialogTrigger>
-                <Button
-                  type="submit"
-                  className="mt-4 cursor-pointer"
-                  variant="default"
-                >
-                  Cadastrar Contrato
-                </Button>
-              </AlertDialogTrigger>
+            <Button
+              type="submit"
+              className="mt-4 cursor-pointer"
+              variant="default"
+            >
+              Cadastrar Contrato
+            </Button>
+            <AlertDialog open={responseOk} onOpenChange={(open) => {
+              setResponseOk(open);
+            }}>
               <AlertDialogContent>
-
-                {responseOk === true ? (
+                {responseOk === true && (
                   <>
                     <AlertDialogHeader>
                       <AlertDialogTitle className="text-ring flex items-center gap-3"><CircleCheckBigIcon /> Contrato cadastrado com sucesso</AlertDialogTitle>
@@ -323,7 +324,8 @@ function AdicionarContrato() {
                       </Link>
                     </AlertDialogFooter>
                   </>
-                ) : (
+                )}
+                {responseOk === false && (
                   <>
                     <AlertDialogHeader>
                       <AlertDialogTitle className="text-destructive flex items-center gap-3"><CircleX /> Erro ao cadastrar contrato</AlertDialogTitle>
@@ -349,29 +351,29 @@ function AdicionarContrato() {
 function AddContratoIsLoading() {
   return (
     <div className="w-full flex flex-col flex-wrap gap-2 p-4 ">
-      <Skeleton className="h-9 w-25"/>
-      <Skeleton className="h-9 w-80"/>
-      <Skeleton className="h-5 w-115"/>
-      <Skeleton className="h-5 w-full"/>
-      <Skeleton className="h-5 w-full"/>
-      <Skeleton className="h-5 w-75"/>
+      <Skeleton className="h-9 w-25" />
+      <Skeleton className="h-9 w-80" />
+      <Skeleton className="h-5 w-115" />
+      <Skeleton className="h-5 w-full" />
+      <Skeleton className="h-5 w-full" />
+      <Skeleton className="h-5 w-75" />
       <div className="flex gap-3 flex-wrap">
         <div className="flex flex-col gap-3">
-        <Skeleton className="h-5 w-40"/>
-        <Skeleton className="h-12 w-90" />
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-12 w-90" />
         </div>
         <div className="flex flex-col gap-3">
-        <Skeleton className="h-5 w-40"/>
-        <Skeleton className="h-12 w-90" />
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-12 w-90" />
         </div>
       </div>
       <div className="flex flex-col gap-3">
-        <Skeleton className="h-5 w-25"/>
+        <Skeleton className="h-5 w-25" />
         <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-5 w-50"/>
-        </div>
+        <Skeleton className="h-5 w-50" />
+      </div>
       <div className=" flex flex-wrap gap-3">
-        <Skeleton className="h-5 w-25"/>
+        <Skeleton className="h-5 w-25" />
         <Skeleton className="h-100 w-full" />
       </div>
       <div className="w-full flex justify-center items-center flex-wrap gap-3">
@@ -390,7 +392,7 @@ function ErrorFallback({
 }
 
 function AddContrato() {
-     const { reset } = useQueryErrorResetBoundary();
+  const { reset } = useQueryErrorResetBoundary();
   return (
     <ErrorBoundary
       onReset={reset}
