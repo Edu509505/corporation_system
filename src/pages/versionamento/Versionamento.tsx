@@ -554,7 +554,7 @@ function Versionamento() {
                                                           </FormLabel>
                                                           <FormControl>
                                                             <Input
-                                                              placeholder="Unidade de medidKa"
+                                                              placeholder="Unidade de medida"
                                                               {...field}
                                                             />
                                                           </FormControl>

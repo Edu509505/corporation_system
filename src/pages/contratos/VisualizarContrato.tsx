@@ -180,6 +180,7 @@ function GetInfoContratos() {
               <a
                 key={idx}
                 href={anexo.toString()}
+                download="olha_aqui_nome_novo"
               >
                 <div className="w-[65px] flex justify-center bg-green-200 rounded-2xl p-2 transition-all hover:scale-110">
                   <h1 className="flex font-bold">
@@ -200,6 +201,7 @@ function GetInfoContratos() {
                 key={idx}
                 href={anexo.toString()}
                 className="w-[65px] flex justify-center bg-green-200 rounded-2xl p-2 transition-all hover:scale-110"
+                download="porqueNaoTaRenomeando"
               >
                 <h1 className="flex font-bold">
                   {idx + 1} - <FileImage />
