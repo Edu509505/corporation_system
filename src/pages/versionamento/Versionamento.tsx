@@ -227,7 +227,7 @@ function Versionamento() {
 
   const { mutateAsync: updateVersionamento } = useMutation({
     mutationKey: ["updateVersionamento"],
-    mutationFn: async ({ id, status }: { id: number; status: string }) => {
+    mutationFn: async ({ id, status }: { id: number;  status: string }) => {
       const response = await fetch(`${url}/versionamento/${id}`, {
         method: "PUT", // ou PATCH, dependendo da sua API
         headers: {
@@ -521,10 +521,10 @@ function Versionamento() {
                                     <DialogContent className="sm:max-w-[70%] [&>button]:hidden flex flex-col gap-3">
                                       <DialogHeader>
                                         <DialogTitle>
-                                          Adocionar quantitativa
+                                          Adicionar quantitativa
                                         </DialogTitle>
                                         <DialogDescription>
-                                          Para proseguir, é necessário adicionar
+                                          Para prosseguir, é necessário adicionar
                                           a quantitativa dessa proposta, item,
                                           unidade e preço
                                         </DialogDescription>
