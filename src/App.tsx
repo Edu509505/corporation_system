@@ -38,7 +38,8 @@ function App() {
             <Route path="/cadastro" element={<CadastroCliente />} />
             <Route path="/clientes" element={<Clientes />} />
             <Route path="/propostas" element={<VerPropostas />} />
-            <Route path="/diarioDeObra" element={<DiarioDeObra />} />
+            <Route path="/diario-de-obra" element={<DiarioDeObra />} />
+            {/* <Route path="/diario-de-obra/proposta/:idProposta" element={<DiarioDeObra />} /> */}
             <Route path="/criarDiarioDeObra" element={<CriarDiarioDeObra />} />
             <Route
               path="/proposta/versionamento/:id"
