@@ -1,16 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+// Select já é importado no topo do arquivo (se necessário ajuste), evitando duplicação
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Calendar } from "@/components/ui/calendar"
 import React from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import z, { json } from "zod";
+import z from "zod";
 import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ChevronDownIcon, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -42,11 +44,14 @@ const validaSchemaDiarioDeObra = z
         dataDia: z.date(),
         itensDoDia: z.array(z.object({
             descricao: z.string().min(2, "Nome obrigatório"),
-            itemQuantitativa: z.string().min(1, "Unidade obrigatória"),
+            idQuantitativa: z.string().min(1, "Selecione a quantitativa"),
             quantidade: z.number().min(1, "Quantidade obrigatória"),
         }))
     })
 export default function CriarDiarioDeObra() {
+
+    const navigate = useNavigate();
+    const [toast, setToast] = React.useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
     const { data: propostasAprovadas } = useQuery({
         queryKey: ["propostasAprovadas",],
@@ -74,19 +79,67 @@ export default function CriarDiarioDeObra() {
     });
 
     const dataDia = form.watch('dataDia');
+    const idPropostaSelecionada = form.watch('idProposta');
 
-    function onSubmit(values: z.infer<typeof validaSchemaDiarioDeObra>) {
-        console.log(values)
+    const { data: quantitativasForProposta } = useQuery({
+        queryKey: ['quantitativas', idPropostaSelecionada],
+        queryFn: async () => {
+            if (!idPropostaSelecionada) return [] as any[];
+            const response = await fetch(`${url}/quantitativa/${idPropostaSelecionada}`);
+            if (!response.ok) return [] as any[];
+            const data = await response.json();
+            return data as { id: number; descricao: string }[];
+        }
+    });
+
+    const criarDiarioMutation = useMutation({
+        mutationKey: ['criarDiario'],
+        mutationFn: async (payload: any) => {
+            const response = await fetch(`${url}/diarioDeObra`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || 'Erro ao criar diário');
+            }
+            return response.json();
+        }
+    });
+
+    async function onSubmit(values: z.infer<typeof validaSchemaDiarioDeObra>) {
+        try {
+            const payload = {
+                idProposta: Number(values.idProposta),
+                dataDia: values.dataDia instanceof Date ? values.dataDia.toISOString() : values.dataDia,
+                itensDoDia: values.itensDoDia.map((it) => ({
+                    descricao: it.descricao,
+                    idQuantitativa: Number(it.idQuantitativa),
+                    quantidade: Number(it.quantidade),
+                })),
+            };
+
+            await criarDiarioMutation.mutateAsync(payload);
+            form.reset({ idProposta: '', dataDia: new Date(), itensDoDia: [] });
+            setToast({ message: 'Diário criado com sucesso', type: 'success' });
+            setTimeout(() => setToast(null), 3000);
+            // redirecionar para lista de diários
+            navigate('/diarioDeObra');
+        } catch (err: any) {
+            console.error('Erro ao criar diário:', err);
+            alert('Erro ao criar diário: ' + (err?.message || ''));
+        }
     }
 
     const [open, setOpen] = React.useState(false);
 
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "itensDoDia",
-  });
+    const { fields, append, remove } = useFieldArray({
+        control: form.control,
+        name: "itensDoDia",
+    });
 
-  console.log('fields', fields);
+    console.log('fields', fields);
 
 
 
@@ -104,6 +157,11 @@ export default function CriarDiarioDeObra() {
 
     return (
         <div className="flex flex-col p-4 gap-3">
+            {toast ? (
+                <div className={`p-3 rounded ${toast.type === 'success' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
+                    {toast.message}
+                </div>
+            ) : null}
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-3">
                     <FormField
@@ -193,17 +251,26 @@ export default function CriarDiarioDeObra() {
                                         />
                                         <FormField
                                             control={form.control}
-                                            name={`itensDoDia.${index}.itemQuantitativa`}
+                                            name={`itensDoDia.${index}.idQuantitativa`}
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>
-                                                        Item Quantitativa
-                                                    </FormLabel>
+                                                    <FormLabel>Quantitativa</FormLabel>
                                                     <FormControl>
-                                                        <Input
-                                                            placeholder="Item Quantitativa"
-                                                            {...field}
-                                                        />
+                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                            <FormControl>
+                                                                <SelectTrigger className="w-[200px]">
+                                                                    <SelectValue placeholder="Selecione a quantitativa" />
+                                                                </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent className="w-[200px]">
+                                                                <SelectGroup>
+                                                                    <SelectLabel>Quantitativas</SelectLabel>
+                                                                    {quantitativasForProposta?.map((q) => (
+                                                                        <SelectItem key={q.id} value={q.id.toString()}>{q.descricao}</SelectItem>
+                                                                    ))}
+                                                                </SelectGroup>
+                                                            </SelectContent>
+                                                        </Select>
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -219,8 +286,10 @@ export default function CriarDiarioDeObra() {
                                                     </FormLabel>
                                                     <FormControl>
                                                         <Input
+                                                            type="number"
                                                             placeholder="Quantidade"
-                                                            {...field}
+                                                            value={field.value}
+                                                            onChange={e => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
                                                         />
                                                     </FormControl>
                                                     <FormMessage />
@@ -242,21 +311,24 @@ export default function CriarDiarioDeObra() {
                             </div>
                             <Button
                                 type="button"
-                                onClick={() =>
-                                    {
-                                        append({
-                                            descricao: "",
-                                            itemQuantitativa: "",
-                                            quantidade: 0,
-                                        });
-                                    }
+                                onClick={() => {
+                                    append({
+                                        descricao: "",
+                                        idQuantitativa: "",
+                                        quantidade: 0,
+                                    });
+                                }
                                 }
                             >
                                 Adicionar item
                             </Button>
                         </div>
                     </div>
-                    {/* <Button type="submit">Submit</Button> */}
+                    <div className="flex gap-2">
+                        <Button type="submit" disabled={criarDiarioMutation.status === 'pending'}>
+                            {criarDiarioMutation.status === 'pending' ? 'Criando...' : 'Criar'}
+                        </Button>
+                    </div>
                 </form>
             </Form>
         </div>
