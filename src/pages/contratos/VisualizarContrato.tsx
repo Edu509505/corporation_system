@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
 import { Suspense } from "react";
 import { formatToBRL, formatToNumber } from 'brazilian-values';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -67,27 +68,24 @@ function GetInfoContratos() {
     },
   });
 
-  console.log("dadosCliente", dadosCliente)
+  const { data: versionamentoAprovado } = useSuspenseQuery({
+      queryKey: ["versionamento", dadosCliente?.proposta.id],
+      queryFn: async () => {
+        const response = await fetch(
+          `${url}/proposta/${dadosCliente?.proposta.id.toString()}/verAprovado`
+        );
+        if (!response.ok) throw new Error("Versionamento não encontrada");
+        const data = await response.json();
+        return data as Versionamento[];
+      },
+    });
 
-  const { data: versionamento } = useSuspenseQuery({
-    queryKey: ["versionamento", dadosCliente?.proposta.id],
-    queryFn: async () => {
-      const response = await fetch(
-        `${url}/proposta/${dadosCliente?.proposta.id}/verAprovado`
-      );
-      if (!response.ok) throw new Error("Versionamento não encontrada");
-      const data = await response.json();
-      return data as Versionamento;
-    },
-  });
-
-  console.log("versionamento", versionamento)
 
   const { data: anexoVersionamento } = useSuspenseQuery({
-    queryKey: ["anexoVersionamento", versionamento?.id],
+    queryKey: ["anexoVersionamento", versionamentoAprovado],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/versionamento/${versionamento?.id}/anexos/urls`
+        `${url}/versionamento/${versionamentoAprovado.map((ver) => ver.id)}/anexos/urls`
       )
       if (!response.ok) throw new Error("Anexo não encontrada");
       const data = await response.json();
@@ -96,7 +94,7 @@ function GetInfoContratos() {
   })
 
   const { data: anexoContrato } = useSuspenseQuery({
-    queryKey: ["anexoContrato", versionamento?.id],
+    queryKey: ["anexoContrato", versionamentoAprovado],
     queryFn: async () => {
       const response = await fetch(`${url}/contrato/${id}/anexoContrato/url`)
       if (!response.ok) throw new Error("Não foi encontrado o Anexo do contrato")
@@ -107,9 +105,9 @@ function GetInfoContratos() {
 
 
   const { data: quantitativa } = useSuspenseQuery({
-    queryKey: ["quantitativa", versionamento?.id],
+    queryKey: ["quantitativa", versionamentoAprovado.map((ver) => ver.id)],
     queryFn: async () => {
-      const response = await fetch(`${url}/quantitativa/${0}`)
+      const response = await fetch(`${url}/quantitativa/${versionamentoAprovado.map((ver)=> ver.id)}`)
       if (!response.ok) throw new Error("Não foi encontrato nenhuma quantitativa")
       const data = await response.json()
       return data as Quantitativa[]
@@ -170,7 +168,7 @@ function GetInfoContratos() {
               .join("/")}
           </h1>
           <h1>
-            <strong>Valor: </strong> {dadosCliente?.proposta.valorProposta}
+            <strong>Valor: </strong> {formatToBRL(dadosCliente?.proposta.valorProposta)}
           </h1>
         </section>
       </div>
@@ -219,14 +217,40 @@ function GetInfoContratos() {
         <h1 className="font-bold text-2xl">Quantitativas imposta na Proposta</h1>
         {quantitativa === undefined ? (
           <span>Nenhuma quantitativa foi encontrada</span>
-        ) : (quantitativa.map((item) => (
-          <div key={item.id} className="flex flex-wrap gap-3 border-1 rounded-2xl border-ring p-3 bg-white">
-            <h1 ><strong>item:</strong> {item.descricao}</h1>
-            <h1 ><strong>Quantidade:</strong> {formatToNumber(item.quantidade)}</h1>
-            <h1 ><strong>Unidade de Medida:</strong> {item.unidadeDeMedida}</h1>
-            <h1 ><strong>Valor Unitário:</strong> {formatToBRL(item.valorUnitario)}</h1>
-          </div>
-        )))}
+        ) : (
+          <>
+          <Table className="rounded-2xl">
+            <TableHeader className="bg-gray-300">
+              <TableRow>
+                <TableHead>item:</TableHead>
+                <TableHead>Quantidade:</TableHead>
+                <TableHead>Unidade de Medida:</TableHead>
+                <TableHead>Valor Unitário:</TableHead> 
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+          {quantitativa.map((item) => (
+            <TableRow>
+            <TableCell > {item.descricao}</TableCell>
+            <TableCell > {formatToNumber(item.quantidade)}</TableCell>
+            <TableCell > {item.unidadeDeMedida}</TableCell>
+            <TableCell >{formatToBRL(item.valorUnitario)}</TableCell>
+            </TableRow>
+          ))
+          }
+            </TableBody>
+          </Table>
+          </>
+        //   quantitativa.map((item) => (
+        //   <div key={item.id} className="flex flex-wrap gap-3 border-1 rounded-2xl border-ring p-3 bg-white">
+        //     <h1 ><strong>item:</strong> {item.descricao}</h1>
+        //     <h1 ><strong>Quantidade:</strong> {formatToNumber(item.quantidade)}</h1>
+        //     <h1 ><strong>Unidade de Medida:</strong> {item.unidadeDeMedida}</h1>
+        //     <h1 ><strong>Valor Unitário:</strong> {formatToBRL(item.valorUnitario)}</h1>
+        //   </div>
+        // ))
+        
+        )}
       </div>
     </div>
   )
