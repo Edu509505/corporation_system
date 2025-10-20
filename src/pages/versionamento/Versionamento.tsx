@@ -80,12 +80,12 @@ interface Versionamento {
   anexos: string;
 }
 
-interface versionamentoAprovado {
-  id: number;
-  idProposta: number;
-  status: string;
-  updateAt: string;
-}
+// interface versionamentoAprovado {
+//   id: number;
+//   idProposta: number;
+//   status: string;
+//   updateAt: string;
+// }
 
 interface Propostas {
   id: number;

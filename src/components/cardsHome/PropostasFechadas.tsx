@@ -2,10 +2,12 @@ import { useSuspenseQuery } from "@tanstack/react-query"
 
 const url = import.meta.env.VITE_API_URL;
 
-interface Versionamento {
+interface Proposta {
   id: number;
-  idProposta: number;
-  status: string;
+  idCliente: number;
+  nomeDaProposta: string;
+  descricao: string;
+  valorProposta: string;
   updateAt: string;
 }
 
@@ -17,7 +19,7 @@ function PropostasFechadas() {
         const response = await fetch(`${url}/propostasAprovadas`);
         if(!response.ok) throw new Error("erro ao encontrar os versionamentos aprovados");
         const data = await response.json();
-        return data as Versionamento[];
+        return data as Proposta[];
       }
     })
 
