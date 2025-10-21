@@ -38,7 +38,7 @@ function PropostasFechadas() {
                 {propostasAprovadas.length}
               </h1>
 
-              {propostasAprovadas.length === 0 ?
+              {propostasAprovadas.length === 0 || null?
               (<>Até o momento nenhuma Proposta Aprovada</>)
               : propostasAprovadas.length === 1 ?
               (<>Proposta Aprovada</>) : (<>Propostas Aprovadas</>)}

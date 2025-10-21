@@ -1,5 +1,5 @@
 import PropostasFechadas from "@/components/cardsHome/PropostasFechadas";
-import Grafico from "@/components/grafico/grafico";
+import Grafico from "@/components/grafico/Grafico";
 
 function Home() {
   return (
