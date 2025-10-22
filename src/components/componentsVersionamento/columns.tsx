@@ -1,6 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table";
 //import { CircleAlertIcon, CircleCheck, CircleX } from "lucide-react";
-import StatusDeAprovacao from "../componentsVersionamento/StatusDeAprovaao";
+import StatusDeAprovacao from "./StatusDeAprovaao";
 import { id } from "zod/v4/locales";
 import { Link } from "react-router-dom";
 import { TableCell } from "../ui/table";
@@ -14,7 +14,7 @@ export type Propostas = {
   createdAt: string | null;
   descricao: string;
   valorProposta: string;
-  cliente: {
+  name: {
     cliente: string;
     local: string;
   };
@@ -27,7 +27,7 @@ export const columns: ColumnDef<Propostas>[] = [
     header: "Número",
   },
   {
-    id: 'cliente.cliente',
+    id: 'cliente.name',
     accessorKey: "cliente.cliente",
     header: "Empresa",
     footer: ({ column }) => {

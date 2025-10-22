@@ -38,7 +38,7 @@ function ClientListContent() {
                 {clientes.map(cliente => (
                     <CardClient key={cliente.id}
                         id={cliente.id}
-                        cliente={cliente.cliente}
+                        name={cliente.name}
                         cnpjCliente={cliente.cnpj}
                         local={cliente.local}
                         status={cliente.status}

@@ -93,7 +93,7 @@ interface Propostas {
   descricao: string;
   createdAt: string;
   cliente: {
-    cliente: string;
+    name: string;
     cnpj: string;
   };
 }
@@ -364,7 +364,7 @@ function Versionamento() {
         <InfoClientes
           nomeDaProposta={proposta.nomeDaProposta}
           createdAt={proposta.createdAt}
-          cliente={proposta.cliente.cliente}
+          cliente={proposta.cliente.name}
           cnpjCliente={proposta.cliente.cnpj}
         />
       )}

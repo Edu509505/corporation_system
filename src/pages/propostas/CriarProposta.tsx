@@ -116,7 +116,7 @@ export default function CriarProposta() {
                 <SelectLabel>Cliente</SelectLabel>
                 {clientes.map((cliente) => (
                   <SelectItem key={cliente.id} value={cliente.id.toString()}>
-                    {cliente.cliente}
+                    {cliente.name}
                   </SelectItem>
                 ))}
               </SelectGroup>
