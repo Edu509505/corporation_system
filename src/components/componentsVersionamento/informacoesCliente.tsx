@@ -1,6 +1,6 @@
 import { cnpj } from "cpf-cnpj-validator";
 
-interface Propostas {
+interface InfoClientesProps {
   nomeDaProposta: string;
   createdAt: string;
   cliente: string;
@@ -12,7 +12,7 @@ function InfoClientes({
   createdAt,
   cliente,
   cnpjCliente,
-}: Propostas) {
+}: InfoClientesProps) {
   return (
     <div className="flex items-start justify-between gap-4">
       <section>
