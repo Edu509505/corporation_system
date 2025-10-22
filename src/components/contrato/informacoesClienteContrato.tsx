@@ -3,19 +3,20 @@ import { cnpj } from "cpf-cnpj-validator";
 
 const url = import.meta.env.VITE_API_URL;
 
-function InformacoesClientesContrato({ id }: { id: number | undefined }) {
+interface InformacoesClientesContratoProps {
+  id: number;
+}
+
+function InformacoesClientesContrato({ id }: InformacoesClientesContratoProps) {
   const { data: dadosCliente } = useQuery({
-    queryKey: ["cliente"],
+    queryKey: ["cliente", id],
     queryFn: async () => {
-      const response = await fetch(`${url}/cliente/${id?.toString()}`);
+      const response = await fetch(`${url}/cliente/${id}`);
       if (!response.ok) throw new Error("Cliente não encontrato");
       const data = await response.json();
-      console.log(data);
       return data;
     },
   });
-
-  console.log("dados Clientes", dadosCliente);
 
   return (
     <div className="flex items-start justify-between gap-4">

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
 import { Suspense } from "react";
-import { formatToBRL, formatToNumber } from 'brazilian-values';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const url = import.meta.env.VITE_API_URL;
@@ -69,16 +68,16 @@ function GetInfoContratos() {
   });
 
   const { data: versionamentoAprovado } = useSuspenseQuery({
-      queryKey: ["versionamento", dadosCliente?.proposta.id],
-      queryFn: async () => {
-        const response = await fetch(
-          `${url}/proposta/${dadosCliente?.proposta.id.toString()}/verAprovado`
-        );
-        if (!response.ok) throw new Error("Versionamento não encontrada");
-        const data = await response.json();
-        return data as Versionamento[];
-      },
-    });
+    queryKey: ["versionamento", dadosCliente?.proposta.id],
+    queryFn: async () => {
+      const response = await fetch(
+        `${url}/proposta/${dadosCliente?.proposta.id.toString()}/verAprovado`
+      );
+      if (!response.ok) throw new Error("Versionamento não encontrada");
+      const data = await response.json();
+      return data as Versionamento[];
+    },
+  });
 
 
   const { data: anexoVersionamento } = useSuspenseQuery({
@@ -107,7 +106,7 @@ function GetInfoContratos() {
   const { data: quantitativa } = useSuspenseQuery({
     queryKey: ["quantitativa", versionamentoAprovado.map((ver) => ver.id)],
     queryFn: async () => {
-      const response = await fetch(`${url}/quantitativa/${versionamentoAprovado.map((ver)=> ver.id)}`)
+      const response = await fetch(`${url}/quantitativa/${versionamentoAprovado.map((ver) => ver.id)}`)
       if (!response.ok) throw new Error("Não foi encontrato nenhuma quantitativa")
       const data = await response.json()
       return data as Quantitativa[]
@@ -168,7 +167,10 @@ function GetInfoContratos() {
               .join("/")}
           </h1>
           <h1>
-            <strong>Valor: </strong> {formatToBRL(dadosCliente?.proposta.valorProposta)}
+            <strong>Valor: </strong> {Intl.NumberFormat('PT-BR', {
+              style: "currency",
+              currency: "BRL"
+            }).format(dadosCliente?.proposta.valorProposta)}
           </h1>
         </section>
       </div>
@@ -219,37 +221,40 @@ function GetInfoContratos() {
           <span>Nenhuma quantitativa foi encontrada</span>
         ) : (
           <>
-          <Table className="rounded-2xl">
-            <TableHeader className="bg-gray-300">
-              <TableRow>
-                <TableHead>item:</TableHead>
-                <TableHead>Quantidade:</TableHead>
-                <TableHead>Unidade de Medida:</TableHead>
-                <TableHead>Valor Unitário:</TableHead> 
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-          {quantitativa.map((item) => (
-            <TableRow>
-            <TableCell > {item.descricao}</TableCell>
-            <TableCell > {formatToNumber(item.quantidade)}</TableCell>
-            <TableCell > {item.unidadeDeMedida}</TableCell>
-            <TableCell >{formatToBRL(item.valorUnitario)}</TableCell>
-            </TableRow>
-          ))
-          }
-            </TableBody>
-          </Table>
+            <Table className="rounded-2xl">
+              <TableHeader className="bg-gray-300">
+                <TableRow>
+                  <TableHead>item:</TableHead>
+                  <TableHead>Quantidade:</TableHead>
+                  <TableHead>Unidade de Medida:</TableHead>
+                  <TableHead>Valor Unitário:</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {quantitativa.map((item) => (
+                  <TableRow>
+                    <TableCell > {item.descricao}</TableCell>
+                    <TableCell > {Intl.NumberFormat("pt-BR").format(item.quantidade)}</TableCell>
+                    <TableCell > {item.unidadeDeMedida}</TableCell>
+                    <TableCell >{Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL"
+                    }).format(item.valorUnitario)}</TableCell>
+                  </TableRow>
+                ))
+                }
+              </TableBody>
+            </Table>
           </>
-        //   quantitativa.map((item) => (
-        //   <div key={item.id} className="flex flex-wrap gap-3 border-1 rounded-2xl border-ring p-3 bg-white">
-        //     <h1 ><strong>item:</strong> {item.descricao}</h1>
-        //     <h1 ><strong>Quantidade:</strong> {formatToNumber(item.quantidade)}</h1>
-        //     <h1 ><strong>Unidade de Medida:</strong> {item.unidadeDeMedida}</h1>
-        //     <h1 ><strong>Valor Unitário:</strong> {formatToBRL(item.valorUnitario)}</h1>
-        //   </div>
-        // ))
-        
+          //   quantitativa.map((item) => (
+          //   <div key={item.id} className="flex flex-wrap gap-3 border-1 rounded-2xl border-ring p-3 bg-white">
+          //     <h1 ><strong>item:</strong> {item.descricao}</h1>
+          //     <h1 ><strong>Quantidade:</strong> {formatToNumber(item.quantidade)}</h1>
+          //     <h1 ><strong>Unidade de Medida:</strong> {item.unidadeDeMedida}</h1>
+          //     <h1 ><strong>Valor Unitário:</strong> {formatToBRL(item.valorUnitario)}</h1>
+          //   </div>
+          // ))
+
         )}
       </div>
     </div>
@@ -259,8 +264,8 @@ function GetInfoContratos() {
 function VisualizarContratoLoading() {
   return (
     <div className="w-full flex flex-col flex-wrap gap-3 p-4 ">
-      <Skeleton className="h-9 w-25"/>
-      <Skeleton className="h-9 w-100"/>
+      <Skeleton className="h-9 w-25" />
+      <Skeleton className="h-9 w-100" />
       <div className="flex gap-3 flex-wrap">
         <Skeleton className="h-50 w-80" />
         <Skeleton className="h-50 w-80" />
@@ -270,11 +275,11 @@ function VisualizarContratoLoading() {
         <Skeleton className="h-40 w-70" />
         <Skeleton className="h-40 w-70" />
       </div>
-      <Skeleton className="h-9 w-100"/>
+      <Skeleton className="h-9 w-100" />
       <div className="flex flex-col gap-3">
-        <Skeleton className="h-11 w-full"/>
-        <Skeleton className="h-11 w-full"/>
-        <Skeleton className="h-11 w-full"/>
+        <Skeleton className="h-11 w-full" />
+        <Skeleton className="h-11 w-full" />
+        <Skeleton className="h-11 w-full" />
       </div>
     </div>
   )
@@ -290,7 +295,7 @@ function ErrorFallback({
 }
 
 function VisualizarContrato() {
-    const { reset } = useQueryErrorResetBoundary();
+  const { reset } = useQueryErrorResetBoundary();
   return (
     <ErrorBoundary
       onReset={reset}
