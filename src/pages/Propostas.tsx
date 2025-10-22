@@ -13,7 +13,7 @@ import { CirclePlus, CirclePlusIcon, Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import StatusDeAprovacao from "@/components/componentsVersionamento/StatusDeAprovaao";
-import TabelaPropostas from "@/components/versionamento/page";
+import TabelaPropostas from "@/components/componentsVersionamento/page";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -29,7 +29,6 @@ interface Propostas {
 }
 
 export default function VerPropostas() {
-  const navigate = useNavigate();
 
   // const [propostas, setPropostas] = useState<Propostas[]>([]);
 
@@ -44,10 +43,6 @@ export default function VerPropostas() {
 
   // console.log(propostas);
 
-  const handleClick = () => {
-    navigate("/criarProposta"); // Navigates to the /dashboard route
-  };
-
   // const paginaVersionamento = (propostaId: number) => {
   //   navigate(`/proposta/versionamento/${propostaId}`);
   // };
@@ -61,10 +56,12 @@ export default function VerPropostas() {
         </article>
         <article className="w-full">
           <div className="flex items-center justify-end w-full">
-            <Button onClick={handleClick} className="cursor-pointer">
+           <Link to="/criarProposta">
+            <Button className="cursor-pointer">
               <CirclePlus />
               Criar Proposta
             </Button>
+           </Link>
           </div>
           <TabelaPropostas />
         </article>

@@ -125,7 +125,7 @@ export default function CriarDiarioDeObra() {
             setToast({ message: 'Diário criado com sucesso', type: 'success' });
             setTimeout(() => setToast(null), 3000);
             // redirecionar para lista de diários
-            navigate('/diario-de-obra/proposta/:idProposta');
+            navigate('/diariosDeObra');
         } catch (err: any) {
             console.error('Erro ao criar diário:', err);
             alert('Erro ao criar diário: ' + (err?.message || ''));

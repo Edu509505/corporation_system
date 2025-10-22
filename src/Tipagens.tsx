@@ -1,6 +1,6 @@
 export type Cliente = {
   id: number;
-  cliente: string;
+  name: string;
   cnpj: string;
   local: string;
   status: "ATIVO" | "INATIVO";

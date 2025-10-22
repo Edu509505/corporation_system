@@ -45,7 +45,7 @@ const url = import.meta.env.VITE_API_URL;
 //Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática
 
 const criarClienteSchema = z.object({
-  cliente: z
+  name: z
     .string()
     .min(3, "Escreva um nome válido")
     .nonempty("Campo Obrigatório"),
@@ -68,7 +68,7 @@ export default function CriarCliente() {
   const formCliente = useForm<z.infer<typeof criarClienteSchema>>({
     resolver: zodResolver(criarClienteSchema),
     defaultValues: {
-      cliente: "",
+      name: "",
       cnpj: "",
       local: "",
       status: "" as "ATIVO" | "INATIVO",
@@ -123,7 +123,7 @@ export default function CriarCliente() {
         >
           <FormField
             control={formCliente.control}
-            name="cliente"
+            name="name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Nome do Cliente</FormLabel>

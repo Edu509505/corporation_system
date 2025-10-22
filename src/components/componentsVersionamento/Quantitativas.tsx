@@ -127,7 +127,7 @@ function Quantitativa({ itemVersionamento }: funcoesQuantitativa) {
                           <FormLabel>Unidade</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Unidade de medidKa"
+                              placeholder="Unidade de medida"
                               {...field}
                             />
                           </FormControl>

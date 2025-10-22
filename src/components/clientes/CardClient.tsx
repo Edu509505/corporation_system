@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 interface CardClientProps {
   id: number;
-  cliente: string;
+  name: string;
   cnpjCliente: string;
   local: string;
   status: "ATIVO" | "INATIVO";
@@ -14,7 +14,7 @@ interface CardClientProps {
 
 function CardClient({
   id,
-  cliente,
+  name,
   cnpjCliente,
   local,
   status,
@@ -32,7 +32,7 @@ function CardClient({
               {!path ? (
                 <h1 className="text-5xl ">
                   {
-                    cliente
+                    name
                       ?.split(" ")
                       .slice(0, 2)
                       .map((palavra) => palavra[0])
@@ -55,7 +55,7 @@ function CardClient({
                 {!path ? (
                   <h1 className="text-5xl ">
                     {
-                      cliente
+                      name
                         ?.split(" ")
                         .slice(0, 2)
                         .map((palavra) => palavra[0])
@@ -78,7 +78,7 @@ function CardClient({
           )}
           <div className="w-full flex flex-col gap-2">
             <p>
-              <strong>Cliente:</strong> {cliente}
+              <strong>Cliente:</strong> {name}
             </p>
             <p>
               <strong>CNPJ:</strong> {cnpj.format(cnpjCliente)}

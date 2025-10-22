@@ -56,7 +56,7 @@ const items = [
     url: "/#",
     icon: PencilRuler,
     subMenu: [
-      { title: "Diário De Obra", url: "/diario-de-obra", icon: NotebookPenIcon },
+      { title: "Diário De Obra", url: "/diarioDeObra", icon: NotebookPenIcon },
       // { title: "Diário De Obra", url: "/diario-de-obra/proposta/:idProposta", icon: NotebookPenIcon },
       { title: "Medição", url: "/medicao", icon: PencilRuler },
     ],
