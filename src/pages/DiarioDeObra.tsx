@@ -1,8 +1,9 @@
 // import { useQuery } from '@tanstack/react-query';
 // import { fetchDiarioDeObraPorProposta } from '../services/diarioDeObraService';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { CirclePlus } from 'lucide-react';
+import TabelaDiariosDeObras from '@/components/diarioDeObra/TabelaDiarioDeObra'
 
 // export default function DiarioDeObra() {
 //   const { idProposta } = useParams<{ idProposta: string }>();
@@ -44,7 +45,7 @@ import { CirclePlus } from 'lucide-react';
 //     </div>
 //   );
 // }
-import TabelaDiariosDeObras from '@/components/diarioDeObra/tabelaDiarioDeObra';
+
 
 
 

@@ -26,12 +26,12 @@ interface todosOsItensDoDia {
     }
 }
 
-const chartConfig = {
-    quantidade: {
-        label: "M²",
-        color: "#2563eb",
-    }
-} satisfies ChartConfig
+// const chartConfig = {
+//     quantidade: {
+//         label: "M²",
+//         color: "#2563eb",
+//     }
+// } satisfies ChartConfig
 
 function Grafico() {
 
@@ -55,7 +55,7 @@ function Grafico() {
     //     }
     // })
 
-const description = "An interactive area chart"
+// const description = "An interactive area chart"
 
 const chartData = [
   { date: "2024-04-01", desktop: 222, mobile: 150 },

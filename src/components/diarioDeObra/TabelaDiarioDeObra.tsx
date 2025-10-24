@@ -2,7 +2,7 @@ import { useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-qu
 import type { ColumnFilter } from "@tanstack/react-table";
 import React, { Suspense } from "react";
 import { DataTable } from "../data-table";
-import { columnsDiario, type DiarioDeObra } from "./columsDiario";
+import { columnsDiario, type DiarioDeObra } from './ColumsDiario'
 import { Skeleton } from "../ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
 

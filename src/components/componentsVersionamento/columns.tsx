@@ -1,7 +1,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 //import { CircleAlertIcon, CircleCheck, CircleX } from "lucide-react";
 import StatusDeAprovacao from "./StatusDeAprovaao";
-import { id } from "zod/v4/locales";
+// import { id } from "zod/v4/locales";
 import { Link } from "react-router-dom";
 import { TableCell } from "../ui/table";
 import { Input } from "../ui/input";

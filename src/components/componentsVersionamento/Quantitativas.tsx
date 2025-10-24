@@ -12,17 +12,17 @@ import { Input } from "../ui/input";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-import {
-  Dialog,
-  DialogClose,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
-import { useMutation } from "@tanstack/react-query";
-import { DialogContent } from "@radix-ui/react-dialog";
+// import {
+//   Dialog,
+//   DialogClose,
+//   DialogDescription,
+//   DialogFooter,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogTrigger,
+// } from "../ui/dialog";
+// import { useMutation } from "@tanstack/react-query";
+// import { DialogContent } from "@radix-ui/react-dialog";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -82,21 +82,21 @@ function Quantitativa({ itemVersionamento }: funcoesQuantitativa) {
     } catch {}
   };
 
-  const { mutateAsync: updateVersionamento } = useMutation({
-    mutationKey: ["updateVersionamento"],
-    mutationFn: async ({ id, status }: { id: number; status: string }) => {
-      const response = await fetch(`${url}/versionamento/${id}`, {
-        method: "PUT", // ou PATCH, dependendo da sua API
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          status: status,
-        }),
-      });
-      if (!response.ok) throw new Error("Versionamento não encontrado");
-    },
-  });
+  // const { mutateAsync: updateVersionamento } = useMutation({
+  //   mutationKey: ["updateVersionamento"],
+  //   mutationFn: async ({ id, status }: { id: number; status: string }) => {
+  //     const response = await fetch(`${url}/versionamento/${id}`, {
+  //       method: "PUT", // ou PATCH, dependendo da sua API
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         status: status,
+  //       }),
+  //     });
+  //     if (!response.ok) throw new Error("Versionamento não encontrado");
+  //   },
+  // });
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>

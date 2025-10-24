@@ -12,7 +12,7 @@ import Clientes from "./pages/Clientes";
 import EditarCliente from "./pages/clientes/cliente[userId]/EditarCliente";
 import CriarProposta from "./pages/propostas/CriarProposta";
 import VerPropostas from "./pages/Propostas";
-import VerVersionamento from "./Versionamento";
+// import VerVersionamento from "./Versionamento";
 import Versionamento from "./pages/versionamento/Versionamento";
 import Contratos from "./pages/Contratos";
 import AddContrato from "./pages/contratos/AddContrato";
@@ -29,7 +29,7 @@ function App() {
           <Route path="/" element={<Layout children={undefined} />}>
             <Route index element={<Home />} />
             <Route path="/criarProposta" element={<CriarProposta />} />
-            <Route path="/versionamento" element={<VerVersionamento />} />
+            {/* <Route path="/versionamento" element={<VerVersionamento />} /> */}
             <Route path="/notasFiscais" element={<NotasFiscais />} />
             <Route path="/medicao" element={<Medicao />} />
             <Route path="/adicionarMedicao" element={<AdicionarMedicao />} />
