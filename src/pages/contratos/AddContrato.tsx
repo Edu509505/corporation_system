@@ -12,7 +12,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useQueryErrorResetBoundary,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import {
   Select,
   SelectContent,
@@ -30,8 +33,22 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { CircleArrowLeftIcon, CircleCheckBigIcon, CircleX, Paperclip } from "lucide-react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import {
+  CircleArrowLeftIcon,
+  CircleCheckBigIcon,
+  CircleX,
+  Paperclip,
+} from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Link } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
@@ -51,9 +68,6 @@ interface Propostas {
   nomeDaProposta: string;
   statusProposta: string;
 }
-
-
-
 
 function AdicionarContrato() {
   const { data: clientes } = useSuspenseQuery({
@@ -95,8 +109,7 @@ function AdicionarContrato() {
         "Você deve selecionar ao menos um arquivo"
       )
       .refine(
-        (files) =>
-          files?.[0]?.size <= 15 * 1024 * 1024,
+        (files) => files?.[0]?.size <= 15 * 1024 * 1024,
         "Arquivo deve ter até 50MB"
       )
       .refine(
@@ -118,8 +131,8 @@ function AdicionarContrato() {
     },
   });
 
-  const [responseOk, setResponseOk] = useState<boolean>(false)
-  const [responseNotOk, setResponseNotOk] = useState<boolean>(false)
+  const [responseOk, setResponseOk] = useState<boolean>(false);
+  const [responseNotOk, setResponseNotOk] = useState<boolean>(false);
 
   const onSubmit = async (data: z.infer<typeof contratoSchema>) => {
     console.log("data ", data);
@@ -141,10 +154,10 @@ function AdicionarContrato() {
         method: "POST",
         body: form,
       });
-      console.log('response', response);
+      console.log("response", response);
       if (!response.ok) {
         // Aqui você lida com o erro de forma clara
-        setResponseNotOk(true)
+        setResponseNotOk(true);
         setResponseOk(false);
         const errorText = await response.text();
         throw new Error(`Erro ${response.status}: ${errorText}`);
@@ -152,15 +165,17 @@ function AdicionarContrato() {
       console.log("estou aqui");
       const body = await response.json();
       setResponseOk(true);
-      setResponseNotOk(false)
+      setResponseNotOk(false);
       console.log("Cliente criado com sucesso:", body);
-    } catch { }
+    } catch {}
   };
   return (
     <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
       <header>
-        <Link to='/contratos'>
-          <Button><CircleArrowLeftIcon /> Retornar</Button>
+        <Link to="/contratos">
+          <Button>
+            <CircleArrowLeftIcon /> Retornar
+          </Button>
         </Link>
         <h1 className="text-2xl font-bold">Adicionar Contrato</h1>
         <p className="text-gray-600">
@@ -191,7 +206,7 @@ function AdicionarContrato() {
                     <Select
                       //value={idCliente.id}
                       onValueChange={(value) => {
-                        setIdCliente(value.toString(),);
+                        setIdCliente(value.toString());
                         field.onChange(value);
                         propostasAprovadas;
                       }}
@@ -309,25 +324,39 @@ function AdicionarContrato() {
             >
               Cadastrar Contrato
             </Button>
-            <AlertDialog open={responseOk} onOpenChange={(open) => { setResponseOk(open) }}>
+            <AlertDialog
+              open={responseOk}
+              onOpenChange={(open) => {
+                setResponseOk(open);
+              }}
+            >
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="text-ring flex items-center gap-3"><CircleCheckBigIcon /> Contrato cadastrado com sucesso</AlertDialogTitle>
+                  <AlertDialogTitle className="text-ring flex items-center gap-3">
+                    <CircleCheckBigIcon /> Contrato cadastrado com sucesso
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
                     Seu contrato foi cadastrado e inserido no sistema
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <Link to='/contratos'>
+                  <Link to="/contratos">
                     <AlertDialogAction>Continuar</AlertDialogAction>
                   </Link>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            <AlertDialog open={responseNotOk} onOpenChange={(open) => { setResponseNotOk(open) }}>
+            <AlertDialog
+              open={responseNotOk}
+              onOpenChange={(open) => {
+                setResponseNotOk(open);
+              }}
+            >
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="text-destructive flex items-center gap-3"><CircleX /> Erro ao cadastrar contrato</AlertDialogTitle>
+                  <AlertDialogTitle className="text-destructive flex items-center gap-3">
+                    <CircleX /> Erro ao cadastrar contrato
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
                     A ação de cadastrar o contrato foi mal-sucedida
                   </AlertDialogDescription>
@@ -376,7 +405,7 @@ function AddContratoIsLoading() {
         <Skeleton className="h-12 w-100" />
       </div>
     </div>
-  )
+  );
 }
 function ErrorFallback({
   error,
