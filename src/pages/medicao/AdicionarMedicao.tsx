@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
+  noop,
   useQueryErrorResetBoundary,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -103,8 +104,8 @@ function AdicionarContrato() {
     observacao: z.string(),
     idCliente: z.string().min(1, "Selecione ao menos um cliente"),
     idProposta: z.string().min(1, "Selecione ao menos uma proposta"),
-    periodoInicial: z.date({ required_error: "" }),
-    periodoFinal: z.string().min(1),
+    periodoInicial: z.date("Data Inicial Obrigatória"),
+    periodoFinal: z.date("Data Final Obrigatória"),
   });
 
   const form = useForm<z.infer<typeof contratoSchema>>({
@@ -113,12 +114,34 @@ function AdicionarContrato() {
       idCliente: "",
       observacao: "",
       idProposta: "",
-      periodoFinal: "",
     },
   });
 
   const [responseOk, setResponseOk] = useState<boolean>(false);
   const [responseNotOk, setResponseNotOk] = useState<boolean>(false);
+
+  const [dataInicial, setDataInicial] = useState<Date | null>(null)
+  const [dataFinal, setDataFinal] = useState<Date | null>(null)
+
+  console.log("Data Inicial", dataInicial)
+  console.log("Data Final", dataFinal)
+  console.log("As duas datas", dataInicial && dataFinal)
+
+  const { data: periodo } = useSuspenseQuery({
+    queryKey: ["getPeriodoDeObra"],
+    queryFn: dataFinal && dataInicial ? async () => {
+        if(dataFinal){
+          const response = await fetch(
+            `${url}/usuarios`
+          );
+          if (!response.ok) throw new Error("Propostas não encontradas");
+          const data = await response.json();
+          return data
+        }
+    } : noop
+  })
+
+  console.log("Periodo", periodo)
 
   const onSubmit = async (data: z.infer<typeof contratoSchema>) => {
     console.log("data ", data);
@@ -148,7 +171,7 @@ function AdicionarContrato() {
       setResponseOk(true);
       setResponseNotOk(false);
       console.log("Cliente criado com sucesso:", body);
-    } catch {}
+    } catch { }
   };
   return (
     <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
@@ -265,48 +288,99 @@ function AdicionarContrato() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="periodoFinal"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Data Inicial</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-[240px] pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
+              <h1>Selecione um período para que seja feito o fechamento</h1>
+            <section className="flex gap-3">
+              <FormField
+                control={form.control}
+                name="periodoInicial"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Data Inicial</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-[240px] pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "d/MM/yy")
+                            ) : (
+                              <span>Selecionar Data</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={(value) => (
+                            field.onChange(value),
+                            setDataInicial(value as Date)
                           )}
-                        >
-                          {field.value ? (
-                            format(field.value, "d/MM/yy")
-                          ) : (
-                            <span>Selecionar Data</span>
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          captionLayout="dropdown"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription>Escolha a data inicial</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="periodoFinal"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Data Final</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-[240px] pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "d/MM/yy")
+                            ) : (
+                              <span>Selecionar Data</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={(value) => (
+                            field.onChange(value),
+                            setDataFinal(value as Date)
                           )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value as Date | String}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                        captionLayout="dropdown"
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormDescription>Escolha a data inicial</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          captionLayout="dropdown"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription>Escolha a data inicial</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </section>
             <Button
               type="submit"
               className="mt-4 cursor-pointer"
