@@ -53,6 +53,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns/format";
+import PeriodoFechamento from "@/components/medicao/periodoFechamento";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -362,6 +363,12 @@ function AdicionarContrato() {
                 )}
               />
             </section>
+            {
+              dataInicial && dataFinal ? (
+
+                <PeriodoFechamento dataInicial={dataInicial} dataFinal={dataInicial}/>
+              ): <h1>Nenhum Periodo Selecionado</h1>
+            }
             <Button
               type="submit"
               className="mt-4 cursor-pointer"
@@ -414,6 +421,7 @@ function AdicionarContrato() {
           </form>
         </Form>
       </main>
+
     </div>
   );
 }

@@ -3,8 +3,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 const url = import.meta.env.VITE_API_URL;
 
 interface PeriodoFechamentoProps {
-  dataInicial: Date,
-  dataFinal: Date
+  dataInicial: Date | null,
+  dataFinal: Date | null
 }
 
 interface DiarioDeObra{
@@ -20,10 +20,10 @@ interface DiarioDeObra{
   }
 }
 
-function periodoFechamento({dataInicial, dataFinal}: PeriodoFechamentoProps) {
+function PeriodoFechamento({dataInicial, dataFinal}: PeriodoFechamentoProps) {
 
     const { data: periodo } = useSuspenseQuery({
-      queryKey: ["getPeriodoDeObra"],
+      queryKey: ["getPeriodoDeObra", dataInicial || dataFinal],
       queryFn: async () => {
         const response = await fetch(`${url}/diarioDeObraPeriodo/${dataInicial}/${dataFinal}`);
         if (!response.ok) throw new Error("Propostas não encontradas");
@@ -35,10 +35,10 @@ function periodoFechamento({dataInicial, dataFinal}: PeriodoFechamentoProps) {
     console.log("Periodo", periodo);
 
   return(
-    <>
+    <section className="h-full bg-amber-200">
       <h1>{periodo.map((dados) => dados.itensDiarioDeObra.descricao)}</h1>
-    </>
+    </section>
   )
 }
 
-export default periodoFechamento;
+export default PeriodoFechamento;
