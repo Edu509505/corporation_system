@@ -127,21 +127,21 @@ function AdicionarContrato() {
   console.log("Data Final", dataFinal)
   console.log("As duas datas", dataInicial && dataFinal)
 
-  const { data: periodo } = useSuspenseQuery({
-    queryKey: ["getPeriodoDeObra"],
-    queryFn: dataFinal && dataInicial ? async () => {
-        if(dataFinal){
-          const response = await fetch(
-            `${url}/usuarios`
-          );
-          if (!response.ok) throw new Error("Propostas não encontradas");
-          const data = await response.json();
-          return data
-        }
-    } : noop
-  })
+  // const { data: periodo } = useSuspenseQuery({
+  //   queryKey: ["getPeriodoDeObra"],
+  //   queryFn: dataFinal && dataInicial ? async () => {
+  //       if(dataFinal){
+  //         const response = await fetch(
+  //           `${url}/usuarios`
+  //         );
+  //         if (!response.ok) throw new Error("Propostas não encontradas");
+  //         const data = await response.json();
+  //         return data
+  //       }
+  //   } : noop
+  // })
 
-  console.log("Periodo", periodo)
+  // console.log("Periodo", periodo)
 
   const onSubmit = async (data: z.infer<typeof contratoSchema>) => {
     console.log("data ", data);
