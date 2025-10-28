@@ -13,8 +13,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
-  noop,
-  useQuery,
   useQueryErrorResetBoundary,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -128,17 +126,17 @@ function AdicionarContrato() {
   console.log("Data Final", dataFinal);
   console.log("As duas datas", dataInicial && dataFinal);
 
-  const { data: periodo } = useSuspenseQuery({
-    queryKey: ["getPeriodoDeObra"],
-    queryFn: async () => {
-      const response = await fetch(`${url}/usuarios`);
-      if (!response.ok) throw new Error("Propostas não encontradas");
-      const data = await response.json();
-      return data;
-    },
-  });
+  // const { data: periodo } = useSuspenseQuery({
+  //   queryKey: ["getPeriodoDeObra"],
+  //   queryFn: async () => {
+  //     const response = await fetch(`${url}/usuarios`);
+  //     if (!response.ok) throw new Error("Propostas não encontradas");
+  //     const data = await response.json();
+  //     return data;
+  //   },
+  // });
 
-  console.log("Periodo", periodo);
+  // console.log("Periodo", periodo);
 
   const onSubmit = async (data: z.infer<typeof contratoSchema>) => {
     console.log("data ", data);
