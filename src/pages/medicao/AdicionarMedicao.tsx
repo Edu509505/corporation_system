@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   noop,
+  useQuery,
   useQueryErrorResetBoundary,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -120,28 +121,24 @@ function AdicionarContrato() {
   const [responseOk, setResponseOk] = useState<boolean>(false);
   const [responseNotOk, setResponseNotOk] = useState<boolean>(false);
 
-  const [dataInicial, setDataInicial] = useState<Date | null>(null)
-  const [dataFinal, setDataFinal] = useState<Date | null>(null)
+  const [dataInicial, setDataInicial] = useState<Date | null>(null);
+  const [dataFinal, setDataFinal] = useState<Date | null>(null);
 
-  console.log("Data Inicial", dataInicial)
-  console.log("Data Final", dataFinal)
-  console.log("As duas datas", dataInicial && dataFinal)
+  console.log("Data Inicial", dataInicial);
+  console.log("Data Final", dataFinal);
+  console.log("As duas datas", dataInicial && dataFinal);
 
-  // const { data: periodo } = useSuspenseQuery({
-  //   queryKey: ["getPeriodoDeObra"],
-  //   queryFn: dataFinal && dataInicial ? async () => {
-  //       if(dataFinal){
-  //         const response = await fetch(
-  //           `${url}/usuarios`
-  //         );
-  //         if (!response.ok) throw new Error("Propostas não encontradas");
-  //         const data = await response.json();
-  //         return data
-  //       }
-  //   } : noop
-  // })
+  const { data: periodo } = useSuspenseQuery({
+    queryKey: ["getPeriodoDeObra"],
+    queryFn: async () => {
+      const response = await fetch(`${url}/usuarios`);
+      if (!response.ok) throw new Error("Propostas não encontradas");
+      const data = await response.json();
+      return data;
+    },
+  });
 
-  // console.log("Periodo", periodo)
+  console.log("Periodo", periodo);
 
   const onSubmit = async (data: z.infer<typeof contratoSchema>) => {
     console.log("data ", data);
@@ -171,7 +168,7 @@ function AdicionarContrato() {
       setResponseOk(true);
       setResponseNotOk(false);
       console.log("Cliente criado com sucesso:", body);
-    } catch { }
+    } catch {}
   };
   return (
     <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
@@ -288,7 +285,7 @@ function AdicionarContrato() {
                 </FormItem>
               )}
             />
-              <h1>Selecione um período para que seja feito o fechamento</h1>
+            <h1>Selecione um período para que seja feito o fechamento</h1>
             <section className="flex gap-3">
               <FormField
                 control={form.control}
@@ -320,8 +317,7 @@ function AdicionarContrato() {
                           mode="single"
                           selected={field.value}
                           onSelect={(value) => (
-                            field.onChange(value),
-                            setDataInicial(value as Date)
+                            field.onChange(value), setDataInicial(value as Date)
                           )}
                           disabled={(date) =>
                             date > new Date() || date < new Date("1900-01-01")
@@ -365,8 +361,7 @@ function AdicionarContrato() {
                           mode="single"
                           selected={field.value}
                           onSelect={(value) => (
-                            field.onChange(value),
-                            setDataFinal(value as Date)
+                            field.onChange(value), setDataFinal(value as Date)
                           )}
                           disabled={(date) =>
                             date > new Date() || date < new Date("1900-01-01")
