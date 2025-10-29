@@ -1,8 +1,8 @@
 FROM node:22.20 AS builder
 
-COPY . .
+WORKDIR /app
 
-RUN ls -la
+COPY . .
 
 ## Preparando a aplicação
 RUN npm i
