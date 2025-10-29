@@ -82,7 +82,7 @@ function AdicionarContrato() {
     },
   });
 
-  console.log(clientes)
+  console.log(clientes);
 
   const [idCliente, setIdCliente] = useState<string | undefined>(undefined);
 
@@ -102,7 +102,7 @@ function AdicionarContrato() {
     },
   });
 
-  const [ idProposta, setIdProposta ] = useState<string | undefined>(undefined)
+  const [idProposta, setIdProposta] = useState<string | undefined>(undefined);
 
   const contratoSchema = z.object({
     observacao: z.string(),
@@ -228,8 +228,7 @@ function AdicionarContrato() {
                     <FormLabel>Proposta</FormLabel>
                     <Select
                       onValueChange={(value) => (
-                        setIdProposta(value.toString()),
-                        field.onChange(value)
+                        setIdProposta(value.toString()), field.onChange(value)
                       )}
                       defaultValue={field.value}
                       disabled={false}
@@ -268,9 +267,7 @@ function AdicionarContrato() {
                   <FormControl>
                     <Input placeholder="Observação" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Inserir Observação.
-                  </FormDescription>
+                  <FormDescription>Inserir Observação.</FormDescription>
                 </FormItem>
               )}
             />
@@ -365,12 +362,15 @@ function AdicionarContrato() {
                 )}
               />
             </section>
-            {
-              dataInicial && dataFinal ? (
-
-                <PeriodoFechamento dataInicial={dataInicial} dataFinal={dataFinal} idProposta={idProposta}/>
-              ): <h1>Nenhum Periodo Selecionado</h1>
-            }
+            {dataInicial && dataFinal ? (
+              <PeriodoFechamento
+                dataInicial={dataInicial}
+                dataFinal={dataFinal}
+                idProposta={idProposta}
+              />
+            ) : (
+              <h1>Nenhum Periodo Selecionado</h1>
+            )}
             <Button
               type="submit"
               className="mt-4 cursor-pointer"
@@ -423,7 +423,6 @@ function AdicionarContrato() {
           </form>
         </Form>
       </main>
-
     </div>
   );
 }
