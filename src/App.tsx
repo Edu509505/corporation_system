@@ -19,6 +19,7 @@ import AddContrato from "./pages/contratos/AddContrato";
 import VisualizarContrato from "./pages/contratos/VisualizarContrato";
 import DiarioDeObra from "./pages/DiarioDeObra";
 import CriarDiarioDeObra from "./components/diarioDeObra/Create";
+import MostrarDiarioDeObraPorProposta from "./pages/DiarioPorProposta";
 
 function App() {
   return (
@@ -37,7 +38,7 @@ function App() {
             <Route path="/clientes" element={<Clientes />} />
             <Route path="/propostas" element={<VerPropostas />} />
             <Route path="/diarioDeObra" element={<DiarioDeObra />} />
-            {/* <Route path="/diario-de-obra/proposta/:idProposta" element={<DiarioDeObra />} /> */}
+            <Route path="/diarioPorProposta/:idProposta" element={<MostrarDiarioDeObraPorProposta />} />
             <Route path="/criarDiarioDeObra" element={<CriarDiarioDeObra />} />
             <Route
               path="/proposta/versionamento/:id"
