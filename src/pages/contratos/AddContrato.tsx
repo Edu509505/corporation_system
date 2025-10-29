@@ -57,7 +57,7 @@ const url = import.meta.env.VITE_API_URL;
 
 interface Cliente {
   id: number;
-  cliente: string;
+  name: string;
   cnpj: string;
   proposta: string;
 }
@@ -73,7 +73,7 @@ function AdicionarContrato() {
   const { data: clientes } = useSuspenseQuery({
     queryKey: ["clientes", ""],
     queryFn: async () => {
-      const response = await fetch(`${url}/clientes/`);
+      const response = await fetch(`${url}/clientes`);
       if (!response.ok) throw new Error("Clientes não encontrados");
       const data = await response.json();
       return data as Cliente[];
@@ -204,7 +204,6 @@ function AdicionarContrato() {
                   <FormItem>
                     <FormLabel>Cliente</FormLabel>
                     <Select
-                      //value={idCliente.id}
                       onValueChange={(value) => {
                         setIdCliente(value.toString());
                         field.onChange(value);
@@ -225,7 +224,7 @@ function AdicionarContrato() {
                               key={cliente.id}
                               value={cliente.id.toString()}
                             >
-                              {cliente.cliente}
+                              {cliente.name}
                             </SelectItem>
                           ))}
                         </SelectGroup>

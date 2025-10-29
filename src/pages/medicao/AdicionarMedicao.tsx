@@ -59,7 +59,7 @@ const url = import.meta.env.VITE_API_URL;
 
 interface Cliente {
   id: number;
-  cliente: string;
+  name: string;
   cnpj: string;
   proposta: string;
 }
@@ -73,14 +73,16 @@ interface Propostas {
 
 function AdicionarContrato() {
   const { data: clientes } = useSuspenseQuery({
-    queryKey: ["clientes", ""],
+    queryKey: ["clientes"],
     queryFn: async () => {
-      const response = await fetch(`${url}/clientes/`);
+      const response = await fetch(`${url}/clientes`);
       if (!response.ok) throw new Error("Clientes não encontrados");
       const data = await response.json();
       return data as Cliente[];
     },
   });
+
+  console.log(clientes)
 
   const [idCliente, setIdCliente] = useState<string | undefined>(undefined);
 
@@ -99,6 +101,8 @@ function AdicionarContrato() {
       }
     },
   });
+
+  const [ idProposta, setIdProposta ] = useState<string | undefined>(undefined)
 
   const contratoSchema = z.object({
     observacao: z.string(),
@@ -122,10 +126,6 @@ function AdicionarContrato() {
 
   const [dataInicial, setDataInicial] = useState<Date | null>(null);
   const [dataFinal, setDataFinal] = useState<Date | null>(null);
-
-  console.log("Data Inicial", dataInicial);
-  console.log("Data Final", dataFinal);
-  console.log("As duas datas", dataInicial && dataFinal);
 
   const onSubmit = async (data: z.infer<typeof contratoSchema>) => {
     console.log("data ", data);
@@ -190,7 +190,6 @@ function AdicionarContrato() {
                   <FormItem>
                     <FormLabel>Cliente</FormLabel>
                     <Select
-                      //value={idCliente.id}
                       onValueChange={(value) => {
                         setIdCliente(value.toString());
                         field.onChange(value);
@@ -211,7 +210,7 @@ function AdicionarContrato() {
                               key={cliente.id}
                               value={cliente.id.toString()}
                             >
-                              {cliente.cliente}
+                              {cliente.name}
                             </SelectItem>
                           ))}
                         </SelectGroup>
@@ -228,7 +227,10 @@ function AdicionarContrato() {
                   <FormItem>
                     <FormLabel>Proposta</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => (
+                        setIdProposta(value.toString()),
+                        field.onChange(value)
+                      )}
                       defaultValue={field.value}
                       disabled={false}
                     >
@@ -264,10 +266,10 @@ function AdicionarContrato() {
                   <FormLabel>Observação - Opicional</FormLabel>
                   <FormMessage />
                   <FormControl>
-                    <Input placeholder="Título do contrato" {...field} />
+                    <Input placeholder="Observação" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Insira o título do contrato.
+                    Inserir Observação.
                   </FormDescription>
                 </FormItem>
               )}
@@ -286,12 +288,12 @@ function AdicionarContrato() {
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-[240px] pl-3 text-left font-normal",
+                              "w-60 pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "d/MM/yy")
+                              format(field.value, "dd/MM/yyyy")
                             ) : (
                               <span>Selecionar Data</span>
                             )}
@@ -330,12 +332,12 @@ function AdicionarContrato() {
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-[240px] pl-3 text-left font-normal",
+                              "w-60 pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "d/MM/yy")
+                              format(field.value, "dd/MM/yyyy")
                             ) : (
                               <span>Selecionar Data</span>
                             )}
@@ -366,7 +368,7 @@ function AdicionarContrato() {
             {
               dataInicial && dataFinal ? (
 
-                <PeriodoFechamento dataInicial={dataInicial} dataFinal={dataInicial}/>
+                <PeriodoFechamento dataInicial={dataInicial} dataFinal={dataFinal} idProposta={idProposta}/>
               ): <h1>Nenhum Periodo Selecionado</h1>
             }
             <Button
