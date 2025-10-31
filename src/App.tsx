@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import NoPage from "./pages/NoPage";
 import NotasFiscais from "./pages/NotasFiscais";
 import Medicao from "./pages/Medicao";
-import AdicionarMedicao from "./pages/medicao/AdicionarMedicao"
+import AdicionarMedicao from "./pages/medicao/AdicionarMedicao";
 import LoginForm from "./pages/Login";
 import CadastroCliente from "./pages/clientes/CadastroCliente";
 import Clientes from "./pages/Clientes";
@@ -38,7 +38,10 @@ function App() {
             <Route path="/clientes" element={<Clientes />} />
             <Route path="/propostas" element={<VerPropostas />} />
             <Route path="/diarioDeObra" element={<DiarioDeObra />} />
-            <Route path="/diarioPorProposta/:idProposta" element={<MostrarDiarioDeObraPorProposta />} />
+            <Route
+              path="/diarioPorProposta/:idProposta"
+              element={<MostrarDiarioDeObraPorProposta />}
+            />
             <Route path="/criarDiarioDeObra" element={<CriarDiarioDeObra />} />
             <Route
               path="/proposta/versionamento/:id"

@@ -82,8 +82,6 @@ function AdicionarContrato() {
     },
   });
 
-  console.log(clientes);
-
   const [idCliente, setIdCliente] = useState<string | undefined>(undefined);
 
   const { data: propostasAprovadas } = useSuspenseQuery({
@@ -105,9 +103,9 @@ function AdicionarContrato() {
   const [idProposta, setIdProposta] = useState<string | undefined>(undefined);
 
   const contratoSchema = z.object({
-    observacao: z.string(),
     idCliente: z.string().min(1, "Selecione ao menos um cliente"),
     idProposta: z.string().min(1, "Selecione ao menos uma proposta"),
+    observacao: z.string(),
     periodoInicial: z.date("Data Inicial Obrigatória"),
     periodoFinal: z.date("Data Final Obrigatória"),
   });
@@ -116,8 +114,8 @@ function AdicionarContrato() {
     resolver: zodResolver(contratoSchema),
     defaultValues: {
       idCliente: "",
-      observacao: "",
       idProposta: "",
+      observacao: "",
     },
   });
 
@@ -127,20 +125,22 @@ function AdicionarContrato() {
   const [dataInicial, setDataInicial] = useState<Date | null>(null);
   const [dataFinal, setDataFinal] = useState<Date | null>(null);
 
+  const [desableSelectProposta, setDesableSelectProposta] =
+    useState<boolean>(true);
+  const [periodoInicial, setPeriodoInicial] = useState<boolean>(true);
+  const [periodoFinal, setPeriodoFinal] = useState<boolean>(true);
+
+  //AQUI É FEITO O REGISTRO
   const onSubmit = async (data: z.infer<typeof contratoSchema>) => {
-    console.log("data ", data);
-
     try {
-      const form = new FormData();
+      console.log(data);
 
-      form.set("idCliente", data.idCliente);
-      form.set("idProposta", data.idProposta);
-      form.set("observacao", data.observacao);
-
-      setResponseOk(true);
-      const response = await fetch(`${url}/contrato`, {
+      const response = await fetch(`${url}/criarMedicao`, {
         method: "POST",
-        body: form,
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(data),
       });
       console.log("response", response);
       if (!response.ok) {
@@ -150,7 +150,6 @@ function AdicionarContrato() {
         const errorText = await response.text();
         throw new Error(`Erro ${response.status}: ${errorText}`);
       }
-      console.log("estou aqui");
       const body = await response.json();
       setResponseOk(true);
       setResponseNotOk(false);
@@ -194,6 +193,7 @@ function AdicionarContrato() {
                         setIdCliente(value.toString());
                         field.onChange(value);
                         propostasAprovadas;
+                        setDesableSelectProposta(false);
                       }}
                       defaultValue={field.value}
                     >
@@ -228,10 +228,12 @@ function AdicionarContrato() {
                     <FormLabel>Proposta</FormLabel>
                     <Select
                       onValueChange={(value) => (
-                        setIdProposta(value.toString()), field.onChange(value)
+                        setIdProposta(value.toString()),
+                        field.onChange(value),
+                        setPeriodoInicial(false)
                       )}
                       defaultValue={field.value}
-                      disabled={false}
+                      disabled={desableSelectProposta}
                     >
                       <FormControl>
                         <SelectTrigger className="w-[300px]">
@@ -285,9 +287,10 @@ function AdicionarContrato() {
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-60 pl-3 text-left font-normal",
+                              "w-34 pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"
                             )}
+                            disabled={periodoInicial}
                           >
                             {field.value ? (
                               format(field.value, "dd/MM/yyyy")
@@ -303,7 +306,9 @@ function AdicionarContrato() {
                           mode="single"
                           selected={field.value}
                           onSelect={(value) => (
-                            field.onChange(value), setDataInicial(value as Date)
+                            field.onChange(value),
+                            setDataInicial(value as Date),
+                            setPeriodoFinal(false)
                           )}
                           disabled={(date) =>
                             date > new Date() || date < new Date("1900-01-01")
@@ -329,15 +334,17 @@ function AdicionarContrato() {
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-60 pl-3 text-left font-normal",
+                              "w-34 pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"
                             )}
+                            disabled={periodoFinal}
                           >
                             {field.value ? (
                               format(field.value, "dd/MM/yyyy")
                             ) : (
                               <span>Selecionar Data</span>
                             )}
+
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
                         </FormControl>
@@ -350,7 +357,10 @@ function AdicionarContrato() {
                             field.onChange(value), setDataFinal(value as Date)
                           )}
                           disabled={(date) =>
-                            date > new Date() || date < new Date("1900-01-01")
+                            date > new Date() ||
+                            date < new Date("1900-01-01") ||
+                            date < new Date(dataInicial as Date) ||
+                            dataInicial == null
                           }
                           captionLayout="dropdown"
                         />
@@ -376,7 +386,7 @@ function AdicionarContrato() {
               className="mt-4 cursor-pointer"
               variant="default"
             >
-              Cadastrar Contrato
+              Cadastrar Medição
             </Button>
             <AlertDialog
               open={responseOk}

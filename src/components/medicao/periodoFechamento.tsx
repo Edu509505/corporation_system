@@ -4,11 +4,12 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "../ui/table";
-
+import { MessageCircleWarningIcon } from "lucide-react";
 const url = import.meta.env.VITE_API_URL;
 
 interface PeriodoFechamentoProps {
@@ -54,7 +55,7 @@ function PeriodoFechamento({
   idProposta,
 }: PeriodoFechamentoProps) {
   const { data: periodo } = useSuspenseQuery({
-    queryKey: ["getPeriodoDeObra", dataInicial || dataFinal],
+    queryKey: ["getPeriodoDeObra", dataInicial, dataFinal, idProposta],
     queryFn: async () => {
       const response = await fetch(
         `${url}/diarioDeObraPeriodo/${format(
@@ -72,7 +73,7 @@ function PeriodoFechamento({
   });
 
   const { data: quantitativa } = useSuspenseQuery({
-    queryKey: ["quantitativa", dataInicial || dataFinal],
+    queryKey: ["quantitativa", dataInicial, dataFinal, idProposta],
     queryFn: async () => {
       const response = await fetch(`${url}/quantitativa/${idProposta}`);
       if (!response.ok) throw new Error("Nenhuma quantitativa encontrada");
@@ -81,13 +82,44 @@ function PeriodoFechamento({
     },
   });
 
-  console.log("Quantitativa ", quantitativa[0].descricao);
+  // A função abaixo pega pega item por item sem rpetir e faz soma de forma individual
+  //exemplo: se no fechamento tem retro ele vai pegar essa retro filtrar depois vai verificar quantas tem e somar tudo
+  function calculo(val: number | null) {
+    let resultado = null as any;
+    const calculo = periodo
+      .map((value) =>
+        value.itensDoDia
+          .map((value2) => value2.idQuantitativa === val && value2.quantidade)
+          .filter((valor) => valor)
+      )
+      .flat();
 
-  console.log("Periodo", periodo);
+    for (let i = 0; i < calculo.length; i++) {
+      resultado += calculo[i];
+    }
+
+    return resultado;
+  }
+
+  //Aqui ele pega tudo já somado e faz a soma final
+  // Exemplo: vai pegar todos os resultados da tabela, multiplicar pelo valor definido na quantitativa e logo após isso vai somar tudo
+
+  function resultadosSomados() {
+    let resultado = null as any;
+    const resultadoFinal = quantitativa.map(
+      (value) => calculo(value.id) * value.valorUnitario
+    );
+
+    for (let i = 0; i < resultadoFinal.length; i++) {
+      resultado += resultadoFinal[i];
+    }
+
+    return resultado;
+  }
 
   return (
-    <section className="h-full">
-      <div className="overflow-hidden rounded-md border">
+    <main className="h-full flex flex-col gap-3">
+      <section className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -109,10 +141,16 @@ function PeriodoFechamento({
                   </TableCell>
                   <TableCell>{value2.descricao}</TableCell>
                   <TableCell>
-                    {quantitativa[value2.idQuantitativa - 1].descricao}
+                    {
+                      quantitativa.find((q) => q.id === value2.idQuantitativa)
+                        ?.descricao
+                    }
                   </TableCell>
                   <TableCell>
-                    {quantitativa[value2.idQuantitativa - 1].unidadeDeMedida}
+                    {
+                      quantitativa.find((q) => q.id === value2.idQuantitativa)
+                        ?.unidadeDeMedida
+                    }
                   </TableCell>
                   <TableCell>{value2.quantidade}</TableCell>
                   <TableCell>
@@ -120,7 +158,8 @@ function PeriodoFechamento({
                       style: "currency",
                       currency: "BRL",
                     }).format(
-                      quantitativa[value2.idQuantitativa - 1].valorUnitario
+                      quantitativa.find((q) => q.id === value2.idQuantitativa)
+                        ?.valorUnitario as number
                     )}
                   </TableCell>
                   <TableCell>
@@ -128,8 +167,8 @@ function PeriodoFechamento({
                       style: "currency",
                       currency: "BRL",
                     }).format(
-                      quantitativa[value2.idQuantitativa - 1].valorUnitario *
-                        value2.quantidade
+                      (quantitativa.find((q) => q.id === value2.idQuantitativa)
+                        ?.valorUnitario as number) * value2.quantidade
                     )}
                   </TableCell>
                 </TableRow>
@@ -137,8 +176,56 @@ function PeriodoFechamento({
             )}
           </TableBody>
         </Table>
-      </div>
-    </section>
+      </section>
+      <section className="flex flex-col gap-2 mt-6">
+        <div className="flex gap-3 items-center">
+          <MessageCircleWarningIcon className="size-7" />
+          <h1 className="font-bold text-2xl">Resumo da medição</h1>
+        </div>
+        <h1 className="text-gray-600">
+          Aqui está o resumo da sua medição com base no período definido{" "}
+        </h1>
+        <h1 className="font-bold">Totais presente na medição</h1>
+        <section className="overflow-hidden rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Item</TableHead>
+                <TableHead>Quantidade</TableHead>
+                <TableHead>Medida</TableHead>
+                <TableHead>Valor Total</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {quantitativa.map((value) => (
+                <TableRow key={value.id}>
+                  <TableCell>{value.descricao}</TableCell>
+                  <TableCell>{calculo(value.id)}</TableCell>
+                  <TableCell>{value.unidadeDeMedida}</TableCell>
+                  <TableCell>
+                    {Intl.NumberFormat("PT-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(calculo(value.id) * value.valorUnitario)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TableCell colSpan={3}>Total</TableCell>
+                <TableCell>
+                  {Intl.NumberFormat("PT-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(resultadosSomados() as number)}
+                </TableCell>
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </section>
+      </section>
+    </main>
   );
 }
 
