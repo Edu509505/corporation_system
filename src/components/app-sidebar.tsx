@@ -38,7 +38,7 @@ import { Link } from "react-router-dom";
 const items = [
   {
     title: "Home",
-    url: "/",
+    url: "/home",
     icon: ChartColumnIncreasing,
   },
   {

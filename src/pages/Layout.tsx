@@ -1,17 +1,20 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar"
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout() {
+ const location = useLocation();
+  const hideSidebar = location.pathname === "/login";
 
   return (
     <SidebarProvider>
-      <AppSidebar />
+      {!hideSidebar && <AppSidebar />}
       <main className="flex flex-col h-screen w-screen">
-        <div className="flex items-center justify-start bg-gray-50">
-          <SidebarTrigger />
-        </div>
-        {children}
+        {!hideSidebar && (
+          <div className="flex items-center justify-start bg-gray-50">
+            <SidebarTrigger />
+          </div>
+        )}
         <Outlet />
       </main>
     </SidebarProvider>

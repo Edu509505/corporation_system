@@ -17,11 +17,6 @@ interface UseStore {
 export const useUser = create<UseStore>((set) => ({
     token: null,
     setToken: (token: string) => set({ token }),
-    user: {
-        id: 0,
-        email: "",
-        name: "",
-        role: "adm"
-    },
+    user: null,
     setUser: (user: User | null) => set({ user })
 }))
