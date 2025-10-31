@@ -16,7 +16,10 @@ function PropostasFechadas() {
   const { data: propostasAprovadas } = useSuspenseQuery({
     queryKey: ["propostasAprovadas"],
     queryFn: async () => {
-      const response = await fetch(`${url}/propostasAprovadas`);
+      const response = await fetch(`${url}/propostasAprovadas`,{
+        method: "GET",
+        credentials: "include"
+      });
       if (!response.ok) throw new Error("erro ao encontrar os versionamentos aprovados");
       const data = await response.json();
       return data as Proposta[];

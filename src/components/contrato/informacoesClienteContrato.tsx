@@ -11,7 +11,10 @@ function InformacoesClientesContrato({ id }: InformacoesClientesContratoProps) {
   const { data: dadosCliente } = useQuery({
     queryKey: ["cliente", id],
     queryFn: async () => {
-      const response = await fetch(`${url}/cliente/${id}`);
+      const response = await fetch(`${url}/cliente/${id}`, {
+        method: "GET",
+        credentials: "include"
+      });
       if (!response.ok) throw new Error("Cliente não encontrato");
       const data = await response.json();
       return data;

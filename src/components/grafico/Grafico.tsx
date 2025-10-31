@@ -38,7 +38,10 @@ function Grafico() {
     const { data: itensDoDia } = useSuspenseQuery({
         queryKey: ["itensDoDia"],
         queryFn: async () => {
-            const response = await fetch(`${url}/todosOsItensDoDia`)
+            const response = await fetch(`${url}/todosOsItensDoDia`, {
+                method: "GET",
+                credentials: "include"
+            })
             if (!response.ok) throw new Error("erro ao encontrar propostas");
             const data = await response.json();
             return data as todosOsItensDoDia[]

@@ -1,89 +1,92 @@
-import React, { useState } from "react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { useNavigate } from "react-router-dom"
-import { url } from "@/url"
-import { useUser } from "@/use.store"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { Suspense, useState } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate } from "react-router-dom";
+import { url } from "@/url";
+import { useUser } from "@/use.store";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import ImagemLogin from "../assets/img/IMG-20240823-WA0208.jpg";
 
-export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
-  const navigate = useNavigate()
-  const setToken = useUser((s) => s.setToken)
-  const setUser = useUser((s) => s.setUser)
+// ------------------------------
+// Formulário de Login
+// ------------------------------
+function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
+  const navigate = useNavigate();
+  const { setUser, setToken } = useUser();
 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState<string | null>(null)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   async function loginFn({ email, password }: { email: string; password: string }) {
-    const res = await fetch(`${url}/auth/login`, {
+    const res = await fetch(`${url}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
-    })
+      credentials: "include", // ESSENCIAL para cookies/sessões
+    });
 
-    const body = await res.json()
+    const body = await res.json();
 
     if (!res.ok) {
-      throw new Error(body?.message || body?.error || "Credenciais inválidas")
+      throw new Error(body?.message || body?.error || "Credenciais inválidas");
     }
 
-    return body
+    return body;
   }
 
   const mutation = useMutation({
     mutationFn: loginFn,
     onSuccess(data) {
-      // Esperamos { token, user }
-      const token: string | undefined = data?.token ?? data?.accessToken ?? data?.access_token
-      const user = data?.user ?? null
+      const user = data?.user ?? null;
+      const token = data?.token ?? null;
 
-      if (!token) {
-        setError("Resposta inválida do servidor: token ausente.")
-        return
+      if (!user) {
+        setError("Resposta inválida do servidor: usuário ausente.");
+        return;
       }
 
-      setToken(token)
-      setUser(user)
+      // Salva no Zustand (com persistência no localStorage)
+      setUser(user);
+      setToken(token);
 
-      // Invalidate queries that may depend on auth
-      queryClient.invalidateQueries()
+      // Invalida queries antigas do React Query (como /me)
+      queryClient.invalidateQueries();
 
-      navigate("/home")
+      // Redireciona
+      navigate("/home");
     },
     onError(err: any) {
-      setError(err?.message || "Erro de conexão. Tente novamente.")
+      setError(err?.message || "Erro de conexão. Tente novamente.");
     },
-  })
+  });
 
   function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
 
     if (!email || !password) {
-      setError("Preencha e-mail e senha.")
-      return
+      setError("Preencha e-mail e senha.");
+      return;
     }
 
-    mutation.mutate({ email, password })
+    mutation.mutate({ email, password });
   }
 
   return (
     <form
       className={cn("flex flex-col gap-6", className)}
       onSubmit={handleSubmit}
-  aria-busy={mutation.status === "pending"}
+      aria-busy={mutation.isPending}
       {...props}
     >
-  <FieldGroup>
+      <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Bem-Vindo</h1>
           <h1 className="text-2xl font-bold">Entre com sua conta</h1>
@@ -113,10 +116,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
         <Field>
           <div className="flex items-center">
             <FieldLabel htmlFor="password">Senha</FieldLabel>
-            <a
-              href="#"
-              className="ml-auto text-sm underline-offset-4 hover:underline"
-            >
+            <a href="#" className="ml-auto text-sm underline-offset-4 hover:underline">
               Esqueceu a senha?
             </a>
           </div>
@@ -130,11 +130,88 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
         </Field>
 
         <Field>
-          <Button type="submit" disabled={mutation.status === "pending"}>
-            {mutation.status === "pending" ? "Entrando..." : "Login"}
+          <Button type="submit" disabled={mutation.isPending}>
+            {mutation.isPending ? "Entrando..." : "Login"}
           </Button>
         </Field>
       </FieldGroup>
     </form>
-  )
+  );
+}
+
+// ------------------------------
+// Skeleton de carregamento
+// ------------------------------
+function LoginLoading() {
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col items-center gap-1 text-center">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-4 w-64" />
+      </div>
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+          <Skeleton className="h-10 w-full" />
+        </div>
+
+        <Skeleton className="h-10 w-full" />
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------
+// Fallback de erro
+// ------------------------------
+function LoginErrorFallback({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 p-4">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-destructive">Oops, algo deu errado</h2>
+        <p className="text-muted-foreground mt-2">{error.message}</p>
+      </div>
+      <Button onClick={resetErrorBoundary} variant="outline">
+        Tentar novamente
+      </Button>
+    </div>
+  );
+}
+
+// ------------------------------
+// Tela completa de login
+// ------------------------------
+export function LoginFormEnviar() {
+  return (
+    <div className="grid min-h-svh lg:grid-cols-2">
+      <div className="flex flex-col gap-4 p-6 md:p-10">
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-xs">
+            <ErrorBoundary FallbackComponent={LoginErrorFallback}>
+              <Suspense fallback={<LoginLoading />}>
+                <LoginForm />
+              </Suspense>
+            </ErrorBoundary>
+          </div>
+        </div>
+      </div>
+      <div className="bg-muted relative hidden lg:block">
+        <img
+          src={ImagemLogin}
+          alt="Imagem"
+          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+        />
+      </div>
+    </div>
+  );
 }

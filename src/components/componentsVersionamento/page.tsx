@@ -14,7 +14,10 @@ function PropostaListContent(){
   const { data: propostas } = useSuspenseQuery({
     queryKey: ["propostas"],
     queryFn: async () => {
-      const response = await fetch(`${url}/propostas/`);
+      const response = await fetch(`${url}/propostas/`,{
+        method: "GET",
+        credentials: "include"
+      });
       if (!response.ok) throw new Error("Propostas não encontradas");
       const data = await response.json();
       return data as Propostas[];

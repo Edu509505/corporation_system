@@ -65,6 +65,7 @@ import { RouterProvider } from "react-router/dom";
 import LoginPage from "./pages/Login";
 import { OnlyPlebes } from "./permissions/onlyPlebes";
 import Layout from "./pages/Layout";
+import { Navigate } from "react-router-dom";
 
 
 
@@ -75,6 +76,10 @@ function App() {
     path: "/",
     element: <Layout />, // Layout com o menu
     children: [
+       {
+        path: "", // rota raiz
+        element: <Navigate to="/login" replace />,
+      },
       {
         path: "login",
         element: <LoginPage />,
@@ -151,3 +156,4 @@ function App() {
 }
 
 export default App;
+

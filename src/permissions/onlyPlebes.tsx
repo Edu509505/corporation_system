@@ -1,20 +1,17 @@
 import { useUser } from "@/use.store";
-import { Navigate } from "react-router";
-
+import { useAuth } from "@/pages/hooks/hooksLogin";
+import { Navigate } from "react-router-dom";
+import { GlobalLoader } from "@/components/ui/GlobalLoader";
 
 interface OnlyPlebesProps {
   page: React.ReactNode;
 }
 
+export function OnlyPlebes({ page }: OnlyPlebesProps) {
+  const { user } = useUser();
+  const { loading } = useAuth();
 
-export function OnlyPlebes({ page }: OnlyPlebesProps){
-    const { user } = useUser()
-
-    // Se não há usuário logado, redireciona para a página de login
-    if(!user) return <Navigate to="/login" />
-
-    // Se é um usuário comum (plebe), renderiza a página
-    return <>{page}</>;
+  if (loading) return <GlobalLoader />;
+  if (!user) return <Navigate to="/login" replace />;
+  return <>{page}</>;
 }
-
-

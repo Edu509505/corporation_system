@@ -57,7 +57,10 @@ export default function CriarDiarioDeObra() {
         queryKey: ["propostasAprovadas",],
         queryFn: async () => {
             const response = await fetch(
-                `${url}/propostasAprovadas`
+                `${url}/propostasAprovadas`,{
+                    method: "GET",
+                    credentials: "include"
+                }
             );
             if (!response.ok) throw new Error("Propostas aprovadas não encontradas");
             const data = await response.json();
@@ -85,7 +88,10 @@ export default function CriarDiarioDeObra() {
         queryKey: ['quantitativas', idPropostaSelecionada],
         queryFn: async () => {
             if (!idPropostaSelecionada) return [] as any[];
-            const response = await fetch(`${url}/quantitativa/${idPropostaSelecionada}`);
+            const response = await fetch(`${url}/quantitativa/${idPropostaSelecionada}`, {
+                method: "GET",
+                credentials: "include"
+            });
             if (!response.ok) return [] as any[];
             const data = await response.json();
             return data as { id: number; descricao: string }[];
@@ -97,6 +103,7 @@ export default function CriarDiarioDeObra() {
         mutationFn: async (payload: any) => {
             const response = await fetch(`${url}/diarioDeObra`, {
                 method: 'POST',
+                credentials: "include",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
             });

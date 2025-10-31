@@ -74,6 +74,7 @@ function Quantitativa({ itemVersionamento }: funcoesQuantitativa) {
     try {
       await fetch(`${url}/quantitativa`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-type": "application/json",
         },

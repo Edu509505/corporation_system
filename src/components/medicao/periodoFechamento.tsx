@@ -63,7 +63,10 @@ function PeriodoFechamento({
         )}/${format(
           new Date(dataFinal as Date),
           "yyyy-MM-dd"
-        )}/proposta/${idProposta}`
+        )}/proposta/${idProposta}`,{
+          method: "GET",
+          credentials: "include"
+        }
       );
       if (!response.ok) throw new Error("Propostas não encontradas");
       const data = await response.json();
@@ -74,7 +77,10 @@ function PeriodoFechamento({
   const { data: quantitativa } = useSuspenseQuery({
     queryKey: ["quantitativa", dataInicial || dataFinal],
     queryFn: async () => {
-      const response = await fetch(`${url}/quantitativa/${idProposta}`);
+      const response = await fetch(`${url}/quantitativa/${idProposta}`,{
+        method: "GET",
+        credentials: "include"
+      });
       if (!response.ok) throw new Error("Nenhuma quantitativa encontrada");
       const data = await response.json();
       return data as Quantitativa[];

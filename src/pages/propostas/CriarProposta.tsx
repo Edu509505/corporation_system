@@ -30,7 +30,11 @@ export default function CriarProposta() {
 
   useEffect(() => {
     async function buscarClientes() {
-      const empresas = await fetch(`${url}/clientes`);
+      const empresas = await fetch(`${url}/clientes`,{
+        method: "GET",
+        credentials: "include"
+      }
+      );
       const body = await empresas.json();
       setClientes(body);
     }
@@ -77,6 +81,7 @@ export default function CriarProposta() {
     console.log("Parei aqui");
     const response = await fetch(`${url}/proposta`, {
       method: "POST",
+      credentials: "include",
       body: form,
     });
 
