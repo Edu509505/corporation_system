@@ -13,7 +13,10 @@ function ClientListContent() {
     const { data: clientes } = useSuspenseQuery<Cliente[]>({
         queryKey: ['clientes'],
         queryFn: async () => {
-            const response = await fetch(`${url}/clientes`);
+            const response = await fetch(`${url}/clientes`, {
+                method: "GET",
+                credentials: "include"
+            });
             if (!response.ok) throw new Error('Failed to fetch clientes');
             return response.json();
         }

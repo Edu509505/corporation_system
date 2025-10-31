@@ -75,7 +75,10 @@ function AdicionarContrato() {
   const { data: clientes } = useSuspenseQuery({
     queryKey: ["clientes"],
     queryFn: async () => {
-      const response = await fetch(`${url}/clientes`);
+      const response = await fetch(`${url}/clientes`, {
+        method: "GET",
+        credentials: "include",
+      });
       if (!response.ok) throw new Error("Clientes não encontrados");
       const data = await response.json();
       return data as Cliente[];
@@ -89,7 +92,11 @@ function AdicionarContrato() {
     queryFn: async () => {
       if (idCliente !== "") {
         const response = await fetch(
-          `${url}/cliente/${idCliente}/propostasAprovadas`
+          `${url}/cliente/${idCliente}/propostasAprovadas`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
         );
         if (!response.ok) throw new Error("Propostas não encontradas");
         const data = await response.json();
@@ -141,6 +148,7 @@ function AdicionarContrato() {
           "Content-type": "application/json",
         },
         body: JSON.stringify(data),
+        credentials: "include",
       });
       console.log("response", response);
       if (!response.ok) {

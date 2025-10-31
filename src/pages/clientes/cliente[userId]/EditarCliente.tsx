@@ -78,7 +78,10 @@ function UpdateCliente() {
   const { data: cliente } = useSuspenseQuery({
     queryKey: ["cliente", id],
     queryFn: async () => {
-      const response = await fetch(`${url}/cliente/${id}`);
+      const response = await fetch(`${url}/cliente/${id}`, {
+        method: "GET",
+        credentials: "include"
+      });
       if (!response.ok) throw new Error("Cliente não encontrado");
       const data = await response.json();
       return data as Cliente;
@@ -127,6 +130,7 @@ function UpdateCliente() {
     }) => {
       const response = await fetch(`${url}/cliente/${id}`, {
         method: "PUT", // ou PATCH, dependendo da sua API
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },

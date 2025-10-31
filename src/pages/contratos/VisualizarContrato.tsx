@@ -60,7 +60,10 @@ function GetInfoContratos() {
   const { data: dadosCliente } = useSuspenseQuery({
     queryKey: ["dadosCliente", id],
     queryFn: async () => {
-      const response = await fetch(`${url}/contrato/${id}`);
+      const response = await fetch(`${url}/contrato/${id}`, {
+        method: "GET",
+        credentials: "include"
+      });
       if (!response.ok) throw new Error("Cliente não encontrato");
       const data = await response.json();
       return data as Contratos;
@@ -71,7 +74,10 @@ function GetInfoContratos() {
     queryKey: ["versionamento", dadosCliente?.proposta.id],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/proposta/${dadosCliente?.proposta.id.toString()}/verAprovado`
+        `${url}/proposta/${dadosCliente?.proposta.id.toString()}/verAprovado`,{
+          method: "GET",
+          credentials: "include"
+        }
       );
       if (!response.ok) throw new Error("Versionamento não encontrada");
       const data = await response.json();
@@ -84,7 +90,10 @@ function GetInfoContratos() {
     queryKey: ["anexoVersionamento", versionamentoAprovado],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/versionamento/${versionamentoAprovado.map((ver) => ver.id)}/anexos/urls`
+        `${url}/versionamento/${versionamentoAprovado.map((ver) => ver.id)}/anexos/urls`,{
+          method: "GET",
+          credentials: "include"
+        }
       )
       if (!response.ok) throw new Error("Anexo não encontrada");
       const data = await response.json();
@@ -95,7 +104,10 @@ function GetInfoContratos() {
   const { data: anexoContrato } = useSuspenseQuery({
     queryKey: ["anexoContrato", versionamentoAprovado],
     queryFn: async () => {
-      const response = await fetch(`${url}/contrato/${id}/anexoContrato/url`)
+      const response = await fetch(`${url}/contrato/${id}/anexoContrato/url`, {
+        method: "GET",
+        credentials: "include"
+      })
       if (!response.ok) throw new Error("Não foi encontrado o Anexo do contrato")
       const data = await response.json()
       return (data.url || []) as AnexoContrato[]
@@ -106,7 +118,10 @@ function GetInfoContratos() {
   const { data: quantitativa } = useSuspenseQuery({
     queryKey: ["quantitativa", versionamentoAprovado.map((ver) => ver.id)],
     queryFn: async () => {
-      const response = await fetch(`${url}/quantitativa/${versionamentoAprovado.map((ver) => ver.id)}`)
+      const response = await fetch(`${url}/quantitativa/${versionamentoAprovado.map((ver) => ver.id)}`, {
+        method: "GET",
+        credentials: "include"
+      })
       if (!response.ok) throw new Error("Não foi encontrato nenhuma quantitativa")
       const data = await response.json()
       return data as Quantitativa[]

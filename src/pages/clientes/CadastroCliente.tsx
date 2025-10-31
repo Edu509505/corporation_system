@@ -82,6 +82,7 @@ export default function CriarCliente() {
     try {
       const response = await fetch(`${url}/clientes`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-type": "application/json",
         },

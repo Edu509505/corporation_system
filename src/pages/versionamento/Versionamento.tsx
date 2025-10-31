@@ -135,6 +135,7 @@ function Versionamento() {
     async function atualizarVersionamento() {
       const response = await fetch(`${url}/versionamento/${idVersao}`, {
         method: "PUT", // ou PATCH, dependendo da sua API
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -152,7 +153,10 @@ function Versionamento() {
   useEffect(() => {
     async function fetchAnexoVersionamento() {
       const response = await fetch(
-        `${url}/versionamento/${idVersao}/anexos/urls`
+        `${url}/versionamento/${idVersao}/anexos/urls`, {
+          method: "GET",
+          credentials: "include"
+        }
       );
       console.log(response);
       if (!response.ok) throw new Error("Versionamento Não encontrado");
@@ -176,7 +180,10 @@ function Versionamento() {
   } = useQuery({
     queryKey: ["proposta", id],
     queryFn: async () => {
-      const response = await fetch(`${url}/proposta/${id}`);
+      const response = await fetch(`${url}/proposta/${id}`, {
+        method: "GET",
+        credentials: "include"
+      });
       if (!response.ok) throw new Error("Proposta não encontrada");
       const data = await response.json();
       return data as Propostas;
@@ -190,7 +197,10 @@ function Versionamento() {
   } = useQuery({
     queryKey: ["versionamento", id],
     queryFn: async () => {
-      const response = await fetch(`${url}/proposta/${id}/versionamentos`);
+      const response = await fetch(`${url}/proposta/${id}/versionamentos`, {
+        method: "GET",
+        credentials: "include"
+      });
       if (!response.ok) throw new Error("Versionamento Não encontrado");
       const data = await response.json();
       setTest(data);
@@ -202,7 +212,10 @@ function Versionamento() {
     queryKey: ["versionamento", proposta?.id],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/proposta/${proposta?.id.toString()}/verAprovado`
+        `${url}/proposta/${proposta?.id.toString()}/verAprovado`, {
+          method: "GET",
+          credentials: "include"
+        }
       );
       if (!response.ok) throw new Error("Versionamento não encontrada");
       const data = await response.json();
@@ -216,7 +229,10 @@ function Versionamento() {
   const { data: quantitativa } = useQuery({
     queryKey: ["quantitativa", versionamentoAprovado?.map((ver) => ver.id)],
     queryFn: async () => {
-      const response = await fetch(`${url}/quantitativa/${versionamentoAprovado?.map((ver) => ver.id.toString())}`)
+      const response = await fetch(`${url}/quantitativa/${versionamentoAprovado?.map((ver) => ver.id.toString())}`, {
+        method: "GET",
+        credentials: "include"
+      })
       if (!response.ok) throw new Error("Não foi encontrato nenhuma quantitativa")
       const data = await response.json()
       return data as Quantitativa[]
@@ -230,6 +246,7 @@ function Versionamento() {
     mutationFn: async ({ id, status }: { id: number;  status: string }) => {
       const response = await fetch(`${url}/versionamento/${id}`, {
         method: "PUT", // ou PATCH, dependendo da sua API
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -283,6 +300,7 @@ function Versionamento() {
 
     const response = await fetch(`${url}/proposta/${id}/versao`, {
       method: "POST",
+      credentials: "include",
       body: form,
     });
 
@@ -343,6 +361,7 @@ function Versionamento() {
 
       await fetch(`${url}/quantitativa`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-type": "application/json",
         },

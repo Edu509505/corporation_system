@@ -15,7 +15,10 @@ function DiarioListContent() {
     const { data: diarioDeObraPorProposta } = useSuspenseQuery<DiarioDeObra[]>({
         queryKey: ["DiarioDeObraPorProposta", idProposta],
         queryFn: async () => {
-            const response = await fetch(`${url}/diario-de-obra/proposta/${idProposta}`)
+            const response = await fetch(`${url}/diario-de-obra/proposta/${idProposta}`, {
+                method: "GET",
+                credentials: "include"
+            });
             if (!response.ok) throw new Error('Erro ao buscar diário de obra');
             const data = await response.json();
             return data as DiarioDeObra[];

@@ -6,13 +6,8 @@ import {
   FileTextIcon,
   Inbox,
   NotebookPenIcon,
-  //LucideLayoutDashboard,
   PanelTopOpenIcon,
-  // PenBoxIcon,
   PencilRuler,
-  // PencilRulerIcon,
-  // PenOffIcon,
-  // Percent,
 } from "lucide-react";
 
 import {
@@ -27,18 +22,17 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  // SidebarMenuSub,
-  // SidebarMenuSubButton,
-  // SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 
 import { Link } from "react-router-dom";
+import { useUser } from "@/use.store";
+import { useLogout } from "@/pages/hooks/hooksLogout";
 
 // Menu items.
 const items = [
   {
     title: "Home",
-    url: "/",
+    url: "/home",
     icon: ChartColumnIncreasing,
   },
   {
@@ -57,7 +51,6 @@ const items = [
     icon: PencilRuler,
     subMenu: [
       { title: "Diário De Obra", url: "/diarioDeObra", icon: NotebookPenIcon },
-      // { title: "Diário De Obra", url: "/diario-de-obra/proposta/:idProposta", icon: NotebookPenIcon },
       { title: "Medição", url: "/medicao", icon: PencilRuler },
     ],
   },
@@ -72,41 +65,57 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const user = useUser((s) => s.user);
+  const logout = useLogout();
+
   return (
     <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
+      <SidebarContent className="flex flex-col justify-between h-full">
+        <div>
+          <SidebarGroup>
+            <SidebarGroupLabel>Menu</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link to={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
 
-                  {item.subMenu?.map((tituloSub, index) => (
-                    <SidebarMenuSub key={index}>
-                      <SidebarMenuSubItem key={index}>
-                        <SidebarMenuSubButton asChild>
-                          <Link to={tituloSub.url}>
-                            <tituloSub.icon />
-                            <span className="cursor-pointer">
-                              {tituloSub.title}
-                            </span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                  ))}
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+                    {item.subMenu?.map((sub, index) => (
+                      <SidebarMenuSub key={index}>
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton asChild>
+                            <Link to={sub.url}>
+                              <sub.icon />
+                              <span className="cursor-pointer">
+                                {sub.title}
+                              </span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      </SidebarMenuSub>
+                    ))}
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </div>
+
+        {user && (
+          <div className="p-4 border-t text-sm text-muted-foreground">
+            <p className="mb-2">
+              Logado como: <strong>{user.name}</strong>
+            </p>
+            <button onClick={logout} className="text-red-500 hover:underline">
+              Sair
+            </button>
+          </div>
+        )}
       </SidebarContent>
     </Sidebar>
   );

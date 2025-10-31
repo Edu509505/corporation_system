@@ -36,7 +36,10 @@ function Contratos() {
   } = useQuery({
     queryKey: ["contratos"],
     queryFn: async () => {
-      const response = await fetch(`${url}/contratos/`);
+      const response = await fetch(`${url}/contratos/`, {
+        method: "GET",
+        credentials: "include"
+      });
       if (!response.ok) throw new Error("Proposta não encontrada");
       const data = await response.json();
       return data as Contrato[];
