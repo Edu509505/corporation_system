@@ -14,6 +14,12 @@ import { ChevronDownIcon, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
+
+
+
 const url = import.meta.env.VITE_API_URL;
 
 interface Propostas {
@@ -57,10 +63,10 @@ export default function CriarDiarioDeObra() {
         queryKey: ["propostasAprovadas",],
         queryFn: async () => {
             const response = await fetch(
-                `${url}/propostasAprovadas`,{
-                    method: "GET",
-                    credentials: "include"
-                }
+                `${url}/propostasAprovadas`, {
+                method: "GET",
+                credentials: "include"
+            }
             );
             if (!response.ok) throw new Error("Propostas aprovadas não encontradas");
             const data = await response.json();
@@ -95,8 +101,10 @@ export default function CriarDiarioDeObra() {
             if (!response.ok) return [] as any[];
             const data = await response.json();
             return data as { id: number; descricao: string }[];
-        }
+        },
+        enabled: !!idPropostaSelecionada
     });
+
 
     const criarDiarioMutation = useMutation({
         mutationKey: ['criarDiario'],
@@ -119,7 +127,7 @@ export default function CriarDiarioDeObra() {
         try {
             const payload = {
                 idProposta: Number(values.idProposta),
-                dataDia: values.dataDia instanceof Date ? values.dataDia.toISOString() : values.dataDia,
+                dataDia: dayjs(values.dataDia).format('YYYY-MM-DD'), // ✅ formato puro, sem horário
                 itensDoDia: values.itensDoDia.map((it) => ({
                     descricao: it.descricao,
                     idQuantitativa: Number(it.idQuantitativa),
@@ -127,16 +135,17 @@ export default function CriarDiarioDeObra() {
                 })),
             };
 
+
             await criarDiarioMutation.mutateAsync(payload);
             form.reset({ idProposta: '', dataDia: new Date(), itensDoDia: [] });
             setToast({ message: 'Diário criado com sucesso', type: 'success' });
             setTimeout(() => setToast(null), 3000);
-            // redirecionar para lista de diários
             navigate('/diariodeobra');
         } catch (err: any) {
             console.error('Erro ao criar diário:', err);
             alert('Erro ao criar diário: ' + (err?.message || ''));
         }
+
     }
 
     const [open, setOpen] = React.useState(false);

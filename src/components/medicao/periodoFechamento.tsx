@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
+import dayjs from "dayjs";
 import {
   Table,
   TableBody,
@@ -11,6 +11,11 @@ import {
 } from "../ui/table";
 import { MessageCircleWarningIcon } from "lucide-react";
 const url = import.meta.env.VITE_API_URL;
+
+const formatDateOnly = (date: Date | null) =>
+  date ? date.toISOString().slice(0, 10) : "";
+
+
 
 interface PeriodoFechamentoProps {
   dataInicial: Date | null;
@@ -58,15 +63,10 @@ function PeriodoFechamento({
     queryKey: ["getPeriodoDeObra", dataInicial, dataFinal, idProposta],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/diarioDeObraPeriodo/${format(
-          new Date(dataInicial as Date),
-          "yyyy-MM-dd"
-        )}/${format(
-          new Date(dataFinal as Date),
-          "yyyy-MM-dd"
-        )}/proposta/${idProposta}`,{
+        `${url}/diarioDeObraPeriodo/${formatDateOnly(dataInicial)}/${formatDateOnly(dataFinal)}/proposta/${idProposta}`,
+        {
           method: "GET",
-          credentials: "include"
+          credentials: "include",
         }
       );
       if (!response.ok) throw new Error("Propostas não encontradas");
@@ -78,7 +78,7 @@ function PeriodoFechamento({
   const { data: quantitativa } = useSuspenseQuery({
     queryKey: ["quantitativa", dataInicial, dataFinal, idProposta],
     queryFn: async () => {
-      const response = await fetch(`${url}/quantitativa/${idProposta}`,{
+      const response = await fetch(`${url}/quantitativa/${idProposta}`, {
         method: "GET",
         credentials: "include"
       });
@@ -143,7 +143,7 @@ function PeriodoFechamento({
               value.itensDoDia.map((value2) => (
                 <TableRow key={value2.id}>
                   <TableCell>
-                    {format(new Date(value.dataDia), "dd/MM")}
+                    {dayjs(value.dataDia).format("DD/MM")}
                   </TableCell>
                   <TableCell>{value2.descricao}</TableCell>
                   <TableCell>
