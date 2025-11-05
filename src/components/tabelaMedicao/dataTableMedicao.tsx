@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import {
   type ColumnDef,
   type SortingState,
@@ -22,11 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Filter } from "lucide-react";
-// import { Input } from "@/components/ui/input";
-import { Button } from "./ui/button";
-// import { Link } from "react-router-dom";
-//import { number } from "zod";
-// import { Label } from "./ui/label";
+import { Button } from "@/components/ui/button";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -36,7 +31,7 @@ interface DataTableProps<TData, TValue> {
   DadosValorVazio: string;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTableMedicao<TData, TValue>({
   columns,
   data,
   columnFilters,
