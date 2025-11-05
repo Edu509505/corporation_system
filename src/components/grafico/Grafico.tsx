@@ -4,70 +4,52 @@ import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import React from "react";
-import { da } from "date-fns/locale";
+import dayjs from "dayjs";
 
-const url = import.meta.env.VITE_API_URL;
-
-interface ChartDataItem {
-    dataDia: string,
-    total_m2: number
+interface todosOsItensDoDia {
+    dataDia: string;
+    total_m2: number;
 }
 
-interface PeriodoDashBoardPropos {
-    dataInicial: Date | null;
-    dataFinal: Date | null;
-}
+function Grafico() {
+    const [timeRange, setTimeRange] = React.useState("90d");
 
-function Grafico( { dataInicial, dataFinal }: PeriodoDashBoardPropos) {
+    // Define o número de dias com base no filtro
+    const dias = timeRange === "30d" ? 30 : timeRange === "7d" ? 7 : 90;
+
+    // Calcula datas com dayjs
+    const dataFinal = dayjs().format("YYYY-MM-DD");
+    const dataInicial = dayjs().subtract(dias, "day").format("YYYY-MM-DD");
+
+    const url = import.meta.env.VITE_API_URL;
 
     const { data: chartData } = useSuspenseQuery({
-        queryKey: ["chartData", dataInicial, dataFinal],
+        queryKey: ["itensDoDia", timeRange],
         queryFn: async () => {
             const response = await fetch(`${url}/dashboard/${dataInicial}/${dataFinal}`, {
                 method: "GET",
                 credentials: "include"
             });
-            if (!response.ok) throw new Error("Proposta não encontrada");
+            if (!response.ok) throw new Error("erro ao encontrar propostas");
             const data = await response.json();
-            return data as ChartDataItem[];
-
+            return data as todosOsItensDoDia[];
         }
-    })
+    });
 
     const chartConfig = {
-        visitors: {
-            label: "Visitors",
-        },
-        M2: {
+        total_m2: {
             label: "M²",
-            color: "var(--chart-1)",
-        }
-    } satisfies ChartConfig
-
-
-    const [timeRange, setTimeRange] = React.useState("90d")
-    // const filteredData = chartData.filter((item) => {
-    //     const date = new Date(item.dataDia)
-    //     const referenceDate = new Date("2024-06-30")
-    //     let daysToSubtract = 90
-    //     if (timeRange === "30d") {
-    //         daysToSubtract = 30
-    //     } else if (timeRange === "7d") {
-    //         daysToSubtract = 7
-    //     }
-    //     const startDate = new Date(referenceDate)
-    //     startDate.setDate(startDate.getDate() - daysToSubtract)
-    //     return date >= startDate
-    // })
-
+            color: "var(--chart-2)",
+        },
+    } satisfies ChartConfig;
 
     return (
         <Card className="pt-0">
             <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
                 <div className="grid flex-1 gap-1">
-                    <CardTitle>Area Chart - Interactive</CardTitle>
+                    <CardTitle>Gráfico do M²</CardTitle>
                     <CardDescription>
-                        Showing total visitors for the last 3 months
+                        periodo de quanto está sendo feito o M²
                     </CardDescription>
                 </div>
                 <Select value={timeRange} onValueChange={setTimeRange}>
@@ -75,17 +57,17 @@ function Grafico( { dataInicial, dataFinal }: PeriodoDashBoardPropos) {
                         className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex"
                         aria-label="Select a value"
                     >
-                        <SelectValue placeholder="Last 3 months" />
+                        <SelectValue placeholder="Select period" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
                         <SelectItem value="90d" className="rounded-lg">
-                            Last 3 months
+                            Últimos 3 meses
                         </SelectItem>
                         <SelectItem value="30d" className="rounded-lg">
-                            Last 30 days
+                            Últimos 30 dias
                         </SelectItem>
                         <SelectItem value="7d" className="rounded-lg">
-                            Last 7 days
+                            Últimos 7 dias
                         </SelectItem>
                     </SelectContent>
                 </Select>
@@ -97,80 +79,43 @@ function Grafico( { dataInicial, dataFinal }: PeriodoDashBoardPropos) {
                 >
                     <AreaChart data={chartData}>
                         <defs>
-                            <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                                <stop
-                                    offset="5%"
-                                    stopColor="var(--color-desktop)"
-                                    stopOpacity={0.8}
-                                />
-                                <stop
-                                    offset="95%"
-                                    stopColor="var(--color-desktop)"
-                                    stopOpacity={0.1}
-                                />
-                            </linearGradient>
-                            <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                                <stop
-                                    offset="5%"
-                                    stopColor="var(--color-mobile)"
-                                    stopOpacity={0.8}
-                                />
-                                <stop
-                                    offset="95%"
-                                    stopColor="var(--color-mobile)"
-                                    stopOpacity={0.1}
-                                />
+                            <linearGradient id="fillM2" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="var(--chart-2)" stopOpacity={0.8} />
+                                <stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0.1} />
                             </linearGradient>
                         </defs>
                         <CartesianGrid vertical={false} />
                         <XAxis
-                            dataKey="date"
+                            dataKey="dataDia"
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
-                            minTickGap={32}
-                            tickFormatter={(value) => {
-                                const date = new Date(value)
-                                return date.toLocaleDateString("en-US", {
-                                    month: "short",
-                                    day: "numeric",
-                                })
-                            }}
+                            minTickGap={8}
+                            interval={0}
+                            padding={{ left: 20, right: 20 }} // 👈 aqui está o ajuste!
+                            tickFormatter={(value) => dayjs(value).format("DD/MM")}
                         />
                         <ChartTooltip
                             cursor={false}
                             content={
                                 <ChartTooltipContent
-                                    labelFormatter={(value) => {
-                                        return new Date(value).toLocaleDateString("en-US", {
-                                            month: "short",
-                                            day: "numeric",
-                                        })
-                                    }}
+                                    labelFormatter={(value) => dayjs(value).format("DD/MM")}
                                     indicator="dot"
                                 />
                             }
                         />
                         <Area
-                            dataKey="mobile"
+                            dataKey="total_m2"
                             type="natural"
-                            fill="url(#fillMobile)"
-                            stroke="var(--color-mobile)"
-                            stackId="a"
-                        />
-                        <Area
-                            dataKey="desktop"
-                            type="natural"
-                            fill="url(#fillDesktop)"
-                            stroke="var(--color-desktop)"
-                            stackId="a"
+                            fill="url(#fillM2)"
+                            stroke="var(--chart-2)"
                         />
                         <ChartLegend content={<ChartLegendContent />} />
                     </AreaChart>
                 </ChartContainer>
             </CardContent>
         </Card>
-    )
+    );
 }
 
 export default Grafico
