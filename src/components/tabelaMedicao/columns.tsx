@@ -4,15 +4,16 @@ import { format } from "date-fns/format";
 export interface Medicoes {
   id: number;
   idCliente: number;
-  idProposta: {
+  propostaMedicao: {
     id: number;
     idCliente: number;
-    nomeDaProposta: string;
+    descricao: string;
   };
   observacao: string;
   periodoInicial: string;
   periodoFinal: string;
   createdAt: Date;
+  valorTotal: number;
 }
 
 export const colunaVersionamento: ColumnDef<Medicoes>[] = [
@@ -21,7 +22,7 @@ export const colunaVersionamento: ColumnDef<Medicoes>[] = [
     header: "Data",
     cell: ({ row }) => {
       const createdAt = row.getValue("createdAt") as string | null;
-      let data = createdAt ? format(new Date(createdAt), "dd/mm/yyyy") : "";
+      let data = createdAt ? format(new Date(createdAt), "dd/MM/yyyy") : "";
       return <div>{data}</div>;
     },
   },
@@ -29,8 +30,10 @@ export const colunaVersionamento: ColumnDef<Medicoes>[] = [
     accessorKey: "idProposta",
     header: "Obra",
     cell: ({ row }) => {
-      const proposta = row.getValue("idProposta") as Medicoes["idProposta"];
-      return <div>{proposta?.nomeDaProposta ?? "—"}</div>;
+      const proposta = row.getValue("propostaMedicao") as
+        | Medicoes["propostaMedicao"]
+        | undefined;
+      return <div>{proposta?.descricao}</div>;
     },
   },
   {
@@ -52,6 +55,21 @@ export const colunaVersionamento: ColumnDef<Medicoes>[] = [
       let data = periodoFinal
         ? format(new Date(periodoFinal), "dd/MM/yyyy")
         : "";
+      return <div>{data}</div>;
+    },
+  },
+  {
+    accessorKey: "valorTotal",
+    header: "Valor Da Medição",
+    cell: ({ row }) => {
+      const valorTotal = row.getValue("valorTotal") as number | null;
+      let data = valorTotal
+        ? Intl.NumberFormat("PT-BR", {
+            style: "currency",
+            currency: "BRL",
+          }).format(valorTotal / 100)
+        : "-";
+
       return <div>{data}</div>;
     },
   },

@@ -22,6 +22,10 @@ import {
 } from "@/components/ui/table";
 import { Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+// import { Input } from "../ui/input";
+
+const url = import.meta.env.VITE_API_URL;
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -57,26 +61,20 @@ export function DataTableMedicao<TData, TValue>({
 
   return (
     <div>
-      <article>
+      <article className="">
         <div className="flex">
           <Filter />
           <h3>Filtros</h3>
         </div>
-        <div className="flex w-full items-center py-4 gap-2 justify-between">
-          {table.getFooterGroups().map((footerGroup) => (
-            <div className="flex flex-col gap-3">
-              {footerGroup.headers.map((header) => (
-                <div key={header.id}>
-                  {header.isPlaceholder
-                    ? null // Handle placeholder headers if needed
-                    : flexRender(
-                        header.column.columnDef.footer,
-                        header.getContext()
-                      )}
-                </div>
-              ))}
-            </div>
-          ))}
+        <div className="flex items-center py-4">
+          {/* <Input
+            placeholder="Nome Da Obra"
+            value={(table.getColumn("")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("createdAt")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          /> */}
         </div>
       </article>
       <div className="overflow-hidden rounded-md border">
@@ -96,6 +94,7 @@ export function DataTableMedicao<TData, TValue>({
                     </TableHead>
                   );
                 })}
+                <TableHead className="text-center">Ações</TableHead>
               </TableRow>
             ))}
           </TableHeader>
@@ -114,6 +113,13 @@ export function DataTableMedicao<TData, TValue>({
                       )}
                     </TableCell>
                   ))}
+                  <TableCell className="flex justify-center">
+                    <Link to={`${url}/vizualizarProposta/${row.id++}`}>
+                      <Button className="cursor-pointer bg-blue-200 text-blue-600 rounded-2xl hover:bg-blue-600 hover:text-blue-100">
+                        Visualizar
+                      </Button>
+                    </Link>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
