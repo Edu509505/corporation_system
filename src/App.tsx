@@ -65,7 +65,6 @@ import LoginPage from "./pages/Login";
 import { OnlyPlebes } from "./permissions/onlyPlebes";
 import Layout from "./pages/Layout";
 import { Navigate } from "react-router-dom";
-import AdicionarNotasFiscais from "./pages/notaFiscal/adicionarNotasFiscais";
 
 function App() {
   const router = createBrowserRouter([
@@ -97,10 +96,10 @@ function App() {
           path: "notasFiscais",
           element: <OnlyPlebes page={<NotasFiscais />} />,
         },
-        {
-          path: "adicionarNotaFiscal",
-          element: <OnlyPlebes page={<AdicionarNotasFiscais />} />
-        },
+        // {
+        //   path: "adicionarNotaFiscal",
+        //   element: <OnlyPlebes page={<AdicionarNotasFiscais />} />
+        // },
         {
           path: "medicao",
           element: <OnlyPlebes page={<Medicao />} />,

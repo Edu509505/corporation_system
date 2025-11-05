@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useUser } from "@/use.store";
 import { url } from "@/url";
+import { useEffect } from "react";
 
 async function fetchUser() {
   const res = await fetch(`${url}/me`, {
@@ -16,13 +17,19 @@ async function fetchUser() {
 export function useAuth() {
   const { setUser } = useUser();
 
-  const { data: user, isLoading } = useQuery({
+  const { data: user, isLoading, isError } = useQuery({
     queryKey: ["auth"],
     queryFn: fetchUser,
     retry: false,
-    onSuccess: (data) => setUser(data),
-    onError: () => setUser(null),
   });
+
+  useEffect(() => {
+    if (user) {
+      setUser(user);
+    } else if (isError) {
+      setUser(null);
+    }
+  }, [user, isError, setUser]);
 
   return { user, loading: isLoading };
 }
