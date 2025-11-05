@@ -4,7 +4,7 @@ import "../App.css";
 import { CirclePlusIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Table } from "@/components/ui/table";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 const url = import.meta.env.VITE_API_URL;
 
 interface Medicoes {
@@ -21,14 +21,14 @@ interface Medicoes {
 
 function Medicao() {
 
-  const { data: medicoes } = useSuspenseQuery({
+  const { data: medicoes } = useQuery({
     queryKey: ["medicoes"],
     queryFn: async()=>{
-      const response = await fetch(`${url}/getClientes`, {
+      const response = await fetch(`${url}/getMedicoes`, {
         method: "GET",
         credentials: "include"
       });
-      if (!response.ok) throw new Error("Clientes não encontrados");
+      if (!response.ok) throw new Error("Medições não encontradas");
       const data = await response.json();
       return data as Medicoes[]
     }

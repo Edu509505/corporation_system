@@ -132,7 +132,7 @@ export default function CriarDiarioDeObra() {
             setToast({ message: 'Diário criado com sucesso', type: 'success' });
             setTimeout(() => setToast(null), 3000);
             // redirecionar para lista de diários
-            navigate('/diariosDeObra');
+            navigate('/diariodeobra');
         } catch (err: any) {
             console.error('Erro ao criar diário:', err);
             alert('Erro ao criar diário: ' + (err?.message || ''));
@@ -147,20 +147,6 @@ export default function CriarDiarioDeObra() {
     });
 
     console.log('fields', fields);
-
-
-
-    // const itemSchema = z.object({
-    //     idDiarioDeObra: z.number(),
-    //     descricao: z.string().min(2, "Nome obrigatório"),
-    //     itemQuantitativa: z.string().min(1, "Unidade obrigatória"),
-    //     quantidade: z.string(),
-    //   });
-
-    //   const formSchemaitensArray = z.object({
-    //     itens: z.array(itemSchema).min(1, "Adicione pelo menos um item"),
-    //   });
-
 
     return (
         <div className="flex flex-col p-4 gap-3">

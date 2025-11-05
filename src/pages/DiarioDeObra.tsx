@@ -71,32 +71,13 @@ export default function ListaDeDiarios() {
           <div className="flex items-center justify-end w-full">
             <Button onClick={handleClick} className="cursor-pointer">
               <CirclePlus />
-              Criar Proposta
+              Criar Diario de Obra
             </Button>
           </div>
           <TabelaDiariosDeObras />
         </article>
       </main>
     </>
-    // {/* 
-    //       {isLoading && <p>Carregando...</p>}
-    //       {error && <p>Erro ao carregar dados.</p>}
 
-    //       {data?.map((diario: any) => (
-    //         <div key={diario.id} className="border p-4 mb-4 rounded">
-    //           <h2 className="font-semibold">
-    //             Data: {dayjs(diario.dataDia).format('DD/MM/YYYY')}
-    //           </h2>
-
-    //           <ul>
-    //             {diario.itensDoDia.map((item: any) => (
-    //               <li key={item.id}>
-    //                 {item.descricao} - {item.quantitativa?.descricao} - {item.quantidade}
-    //               </li>
-    //             ))}
-    //           </ul>
-    //         </div>
-    //       ))} */
-    //      }
   );
 }
