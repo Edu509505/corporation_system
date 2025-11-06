@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import "../App.css";
 import { CirclePlusIcon } from "lucide-react";
 import { Link } from "react-router-dom";
+import PageTableMedicao from "@/components/medicao/tabelaMedicao/page";
 
 function Medicao() {
   return (
@@ -14,8 +15,12 @@ function Medicao() {
         </article>
         <div className="w-full">
           <Link to="/adicionarMedicao">
-          <Button className="cursor-pointer"> <CirclePlusIcon/> Criar Nova Medição </Button>
+            <Button className="cursor-pointer">
+              {" "}
+              <CirclePlusIcon /> Criar Nova Medição{" "}
+            </Button>
           </Link>
+          <PageTableMedicao />
         </div>
       </main>
     </>
