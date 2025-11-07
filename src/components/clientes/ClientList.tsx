@@ -18,10 +18,13 @@ function ClientListContent() {
                 credentials: "include"
             });
             if (!response.ok) throw new Error('Failed to fetch clientes');
-            return response.json();
+            const data = await response.json();
+            
+            console.log(data);
+            
+            return data as Cliente[];
         }
     });
-    console.log(clientes);
 
     if (clientes.length === 0) {
         return (
