@@ -21,6 +21,8 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
+import { Filter } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -51,18 +53,53 @@ export function DataTableMedicao<TData, TValue>({
 
   return (
     <>
-      <div className="flex items-center py-4">
+    <section className="flex flex-col">
+      <div className="flex gap-3">
+      <Filter />
+      <h1 className="font-bold">Filtros</h1>
+        </div>
+      <div className="flex gap-3">
+      <div className="flex flex-col gap-3 py-4">
+        <Label>Empresa</Label>
         <Input
           placeholder="filtrar"
           value={
-            (table.getColumn("idCliente")?.getFilterValue() as string) ?? ""
+            (table.getColumn("clienteMedicao.name")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn("idCliente")?.setFilterValue(event.target.value)
+            table.getColumn("clienteMedicao.name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
       </div>
+      <div className="flex flex-col gap-3 py-4">
+        <Label>Cliente</Label>
+        <Input
+          placeholder="filtrar"
+          value={
+            (table.getColumn("propostaMedicao.nomeDaProposta")?.getFilterValue() as string) ?? ""
+          }
+          onChange={(event) =>
+            table.getColumn("propostaMedicao.nomeDaProposta")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+      </div>
+      <div className="flex flex-col gap-3 py-4">
+        <Label>Situaão</Label>
+        <Input
+          placeholder="filtrar"
+          value={
+            (table.getColumn("faturado")?.getFilterValue() as string) ?? ""
+          }
+          onChange={(event) =>
+            table.getColumn("faturado")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+      </div>
+      </div>
+    </section>
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
@@ -95,13 +132,6 @@ export function DataTableMedicao<TData, TValue>({
                       )}
                     </TableCell>
                   ))}
-                  <TableCell>
-                    <Link to={"/"}>
-                      <Button className="rounded-2xl bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white cursor-pointer">
-                        Visualizar
-                      </Button>
-                    </Link>
-                  </TableCell>
                 </TableRow>
               ))
             ) : (

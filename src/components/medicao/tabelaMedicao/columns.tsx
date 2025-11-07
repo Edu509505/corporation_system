@@ -1,4 +1,6 @@
+import { Button } from "@/components/ui/button";
 import type { ColumnDef } from "@tanstack/react-table";
+import { Link } from "react-router-dom";
 
 export interface Medicao {
   id: number;
@@ -17,14 +19,17 @@ export const columns: ColumnDef<Medicao>[] = [
     header: "Número",
   },
   {
-    accessorKey: "idCliente",
+    id: "clienteMedicao.name",
+    accessorKey: "clienteMedicao.name",
     header: "Empresa",
   },
   {
-    accessorKey: "idProposta",
+    id: "propostaMedicao.nomeDaProposta",
+    accessorKey: "propostaMedicao.nomeDaProposta",
     header: "Obra",
   },
   {
+    id: "faturado",
     accessorKey: "faturado",
     header: "Situação",
   },
@@ -40,4 +45,18 @@ export const columns: ColumnDef<Medicao>[] = [
       return formatted;
     },
   },
+  {
+    id: "acoes",
+    header: () => <>Ações</>,
+    cell: ({ row }) => {
+      return (
+        <Link to={`/visualizarMedicao/${row.original.id}`}>
+          <Button className="rounded-2xl bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white cursor-pointer">
+            Visualizar
+          </Button>
+        </Link>
+
+      )
+    }
+  }
 ];
