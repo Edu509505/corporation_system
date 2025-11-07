@@ -25,7 +25,7 @@ interface Medicao {
     createdAt: string
     id: number
     local: string
-    name: string
+    name: string | undefined
     path: string
     status: string
     updatedAt: string
