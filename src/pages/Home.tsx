@@ -1,15 +1,24 @@
-import PropostasFechadas from "@/components/cardsHome/PropostasFechadas";
+import { ComparacaoPropostas } from "@/components/cardsHome/ComparacaoProposta";
+import { CardPropostaEmAndamento } from "@/components/cardsHome/PropostasFechadas";
 import Grafico from "@/components/grafico/Grafico";
 
 function Home() {
   return (
-    <>
-      <div className="flex flex-col bg-gray-50 h-full p-3 gap-3">
-        <PropostasFechadas />
+    <main className="min-h-screen bg-gray-50 p-4">
+      <h1 className="text-xl font-semibold text-gray-800 mb-4">📈 Painel de Propostas</h1>
+
+      <div className="flex flex-wrap gap-x-4 gap-y-6">
+        <CardPropostaEmAndamento />
+        <ComparacaoPropostas />
+        {/* Adicione mais cards aqui */}
+      </div>
+
+      <div className="mt-6">
         <Grafico />
       </div>
-    </>
+    </main>
   );
 }
+
 
 export default Home;
