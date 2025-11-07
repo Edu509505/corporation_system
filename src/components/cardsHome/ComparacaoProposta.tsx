@@ -31,18 +31,22 @@ function CardComparacaoPropostas() {
 
 
     return (
-    <CardBase>
-      <h2 className="text-xl font-bold mb-4 text-gray-800">📊 Comparação de Propostas</h2>
-      <p className="mb-2">Mês Atual: <strong>{data.mesAtual}</strong></p>
-      <p className="mb-2">Mês Anterior: <strong>{data.mesAnterior}</strong></p>
-      <p className="mb-2">Diferença: <strong>{data.diferenca}</strong></p>
-      <p>
-        <strong>Variação:</strong>{' '}
-        {data.variacaoPercentual !== null
-          ? `${data.variacaoPercentual}%`
-          : 'N/A'}
-      </p>
-    </CardBase>
+        <CardBase>
+            <h2 className="text-xl font-bold mb-4 text-gray-800">📊 Comparação de Propostas</h2>
+            <p className="mb-2">Mês Atual: <strong>{data.mesAtual}</strong></p>
+            <p className="mb-2">Mês Anterior: <strong>{data.mesAnterior}</strong></p>
+            <p
+                className={`font-semibold ${data.diferenca > 0 ? 'text-green-600' : data.diferenca < 0 ? 'text-red-600' : 'text-gray-600'
+                    }`}
+            >
+                {data.diferenca > 0
+                    ? `Houve um aumento de ${data.diferenca} em relação ao mês anterior.`
+                    : data.diferenca < 0
+                        ? `Houve uma queda de ${data.diferenca} proposta em relação ao mês anterior.`
+                        : 'Sem variação em relação ao mês anterior.'}
+            </p>
+        </CardBase>
+
     );
 
 }
