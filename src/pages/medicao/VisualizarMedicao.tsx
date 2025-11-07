@@ -25,7 +25,7 @@ interface Medicao {
     createdAt: string
     id: number
     local: string
-    name: string
+    name: string | undefined
     path: string
     status: string
     updatedAt: string
@@ -58,7 +58,7 @@ function VisualMedicao() {
   const { id } = useParams<{ id: string }>();
 
   const { data: medicao } = useSuspenseQuery({
-    queryKey: ["clientes"],
+    queryKey: ["clientes", id],
     queryFn: async () => {
       const response = await fetch(`${url}/getMedicao/${id}`, {
         method: "GET",

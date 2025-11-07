@@ -23,19 +23,6 @@ function DiarioListContent() {
             return data as DiarioDeObra[];
         }
     });
-
-    //  if (todosDiariosDeObra.length === 0) {
-    //     return (
-
-    //         //Caso a tabela donde fica cadastrado os clientes estiver vazia ele retorna essa mensagem
-
-    //         <div className="w-full flex flex-col justify-center items-center text-center gap-3 text-muted-foreground">
-    //             <CircleX className="size-20" />
-    //             <h1 className="text-4xl">Não há diários de obra </h1>
-    //         </div>
-    //     )
-    // }
-
     return (
         <DataTable
             columns={columnsDiario}

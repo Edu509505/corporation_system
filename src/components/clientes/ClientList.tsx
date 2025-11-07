@@ -1,4 +1,3 @@
-import type { Cliente } from "@/Tipagens";
 import { useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query";
 import CardClient from "./CardClient";
 import { Skeleton } from "../ui/skeleton";
@@ -6,21 +5,32 @@ import { CircleX } from "lucide-react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Suspense } from "react";
 
+interface Cliente {
+  id: number;
+  name: string;
+  cnpj: string;
+  local: string;
+  status: "ATIVO" | "INATIVO";
+  path: string;
+};
 
 function ClientListContent() {
+
     const url = import.meta.env.VITE_API_URL;
 
-    const { data: clientes } = useSuspenseQuery<Cliente[]>({
-        queryKey: ['clientes'],
+    const { data: clientes } = useSuspenseQuery({
+        queryKey: ["clientes"],
         queryFn: async () => {
             const response = await fetch(`${url}/clientes`, {
                 method: "GET",
                 credentials: "include"
             });
             if (!response.ok) throw new Error('Failed to fetch clientes');
-            return response.json();
+            const data = await response.json();
+            return data as Cliente[];
         }
     });
+    
     console.log(clientes);
 
     if (clientes.length === 0) {

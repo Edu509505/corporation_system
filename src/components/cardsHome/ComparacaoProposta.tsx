@@ -4,9 +4,6 @@ import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import CardBase from "./CardsHome";
 
-
-
-
 type ComparacaoPropostasProps = {
     mesAtual: number;
     mesAnterior: number;
