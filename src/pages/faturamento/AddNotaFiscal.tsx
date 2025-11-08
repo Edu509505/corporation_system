@@ -79,7 +79,7 @@ interface Propostas {
 
 function AdicionarNotaFiscal() {
   const { data: clientes } = useSuspenseQuery({
-    queryKey: ["clientes", ""],
+    queryKey: ["clientes"],
     queryFn: async () => {
       const response = await fetch(`${url}/clientes`, {
         method: "GET",
@@ -122,16 +122,13 @@ function AdicionarNotaFiscal() {
     tipo: z.string().min(1, "Selecione o tipo"),
     anexo: z
       .instanceof(File)
-      .refine((files) => files, "Você deve selecionar ao menos um arquivo")
+      .refine((file) => !!file, "Você deve selecionar ao menos um arquivo")
+      .refine((file) => file.size <= 50 * 1024 * 1024, "Arquivo deve ter até 50MB")
       .refine(
-        (files) => files?.size <= 15 * 1024 * 1024,
-        "Arquivo deve ter até 50MB"
-      )
-      .refine(
-        (files) =>
-          ["image/jpeg", "image/png", "application/pdf"].includes(files?.type),
+        (file) =>
+          ["image/jpeg", "image/png", "application/pdf"].includes(file.type),
         "Tipo de arquivo inválido"
-      ),
+      )
   });
 
   const form = useForm<z.infer<typeof contratoSchema>>({
@@ -141,6 +138,8 @@ function AdicionarNotaFiscal() {
       idMedicao: "",
       anexo: undefined,
       idProposta: "",
+      tipo: "",
+      valor: ""
     },
   });
 
@@ -160,7 +159,7 @@ function AdicionarNotaFiscal() {
       form.set("vencimento", data.vencimento.toString());
       form.set("tipo", data.tipo);
 
-      form.append("anexo", data.anexo);
+      form.set("anexo", data.anexo);
 
       setResponseOk(true);
       const response = await fetch(`${url}/contrato`, {
@@ -181,7 +180,7 @@ function AdicionarNotaFiscal() {
       setResponseOk(true);
       setResponseNotOk(false);
       console.log("Cliente criado com sucesso:", body);
-    } catch {}
+    } catch { }
   };
   return (
     <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
@@ -205,7 +204,7 @@ function AdicionarNotaFiscal() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-4"
           >
-            <div className="flex gap-4 flex-wrap">
+            <div className="flex gap-4  flex-wrap">
               <FormField
                 control={form.control}
                 name="idCliente"
@@ -361,18 +360,35 @@ function AdicionarNotaFiscal() {
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className="w-[150px]">
-                          <SelectValue placeholder="Tipo" />
+                        <SelectTrigger className="w-[300px]">
+                          <SelectValue placeholder="Selecionar tipo" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="w-[150px]">
+                      <SelectContent className="w-[300px]">
                         <SelectGroup>
-                          <SelectLabel>Tipo</SelectLabel>
-                          <SelectItem value="servico">Serviço</SelectItem>
+                          <SelectLabel>Proposta</SelectLabel>
+                          <SelectItem value="LOCACAO">Locação</SelectItem>
+                          <SelectItem value="SERVICO">Serviço</SelectItem>
                         </SelectGroup>
                       </SelectContent>
-                      <FormMessage />
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="valor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Unidade</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="R$ - "
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -397,7 +413,7 @@ function AdicionarNotaFiscal() {
                             className="cursor-pointer"
                             type="file"
                             accept=".jpg,.png,.pdf"
-                            onChange={(e) => field.onChange(e.target.files)}
+                            onChange={(e) => field.onChange(e.target.files?.[0])}
                           />
                         </EmptyDescription>
                       </EmptyHeader>
