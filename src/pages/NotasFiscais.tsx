@@ -1,3 +1,4 @@
+import PageTableFaturamento from "@/components/faturamento/page";
 import { Button } from "@/components/ui/button";
 import { CirclePlus } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -15,6 +16,10 @@ function NotasFiscais() {
             Adicionar Nova Nota
           </Button>
         </Link>
+      </section>
+      <section>AQUI PODE FICAR OS CARDS E UM GRÁFICO</section>
+      <section>
+        <PageTableFaturamento />
       </section>
     </main>
   );
