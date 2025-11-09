@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
+  useQuery,
   useQueryErrorResetBoundary,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -77,6 +78,17 @@ interface Propostas {
   statusProposta: string;
 }
 
+interface Medicao {
+  id: number;
+  idCliente: number;
+  idProposta: number;
+  observacao: string;
+  periodoInicial: string;
+  periodoFinal: string;
+  faturado: string;
+  createdAt: string;
+}
+
 function AdicionarNotaFiscal() {
   const { data: clientes } = useSuspenseQuery({
     queryKey: ["clientes"],
@@ -113,6 +125,25 @@ function AdicionarNotaFiscal() {
     },
   });
 
+  const [idProposta, setIdProposta] = useState<string | undefined>(undefined);
+  const [enabled, setEnabled] = useState<boolean>(false);
+  const { data: medicao } = useQuery({
+    enabled: enabled,
+    queryKey: ["medicao", idProposta],
+    queryFn: async () => {
+      const response = await fetch(
+        `${url}/getMedicoes/propostas/${idProposta}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      if (!response.ok) throw new Error("Nenhuma Medição encontrada");
+      const data = await response.json();
+      return data as Medicao[];
+    },
+  });
+
   const contratoSchema = z.object({
     idCliente: z.string().min(1, "Selecione ao menos um cliente"),
     idProposta: z.string().min(1, "Selecione ao menos uma proposta"),
@@ -123,12 +154,15 @@ function AdicionarNotaFiscal() {
     anexo: z
       .instanceof(File)
       .refine((file) => !!file, "Você deve selecionar ao menos um arquivo")
-      .refine((file) => file.size <= 50 * 1024 * 1024, "Arquivo deve ter até 50MB")
+      .refine(
+        (file) => file.size <= 50 * 1024 * 1024,
+        "Arquivo deve ter até 50MB"
+      )
       .refine(
         (file) =>
           ["image/jpeg", "image/png", "application/pdf"].includes(file.type),
         "Tipo de arquivo inválido"
-      )
+      ),
   });
 
   const form = useForm<z.infer<typeof contratoSchema>>({
@@ -139,7 +173,7 @@ function AdicionarNotaFiscal() {
       anexo: undefined,
       idProposta: "",
       tipo: "",
-      valor: ""
+      valor: "",
     },
   });
 
@@ -156,13 +190,18 @@ function AdicionarNotaFiscal() {
       form.set("idCliente", data.idCliente);
       form.set("idProposta", data.idProposta);
       form.set("idMedicao", data.idMedicao);
+      form.set("valor", data.valor);
       form.set("vencimento", data.vencimento.toString());
       form.set("tipo", data.tipo);
+      form.append("anexo", data.anexo);
 
-      form.set("anexo", data.anexo);
+      for (let [key, value] of form.entries()) {
+        console.log(`${key}:`, value);
+      }
 
-      setResponseOk(true);
-      const response = await fetch(`${url}/contrato`, {
+      console.log("FORM ", form);
+
+      const response = await fetch(`${url}/createFaturamento`, {
         method: "POST",
         credentials: "include",
         body: form,
@@ -180,7 +219,7 @@ function AdicionarNotaFiscal() {
       setResponseOk(true);
       setResponseNotOk(false);
       console.log("Cliente criado com sucesso:", body);
-    } catch { }
+    } catch {}
   };
   return (
     <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
@@ -249,7 +288,11 @@ function AdicionarNotaFiscal() {
                   <FormItem>
                     <FormLabel>Proposta</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        setIdProposta(value.toString());
+                        setEnabled(true);
+                      }}
                       defaultValue={field.value}
                       disabled={false}
                     >
@@ -294,13 +337,16 @@ function AdicionarNotaFiscal() {
                       </FormControl>
                       <SelectContent className="w-[300px]">
                         <SelectGroup>
-                          <SelectLabel>Proposta</SelectLabel>
-                          {propostasAprovadas?.map((proposta) => (
+                          <SelectLabel>Medições</SelectLabel>
+                          {medicao?.map((medicao) => (
                             <SelectItem
-                              key={proposta.id}
-                              value={proposta.id.toString()}
+                              key={medicao.id}
+                              value={medicao.id.toString()}
                             >
-                              {proposta.nomeDaProposta}
+                              {format(
+                                new Date(medicao.createdAt),
+                                "dd/MM/yyyy"
+                              )}
                             </SelectItem>
                           ))}
                         </SelectGroup>
@@ -383,10 +429,7 @@ function AdicionarNotaFiscal() {
                   <FormItem>
                     <FormLabel>Unidade</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="R$ - "
-                        {...field}
-                      />
+                      <Input placeholder="R$ - " {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -413,7 +456,9 @@ function AdicionarNotaFiscal() {
                             className="cursor-pointer"
                             type="file"
                             accept=".jpg,.png,.pdf"
-                            onChange={(e) => field.onChange(e.target.files?.[0])}
+                            onChange={(e) =>
+                              field.onChange(e.target.files?.[0])
+                            }
                           />
                         </EmptyDescription>
                       </EmptyHeader>
@@ -428,7 +473,7 @@ function AdicionarNotaFiscal() {
               className="mt-4 cursor-pointer"
               variant="default"
             >
-              Cadastrar Contrato
+              Cadastrar Nota Fiscal
             </Button>
             <AlertDialog
               open={responseOk}

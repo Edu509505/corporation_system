@@ -10,19 +10,16 @@ import {
   TableRow,
 } from "../ui/table";
 import { MessageCircleWarningIcon } from "lucide-react";
-import { id } from "date-fns/locale";
 const url = import.meta.env.VITE_API_URL;
 
 const formatDateOnly = (date: Date | null) =>
   date ? date.toISOString().slice(0, 10) : "";
 
-
-
 interface PeriodoFechamentoProps {
   dataInicial: Date | null;
   dataFinal: Date | null;
   idProposta: string | undefined;
-  idMedicao:string | undefined
+  idMedicao: string | undefined;
 }
 
 interface DiarioDeObra {
@@ -60,13 +57,21 @@ function PeriodoFechamentoIdMedicao({
   dataInicial,
   dataFinal,
   idProposta,
-  idMedicao
+  idMedicao,
 }: PeriodoFechamentoProps) {
   const { data: periodo } = useSuspenseQuery({
-    queryKey: ["getPeriodoDeObra", dataInicial, dataFinal, idProposta, idMedicao],
+    queryKey: [
+      "getPeriodoDeObra",
+      dataInicial,
+      dataFinal,
+      idProposta,
+      idMedicao,
+    ],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/diarioDeObra/${formatDateOnly(dataInicial)}/${formatDateOnly(dataFinal)}/proposta/${idProposta}/medicao/${idMedicao}`,
+        `${url}/diarioDeObra/${formatDateOnly(dataInicial)}/${formatDateOnly(
+          dataFinal
+        )}/proposta/${idProposta}/medicao/${idMedicao}`,
         {
           method: "GET",
           credentials: "include",
@@ -83,7 +88,7 @@ function PeriodoFechamentoIdMedicao({
     queryFn: async () => {
       const response = await fetch(`${url}/quantitativa/${idProposta}`, {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
       });
       if (!response.ok) throw new Error("Nenhuma quantitativa encontrada");
       const data = await response.json();
@@ -145,9 +150,7 @@ function PeriodoFechamentoIdMedicao({
             {periodo.map((value) =>
               value.itensDoDia.map((value2) => (
                 <TableRow key={value2.id}>
-                  <TableCell>
-                    {dayjs(value.dataDia).format("DD/MM")}
-                  </TableCell>
+                  <TableCell>{dayjs(value.dataDia).format("DD/MM")}</TableCell>
                   <TableCell>{value2.descricao}</TableCell>
                   <TableCell>
                     {
