@@ -11,39 +11,47 @@ type ComparacaoPropostasProps = {
     variacaoPercentual: string | null;
 };
 
-function CardComparacaoPropostas() {
-    const { data } = useSuspenseQuery<ComparacaoPropostasProps>({
-        queryKey: ['comparacaoPropostas'],
+function CardComparacaoPropostasList() {
+
+    const { data: comparacaoProposta } = useSuspenseQuery({
+        queryKey: ["comparacao-propostas"],
         queryFn: async () => {
             const response = await fetch(`${url}/comparacao-propostas`, {
                 method: "GET",
                 credentials: "include"
             });
-            if (!response.ok) throw new Error("erro ao encontrar propostas");
+            if (!response.ok) throw new Error("Erro ao encontrar comparação de propostas");
 
             const data = await response.json();
-            return data as ComparacaoPropostasProps;
+            console.log("estou aqui(data comparação)", data);
+
+            return data as ComparacaoPropostasProps[];
         }
     });
+
+    const quantidadeAtual = comparacaoProposta.map((valor) => valor.mesAtual);
+
+    const diferenca = comparacaoProposta.map((valor) => valor.diferenca)
+    const diferencaAtual = diferenca[diferenca.length - 1] // última diferença
 
 
     return (
         <CardBase>
-            <h2 className="text-xl font-bold mb-4 text-gray-800">📊 Comparação de Propostas</h2>
-            <p className="mb-2">Mês Atual: <strong>{data.mesAtual}</strong></p>
-            <p className="mb-2">Mês Anterior: <strong>{data.mesAnterior}</strong></p>
-            <p
-                className={`font-semibold ${data.diferenca > 0 ? 'text-green-600' : data.diferenca < 0 ? 'text-red-600' : 'text-gray-600'
-                    }`}
-            >
-                {data.diferenca > 0
-                    ? `Houve um aumento de ${data.diferenca} em relação ao mês anterior.`
-                    : data.diferenca < 0
-                        ? `Houve uma queda de ${data.diferenca} proposta em relação ao mês anterior.`
-                        : 'Sem variação em relação ao mês anterior.'}
-            </p>
+            <div className="flex items-center gap-6">
+                <h1 className="text-6xl font-bold">{quantidadeAtual}</h1>
+                <div className="flex flex-col justify-center gap-2">
+                    <h2 className="text-2xl font-bold">Propostas mês atual</h2>
+                    <p
+                        className={`${diferencaAtual < 0 ? 'text-red-500' : 'text-green-500'
+                            }`}
+                    >
+                        {diferencaAtual < 0
+                            ? `${diferencaAtual} propostas a menos que o mês anterior`
+                            : `${diferencaAtual} propostas a mais que o mês anterior`}
+                    </p>
+                </div>
+            </div>
         </CardBase>
-
     );
 
 }
@@ -72,7 +80,7 @@ function ErrorFallback({
 }
 
 
-export function ComparacaoPropostas() {
+export function CardComparacaoPropostas() {
     const { reset } = useQueryErrorResetBoundary();
 
     return (
@@ -80,12 +88,10 @@ export function ComparacaoPropostas() {
             resetErrorBoundary }) => <ErrorFallback error={error}
                 resetErrorBoundary={resetErrorBoundary} />} >
             <Suspense fallback={<SkeletonPropostas />} >
-                <CardComparacaoPropostas />
+                <CardComparacaoPropostasList />
             </Suspense>
         </ErrorBoundary>
     )
-
-
 }
 
 

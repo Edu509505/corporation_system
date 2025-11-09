@@ -1,0 +1,129 @@
+import { url } from "@/url";
+import { useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query";
+import { Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import CardBase from "./CardsHome";
+import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Minus, TrendingDown, TrendingUp } from "lucide-react";
+
+type CardFaturamentoPropos = {
+    faturamentoMesAtual: number;
+    variacaoPercentual: number;
+}
+
+
+function CardListFaturamento() {
+    const { data: faturamentoData } = useSuspenseQuery<CardFaturamentoPropos>({
+        queryKey: ['cardFaturamento'],
+        queryFn: async () => {
+            const response = await fetch(`${url}/cardFaturamento`, {
+                method: "GET",
+                credentials: "include"
+            });
+            if (!response.ok) throw new Error("Erro ao buscar faturamento");
+
+            const data = await response.json();
+            return data;
+        }
+    });
+
+    return (
+        <CardBase>
+            <h2 className="font-bold">Faturamento Mensal</h2>
+
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+                {Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL"
+                }).format(Number(faturamentoData.faturamentoMesAtual) || 0)}
+            </CardTitle>
+
+            <CardAction>
+                <Badge
+                    variant="outline"
+                    className={
+                        Number(faturamentoData.variacaoPercentual) > 0
+                            ? "text-green-600 border-green-600"
+                        :
+                        Number(faturamentoData.variacaoPercentual) < 0  ? 
+                        "text-red-600 border-red-600" 
+                        : Number(faturamentoData.variacaoPercentual) == 0 ?
+                         "text-black border-black"
+                        : ""
+                    }
+                >
+                    {Number(faturamentoData.variacaoPercentual) > 0 ? (
+                        <TrendingUp />
+                    ) : Number(faturamentoData.variacaoPercentual) < 0 ? (
+                        <TrendingDown />
+                    ) : Number(faturamentoData.variacaoPercentual) == 0 ? (
+                        <></>
+                    ) : <Minus/>
+                    }
+                    {isFinite(Number(faturamentoData.variacaoPercentual)) &&
+                        `${Number(faturamentoData.variacaoPercentual).toFixed(2)}%`}
+                </Badge>
+            </CardAction>
+
+            <div className="mt-2 text-sm text-muted-foreground">
+                {Number(faturamentoData.variacaoPercentual) > 0 && (
+                    <span className="text-green-600">
+                        O faturamento aumentou em {Number(faturamentoData.variacaoPercentual).toFixed(2)}% em relação ao mês anterior.
+                    </span>
+                )}
+                {Number(faturamentoData.variacaoPercentual) < 0 && (
+                    <span className="text-red-600">
+                        O faturamento caiu {Math.abs(Number(faturamentoData.variacaoPercentual)).toFixed(2)}% em relação ao mês anterior.
+                    </span>
+                )}
+                {Number(faturamentoData.variacaoPercentual) === 0 && (
+                    <span>O faturamento se manteve estável em relação ao mês anterior.</span>
+                )}
+            </div>
+        </CardBase>
+    )
+}
+
+
+
+
+function SkeletonCardFaturamento() {
+    return (
+        <div className="bg-white shadow-md rounded-lg p-6 max-w-md mx-auto mt-10 animate-pulse">
+            <div className="h-6 bg-gray-300 rounded w-2/3 mb-4"></div>
+            <div className="space-y-2">
+                {[...Array(4)].map((_, i) => (
+                    <div key={i} className="h-4 bg-gray-200 rounded w-full"></div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function ErrorFallback({
+    error,
+}: {
+    error: Error;
+    resetErrorBoundary: () => void;
+}) {
+    return <div className="p-5 text-destructive">Erro: {error.message}</div>;
+}
+
+
+
+
+
+export function CardFaturamento() {
+    const { reset } = useQueryErrorResetBoundary();
+
+    return (
+        <ErrorBoundary onReset={reset} fallbackRender={({ error,
+            resetErrorBoundary }) => <ErrorFallback error={error}
+                resetErrorBoundary={resetErrorBoundary} />} >
+            <Suspense fallback={<SkeletonCardFaturamento />} >
+                <CardListFaturamento />
+            </Suspense>
+        </ErrorBoundary>
+    )
+}
