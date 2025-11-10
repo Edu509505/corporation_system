@@ -8,81 +8,76 @@ import { Badge } from "../ui/badge";
 import { Minus, TrendingDown, TrendingUp } from "lucide-react";
 
 type CardFaturamentoPropos = {
-    faturamentoMesAtual: number;
-    variacaoPercentual: number;
-}
-
+  faturamentoMesAtual: number;
+  variacaoPercentual: number;
+};
 
 function CardListFaturamento() {
-    const { data: faturamentoData } = useSuspenseQuery<CardFaturamentoPropos>({
-        queryKey: ['cardFaturamento'],
-        queryFn: async () => {
-            const response = await fetch(`${url}/cardFaturamento`, {
-                method: "GET",
-                credentials: "include"
-            });
-            if (!response.ok) throw new Error("Erro ao buscar faturamento");
+  const { data: faturamentoData } = useSuspenseQuery<CardFaturamentoPropos>({
+    queryKey: ['cardFaturamento'],
+    queryFn: async () => {
+      const response = await fetch(`${url}/cardFaturamento`, {
+        method: "GET",
+        credentials: "include"
+      });
+      if (!response.ok) throw new Error("Erro ao buscar faturamento");
 
-            const data = await response.json();
-            return data;
-        }
-    });
+      const data = await response.json();
+      console.log("data Faturamento", data);
+      return data;
+    }
+  });
 
-    return (
-        <CardBase>
-            <h2 className="font-bold">Faturamento Mensal</h2>
+  const valorFormatado = Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  }).format(Number(faturamentoData.faturamentoMesAtual) || 0);
 
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                {Intl.NumberFormat("pt-BR", {
-                    style: "currency",
-                    currency: "BRL"
-                }).format(Number(faturamentoData.faturamentoMesAtual) || 0)}
-            </CardTitle>
+  const variacao = Number(faturamentoData.variacaoPercentual);
+  const variacaoFormatada = isFinite(variacao) ? `${variacao.toFixed(2)}%` : null;
 
-            <CardAction>
-                <Badge
-                    variant="outline"
-                    className={
-                        Number(faturamentoData.variacaoPercentual) > 0
-                            ? "text-green-600 border-green-600"
-                        :
-                        Number(faturamentoData.variacaoPercentual) < 0  ? 
-                        "text-red-600 border-red-600" 
-                        : Number(faturamentoData.variacaoPercentual) == 0 ?
-                         "text-black border-black"
-                        : ""
-                    }
-                >
-                    {Number(faturamentoData.variacaoPercentual) > 0 ? (
-                        <TrendingUp />
-                    ) : Number(faturamentoData.variacaoPercentual) < 0 ? (
-                        <TrendingDown />
-                    ) : Number(faturamentoData.variacaoPercentual) == 0 ? (
-                        <></>
-                    ) : <Minus/>
-                    }
-                    {isFinite(Number(faturamentoData.variacaoPercentual)) &&
-                        `${Number(faturamentoData.variacaoPercentual).toFixed(2)}%`}
-                </Badge>
-            </CardAction>
+  const badgeClass =
+    variacao > 0 ? "text-green-600 border-green-600" :
+    variacao < 0 ? "text-red-600 border-red-600" :
+    variacao === 0 ? "text-black border-black" : "";
 
-            <div className="mt-2 text-sm text-muted-foreground">
-                {Number(faturamentoData.variacaoPercentual) > 0 && (
-                    <span className="text-green-600">
-                        O faturamento aumentou em {Number(faturamentoData.variacaoPercentual).toFixed(2)}% em relação ao mês anterior.
-                    </span>
-                )}
-                {Number(faturamentoData.variacaoPercentual) < 0 && (
-                    <span className="text-red-600">
-                        O faturamento caiu {Math.abs(Number(faturamentoData.variacaoPercentual)).toFixed(2)}% em relação ao mês anterior.
-                    </span>
-                )}
-                {Number(faturamentoData.variacaoPercentual) === 0 && (
-                    <span>O faturamento se manteve estável em relação ao mês anterior.</span>
-                )}
-            </div>
-        </CardBase>
-    )
+  const badgeIcon =
+    variacao > 0 ? <TrendingUp /> :
+    variacao < 0 ? <TrendingDown /> :
+    variacao === 0 ? null : <Minus />;
+
+  return (
+    <CardBase>
+      <h2 className="font-bold">Faturamento Mensal</h2>
+
+      <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+        {valorFormatado}
+      </CardTitle>
+
+      <CardAction>
+        <Badge variant="outline" className={badgeClass}>
+          {badgeIcon}
+          {variacaoFormatada}
+        </Badge>
+      </CardAction>
+
+      <div className="mt-2 text-sm text-muted-foreground">
+        {variacao > 0 && (
+          <span className="text-green-600">
+            O faturamento aumentou em {variacao.toFixed(2)}% em relação ao mês anterior.
+          </span>
+        )}
+        {variacao < 0 && (
+          <span className="text-red-600">
+            O faturamento caiu {Math.abs(variacao).toFixed(2)}% em relação ao mês anterior.
+          </span>
+        )}
+        {variacao === 0 && (
+          <span>O faturamento se manteve estável em relação ao mês anterior.</span>
+        )}
+      </div>
+    </CardBase>
+  );
 }
 
 
