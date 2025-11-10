@@ -22,11 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Filter } from "lucide-react";
-// import { Input } from "@/components/ui/input";
 import { Button } from "./ui/button";
-// import { Link } from "react-router-dom";
-//import { number } from "zod";
-// import { Label } from "./ui/label";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

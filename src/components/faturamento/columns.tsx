@@ -106,7 +106,7 @@ export const columns: ColumnDef<Faturamento>[] = [
     header: () => <>Ações</>,
     cell: ({ row }) => {
       return (
-        <Link to={`/visualizarMedicao/${row.original.id}`}>
+        <Link to={`/visualizarNotaFiscal/${row.original.id}`}>
           <Button className="rounded-2xl bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white cursor-pointer">
             Visualizar
           </Button>
