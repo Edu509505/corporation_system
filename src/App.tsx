@@ -22,7 +22,7 @@ import Layout from "./pages/Layout";
 import { Navigate } from "react-router-dom";
 import AddNotaFiscal from "./pages/faturamento/AddNotaFiscal";
 import VisualizarMedicao from "./pages/medicao/VisualizarMedicao";
-import VisualizarFaturamento from "./pages/faturamento/VisuaizarFaturamento"
+import VisualizarNotaFiscal from "./pages/faturamento/visuaizarFaturamento"
 
 function App() {
   const router = createBrowserRouter([
@@ -60,7 +60,7 @@ function App() {
         },
         {
           path: "visualizarNotaFiscal/:id",
-          element: <OnlyPlebes page={<VisualizarFaturamento />} />,
+          element: <OnlyPlebes page={<VisualizarNotaFiscal />} />,
         },
         {
           path: "medicao",
