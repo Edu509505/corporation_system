@@ -32,7 +32,7 @@ function App() {
       children: [
         {
           path: "", // rota raiz
-          element: <Navigate to="/#" replace />,
+          element: <Navigate to="/login" replace />,
         },
         {
           path: "login",
