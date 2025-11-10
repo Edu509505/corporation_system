@@ -46,8 +46,8 @@ function CardComparacaoPropostasList() {
                             }`}
                     >
                         {diferencaAtual < 0
-                            ? `${diferencaAtual} propostas a menos que o mês anterior`
-                            : `${diferencaAtual} propostas a mais que o mês anterior`}
+                            ? `${-diferencaAtual} ${-diferencaAtual === 1 ? 'proposta' : 'propostas'} a menos que o mês anterior`
+                            : `${diferencaAtual} ${diferencaAtual === 1 ? 'proposta' : 'propostas'} a mais que o mês anterior`}
                     </p>
                 </div>
             </div>
