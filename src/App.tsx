@@ -1,48 +1,3 @@
-// // import "./App.css";
-// // import { BrowserRouter, Route, Routes } from "react-router-dom";
-// import Layout from "./pages/Layout";
-// import NoPage from "./pages/NoPage";
-// import LoginForm from "./pages/Login";
-
-// function App() {
-// return (
-//   <>
-//     <BrowserRouter>
-//       <Routes>
-//         <Route path="/login" element={<LoginForm />} />
-//         <Route path="/" element={<Layout children={undefined} />}>
-//           <Route index element={<Home />} />
-//           <Route path="/criarProposta" element={<CriarProposta />} />
-//           {/* <Route path="/versionamento" element={<VerVersionamento />} /> */}
-//           <Route path="/notasFiscais" element={<NotasFiscais />} />
-//           <Route path="/medicao" element={<Medicao />} />
-//           <Route path="/adicionarMedicao" element={<AdicionarMedicao />} />
-//           <Route path="/cadastro" element={<CadastroCliente />} />
-//           <Route path="/clientes" element={<Clientes />} />
-//           <Route path="/propostas" element={<VerPropostas />} />
-//           <Route path="/diarioDeObra" element={<DiarioDeObra />} />
-//           <Route path="/diarioPorProposta/:idProposta" element={<MostrarDiarioDeObraPorProposta />} />
-//           <Route path="/criarDiarioDeObra" element={<CriarDiarioDeObra />} />
-//           <Route
-//             path="/proposta/versionamento/:id"
-//             element={<Versionamento />}
-//           />
-//           <Route path="/contratos" element={<Contratos />} />
-//           <Route path="/addContrato" element={<AddContrato />} />
-//           <Route
-//             path="/visualizarContrato/:id"
-//             element={<VisualizarContrato />}
-//           />
-//           <Route path="/clientes/:id" element={<EditarCliente />} />
-//           <Route path="*" element={<NoPage />} />
-//         </Route>
-//       </Routes>
-//     </BrowserRouter>
-//   </>
-// );
-// }
-
-// export default App;
 import Home from "./pages/Home";
 import NotasFiscais from "./pages/NotasFiscais";
 import Medicao from "./pages/Medicao";
@@ -77,7 +32,7 @@ function App() {
       children: [
         {
           path: "", // rota raiz
-          element: <Navigate to="/login" replace />,
+          element: <Navigate to="/#" replace />,
         },
         {
           path: "login",

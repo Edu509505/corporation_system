@@ -105,20 +105,14 @@ function VisualizarNotaFiscal() {
   console.log("Faturamento", anexoFaturamento.path.split('.').reverse()[0])
 
   return (
-    <div className="flex flex-col h-auto gap-3 p-4">
+    <div className="flex flex-col h-auto gap-3 bg-gray-50 p-4">
       <header>
         <Link to="/notasFiscais">
-          <Button>
+          <Button className="cursor-pointer">
             <CircleArrowLeftIcon /> Retornar
           </Button>
         </Link>
         <h1 className="text-2xl font-bold">Visualizar Nota Fiscal</h1>
-        <p className="text-gray-600">Preencha os detalhe abaixo.</p>
-        <p className="text-sm text-gray-500">
-          <strong>Atenção:</strong> Ao cadastrar uma nova Nota Fiscal é
-          necessário selecionar o cliente a qual essa nota pertence e a qual
-          mediçõa ela estará referenciando
-        </p>
       </header>
       <main className="flex flex-col gap-3">
         <div className="flex gap-3 flex-wrap">
