@@ -1,7 +1,5 @@
 import { CardFaturamento } from "@/components/cardsHome/CardFaturamento";
 import { CardComparacaoPropostas } from "@/components/cardsHome/ComparacaoProposta";
-import { CardPropostasEmAnalise } from "@/components/cardsHome/PropostasEmAnalise";
-import { CardPropostaEmAndamento } from "@/components/cardsHome/PropostasFechadas";
 import Grafico from "@/components/grafico/Grafico";
 
 function Home() {

@@ -3,7 +3,7 @@ import { useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-qu
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import CardBase from "./CardsHome";
-import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { CardAction, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Minus, TrendingDown, TrendingUp } from "lucide-react";
 

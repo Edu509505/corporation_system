@@ -1,4 +1,4 @@
-import { useQuery, useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query"
+import { useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query"
 import { url } from '../../url'
 import { columnsDiario, type DiarioDeObra } from "./ColumsDiario"
 
