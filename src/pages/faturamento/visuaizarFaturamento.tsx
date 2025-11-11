@@ -11,6 +11,7 @@ import {
   CircleArrowLeftIcon,
   CircleCheck,
   CircleX,
+  Printer,
   Timer,
 } from "lucide-react";
 import { Link, useParams } from "react-router";
@@ -18,14 +19,24 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
 import { format } from "date-fns/format";
 import { Label } from "@/components/ui/label";
+
+//BAGULHO DO PDF
 import { Viewer, Worker } from '@react-pdf-viewer/core';
+import { zoomPlugin } from '@react-pdf-viewer/zoom';
+import { pageNavigationPlugin } from '@react-pdf-viewer/page-navigation';
+import { getFilePlugin } from '@react-pdf-viewer/get-file';
+import { printPlugin } from '@react-pdf-viewer/print';
+
+// Import styles
+import '@react-pdf-viewer/print/lib/styles/index.css';
 import '@react-pdf-viewer/core/lib/styles/index.css';
+import '@react-pdf-viewer/zoom/lib/styles/index.css';
+import '@react-pdf-viewer/page-navigation/lib/styles/index.css';
+import '@react-pdf-viewer/default-layout/lib/styles/index.css';
+
 // Plugins
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 
-// Import styles
-import '@react-pdf-viewer/core/lib/styles/index.css';
-import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 
 // Create new plugin instance
 import { Badge } from "@/components/ui/badge";
@@ -152,7 +163,17 @@ function VisualizarNotaFiscal() {
     }
   }
 
-  const defaultLayoutPluginInstance = defaultLayoutPlugin();
+  //BAGULHO DO PDF
+
+  const zoomPluginInstance = zoomPlugin();
+  const pageNavigationPluginInstance = pageNavigationPlugin();
+  const getFilePluginInstance = getFilePlugin();
+
+  const { ZoomInButton, ZoomOutButton, CurrentScale } = zoomPluginInstance;
+  const { GoToNextPageButton, GoToPreviousPageButton, CurrentPageLabel } = pageNavigationPluginInstance;
+  const { DownloadButton } = getFilePluginInstance;
+  const printPluginInstance = printPlugin();
+  const { Print } = printPluginInstance;
 
   return (
     <div className="flex flex-col h-auto gap-3 bg-gray-50 p-4">
@@ -283,13 +304,41 @@ function VisualizarNotaFiscal() {
                 :
                 <div style={{ height: '750px' }}>
                   <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
+                    <div className="flex justify-center items-center gap-5 rounded-t-2xl bg-white p-4">
+                      <Print>
+                        {(props) => (
+                          <Button
+                            onClick={props.onClick}
+                            className="cursor-pointer"
+                          >
+                            Imprimir
+                          </Button>
+                        )}
+                      </Print>
+                      <DownloadButton />
+                      <ZoomOutButton />
+                      <CurrentScale />
+                      <ZoomInButton />
+                      <GoToPreviousPageButton />
+                      <CurrentPageLabel />
+                      <GoToNextPageButton />
+                    </div>
+                    <Viewer
+                      fileUrl={anexoFaturamento.url}
+                      plugins={[zoomPluginInstance, pageNavigationPluginInstance, getFilePluginInstance, printPluginInstance]}
+                    />
+
+                  </Worker>
+
+
+                  {/* <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
                     <Viewer fileUrl={anexoFaturamento.url}
                       plugins={[
                         // Register plugins
                         defaultLayoutPluginInstance,
                       ]}
                     />
-                  </Worker>
+                  </Worker> */}
                 </div>
 
             }
