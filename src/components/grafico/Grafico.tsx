@@ -1,17 +1,19 @@
-import { useSuspenseQuery } from "@tanstack/react-query"
+import { useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query"
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import React from "react";
+import React, { Suspense } from "react";
 import dayjs from "dayjs";
+import { Skeleton } from "../ui/skeleton";
+import { ErrorBoundary } from "react-error-boundary";
 
-interface todosOsItensDoDia {
+interface TodosOsItensDoDia {
     dataDia: string;
     total_m2: number;
 }
 
-function Grafico() {
+function GraficoDados() {
     const [timeRange, setTimeRange] = React.useState("90d");
 
     // Define o número de dias com base no filtro
@@ -32,7 +34,7 @@ function Grafico() {
             });
             if (!response.ok) throw new Error("erro ao encontrar propostas");
             const data = await response.json();
-            return data as todosOsItensDoDia[];
+            return data as TodosOsItensDoDia[];
         }
     });
 
@@ -117,5 +119,36 @@ function Grafico() {
         </Card>
     );
 }
+
+function LoadingGrafico(){
+    return(
+        <Skeleton></Skeleton>
+    )
+}
+
+function ErrorFallback({
+    error,
+}: {
+    error: Error;
+    resetErrorBoundary: () => void;
+}) {
+    return <div className="p-5 text-destructive">Erro: {error.message}</div>;
+}
+
+export function Grafico() {
+    const { reset } = useQueryErrorResetBoundary();
+
+    return (
+        <ErrorBoundary onReset={reset} fallbackRender={({ error,
+            resetErrorBoundary }) => <ErrorFallback error={error}
+                resetErrorBoundary={resetErrorBoundary} />} >
+            <Suspense fallback={<LoadingGrafico />} >
+                <GraficoDados />
+            </Suspense>
+        </ErrorBoundary>
+    )
+}
+
+
 
 export default Grafico
