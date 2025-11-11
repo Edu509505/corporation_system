@@ -157,7 +157,7 @@ export const columns: ColumnDef<Faturamento>[] = [
     cell: ({ row }) => {
       return (
         <Link to={`/visualizarNotaFiscal/${row.original.id}`}>
-          <Button className="rounded-2xl bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white cursor-pointer">
+          <Button className="rounded-2xl bg-blue-100 text-blue-600 border-blue-600 border-1 hover:bg-blue-600 hover:text-white cursor-pointer h-8 w-21">
             Visualizar
           </Button>
         </Link>

@@ -298,7 +298,7 @@ export function DataTableFaturamento<TData, TValue>({
         </div>
       </section>
       <div className="overflow-hidden rounded-md border">
-        <Table>
+        <Table className="bg-white">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
