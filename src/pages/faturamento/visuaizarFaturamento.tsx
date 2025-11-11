@@ -20,7 +20,16 @@ import { format } from "date-fns/format";
 import { Label } from "@/components/ui/label";
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
+// Plugins
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+
+// Import styles
+import '@react-pdf-viewer/core/lib/styles/index.css';
+import '@react-pdf-viewer/default-layout/lib/styles/index.css';
+
+// Create new plugin instance
 import { Badge } from "@/components/ui/badge";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -81,7 +90,7 @@ function VisualizarNotaFiscal() {
 
   const { id } = useParams<{ id: string }>();
 
-  const { data: faturamento } = useSuspenseQuery({
+  const { data: faturamento, refetch: refetchFaturamento } = useSuspenseQuery({
     queryKey: ["faturamento", id],
     queryFn: async () => {
       const response = await fetch(`${url}/getFaturamentoId/${id}`, {
@@ -127,22 +136,24 @@ function VisualizarNotaFiscal() {
       if (!response.ok) throw new Error("Faturamento não encontrado");
       console.log("Payload enviado:", { pagamento });
     }
-    
+
   })
 
-  function situacao (){
-    if (faturamento.pagamento === null) {
-        if (new Date() > new Date(faturamento.vencimento as string)) {
+  function situacao() {
+    if (faturamento.pagamento === "ABERTO") {
+      if (new Date() > new Date(faturamento.vencimento as string)) {
         return <Badge className="text-orange-600 bg-orange-100 border border-orange-500"> <AlertCircleIcon /> Em Atraso </Badge>
-        }
-        return <Badge className="text-blue-600 bg-blue-100 border border-blue-500"><Timer /> Em aberto</Badge>
-      } else if (faturamento.pagamento === "PAGA") {
-        return <Badge className="text-green-600 bg-green-100 border border-green-500"> <CircleCheck /> Paga </Badge>
-      } else if (faturamento.pagamento === "CANCELADA") {
-        return <Badge className="text-red-600 bg-red-100 border border-red-500"> <CircleX /> Cancelada </Badge>
-      } 
+      }
+      return <Badge className="text-blue-600 bg-blue-100 border border-blue-500"><Timer /> Em aberto</Badge>
+    } else if (faturamento.pagamento === "PAGA") {
+      return <Badge className="text-green-600 bg-green-100 border border-green-500"> <CircleCheck /> Paga </Badge>
+    } else if (faturamento.pagamento === "CANCELADA") {
+      return <Badge className="text-red-600 bg-red-100 border border-red-500"> <CircleX /> Cancelada </Badge>
+    }
   }
-  
+
+  const defaultLayoutPluginInstance = defaultLayoutPlugin();
+
   return (
     <div className="flex flex-col h-auto gap-3 bg-gray-50 p-4">
       <header>
@@ -197,7 +208,7 @@ function VisualizarNotaFiscal() {
             <Label>Situação</Label>
             <div className=" pl-2 pr-10 pt-1 pb-1 flex justify-start items-center">
               {situacao()}
-              </div>
+            </div>
           </div>
         </div>
 
@@ -205,25 +216,79 @@ function VisualizarNotaFiscal() {
           <Label>Ações</Label>
           <h1 className="text-[0.9rem]"> Qualquer ação feita aqui não poderá ser desfeita </h1>
           <div className="flex gap-3">
-            <Button className="cursor-pointer" onClick={() => updateStatusFaturamento({pagamento: "PAGA"})}> <CircleCheck /> Paga </Button>
-            <Button className="cursor-pointer" variant="destructive" onClick={() => updateStatusFaturamento({pagamento: "CANCELADA"})}> <CircleX /> Cancelada </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button className="cursor-pointer" disabled={faturamento.pagamento === "PAGA" ? true : faturamento.pagamento === "CANCELADA" ? true : undefined}> <CircleCheck /> Paga</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Marcar a nota como Paga?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Essa ação não poderá ser desfeita
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="cursor-pointer" >voltar</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="cursor-pointer"
+                    onClick={
+                      async () => {
+                        await updateStatusFaturamento({ pagamento: "PAGA" }),
+                          refetchFaturamento()
+                      }
+                    }>Continuar</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button className="cursor-pointer" variant="destructive" disabled={faturamento.pagamento === "PAGA" ? true : faturamento.pagamento === "CANCELADA" ? true : undefined} > <CircleX /> Cancelada</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Marcar a nota como Cancelada?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Essa ação não poderá ser desfeita
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="cursor-pointer" >voltar</AlertDialogCancel>
+                  <AlertDialogAction className="cursor-pointer" onClick={
+                    async () => {
+                      await updateStatusFaturamento({ pagamento: "CANCELADA" }),
+                        refetchFaturamento()
+                    }
+                  }>Continuar</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
 
         <div className="flex flex-col gap-3">
           <Label>Arquivo</Label>
           <div className="flex flex-col gap-3">
-            <div>
-              <Link to={anexoFaturamento.url}>
-                <Button className="cursor-pointer" > <CircleArrowDown /> Fazer Download do Arquivo</Button>
-              </Link>
-            </div>
             {
-              anexoFaturamento.path.split('.').reverse()[0] != "pdf" ? <><img src={anexoFaturamento.url}></img></>
+              anexoFaturamento.path.split('.').reverse()[0] != "pdf" ? <>
+
+                <div className="flex flex-col gap-3">
+                  <Link to={anexoFaturamento.url}>
+                    <Button className="cursor-pointer" > <CircleArrowDown /> Fazer Download do Arquivo</Button>
+                  </Link>
+                  <img src={anexoFaturamento.url}></img>
+                </div>
+
+              </>
                 :
                 <div style={{ height: '750px' }}>
                   <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
-                    <Viewer fileUrl={anexoFaturamento.url} />
+                    <Viewer fileUrl={anexoFaturamento.url}
+                      plugins={[
+                        // Register plugins
+                        defaultLayoutPluginInstance,
+                      ]}
+                    />
                   </Worker>
                 </div>
 

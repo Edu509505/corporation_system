@@ -76,6 +76,7 @@ export function DataTableFaturamento<TData, TValue>({
     },
   });
 
+
   const { data: clientes } = useQuery({
     queryKey: ["clientes"],
     queryFn: async () => {
@@ -102,6 +103,8 @@ export function DataTableFaturamento<TData, TValue>({
     },
   });
 
+
+
   return (
     <>
       <section className="flex flex-col">
@@ -113,13 +116,13 @@ export function DataTableFaturamento<TData, TValue>({
           <div className="flex flex-col gap-3">
             <Label>Número da Nota</Label>
             <Input
-            placeholder="Número da Nota"
+              placeholder="Número da Nota"
               type="number"
               value={(table.getColumn("numeroDaNota")?.getFilterValue() as string) ?? ""}
               onChange={(event) =>
                 table.getColumn("numeroDaNota")?.setFilterValue(event.target.value)
               }
-              className="max-w-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-[150px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
           </div>
           <div className="flex flex-col gap-3">
@@ -200,11 +203,11 @@ export function DataTableFaturamento<TData, TValue>({
                 (table.getColumn("tipo")?.getFilterValue() as string) ?? ""
               }
             >
-              <SelectTrigger className="w-[300px]">
+              <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Selecionar tipo" />
               </SelectTrigger>
 
-              <SelectContent className="w-[300px]">
+              <SelectContent className="w-[150px]">
                 <SelectGroup>
                   <SelectLabel>Proposta</SelectLabel>
                   <SelectItem value="LOCACAO">Locação</SelectItem>
@@ -213,6 +216,85 @@ export function DataTableFaturamento<TData, TValue>({
               </SelectContent>
             </Select>
           </div>
+          <div className="flex flex-col gap-3">
+            
+
+            {/* <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-[200px] justify-start text-left font-normal"
+                >
+                  {selectedDate ? format(selectedDate, "dd/MM/yyyy") : "Selecionar Data"}
+                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  captionLayout="dropdown"
+                />
+              </PopoverContent>
+            </Popover> */}
+
+          </div>
+          <div className="flex flex-col gap-3">
+            <Label>Situação</Label>
+            <Select
+              onValueChange={(event) =>
+                table.getColumn("pagamento")?.setFilterValue(event)
+              }
+              // value={
+              //   (table.getColumn("tipo")?.getFilterValue() as string) ?? ""
+              // }
+              defaultValue={
+                (table.getColumn("pagamento")?.getFilterValue() as string) ?? ""
+              }
+            >
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Selecionar tipo" />
+              </SelectTrigger>
+
+              <SelectContent className="w-[150px]">
+                <SelectGroup>
+                  <SelectLabel>Situação</SelectLabel>
+                  <SelectItem value="TODAS">Todas</SelectItem>
+                  <SelectItem value="ABERTO">Em Aberto</SelectItem>
+                  <SelectItem value="PAGA">Paga</SelectItem>
+                  <SelectItem value="CANCELADA">Cancelada</SelectItem>
+                  <SelectItem value="ATRASADA">Atrasada</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+          {/* <div className="flex flex-col gap-3">
+            <Label>Emissão</Label>
+            <Input
+              placeholder="Emissão"
+              type="date"
+              value={(table.getColumn("createdAt")?.getFilterValue() as string) ?? ""}
+              onChange={(event) =>
+                table.getColumn("createdAt")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm no-calendar border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+          </div>
+          <div className="flex flex-col gap-3">
+            <Label>Vencimento</Label>
+            <Input
+              placeholder="Vencimento"
+              type="date"
+              value={(table.getColumn("vencimento")?.getFilterValue() as string) ?? ""}
+              onChange={(event) =>
+                table.getColumn("vencimento")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm no-calendar"
+            />
+
+          </div> */}
         </div>
       </section>
       <div className="overflow-hidden rounded-md border">
