@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import {
+  useMutation,
   useQueryErrorResetBoundary,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -7,6 +8,8 @@ import { Suspense } from "react";
 import {
   CircleArrowDown,
   CircleArrowLeftIcon,
+  CircleCheck,
+  CircleX,
 } from "lucide-react";
 import { Link, useParams } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -104,6 +107,26 @@ function VisualizarNotaFiscal() {
 
   console.log("Faturamento", anexoFaturamento.path.split('.').reverse()[0])
 
+  const { mutateAsync: updateStatusFaturamento } = useMutation({
+    mutationKey: ["updateFaturamento", id],
+    mutationFn: async ({ pagamento }: { pagamento: string }) => {
+      const response = await fetch(`${url}/updateStatusNotaFiscal/notaFiscal/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pagamento
+        }),
+      })
+      if (!response.ok) throw new Error("Faturamento não encontrado");
+      console.log("Payload enviado:", { pagamento });
+    }
+    
+  })
+
+  
   return (
     <div className="flex flex-col h-auto gap-3 bg-gray-50 p-4">
       <header>
@@ -164,8 +187,10 @@ function VisualizarNotaFiscal() {
 
         <div className="flex flex-col gap-3">
           <Label>Ações</Label>
-          <div>
-            <h1>Selecione uma das opções para a nota Fiscal</h1>
+          <h1 className="text-[0.9rem]"> Qualquer ação feita aqui não poderá ser desfeita </h1>
+          <div className="flex gap-3">
+            <Button className="cursor-pointer" onClick={() => updateStatusFaturamento({pagamento: "PAGA"})}> <CircleCheck /> Paga </Button>
+            <Button className="cursor-pointer" variant="destructive" onClick={() => updateStatusFaturamento({pagamento: "CANCELADA"})}> <CircleX /> Cancelada </Button>
           </div>
         </div>
 
@@ -173,9 +198,9 @@ function VisualizarNotaFiscal() {
           <Label>Arquivo</Label>
           <div className="flex flex-col gap-3">
             <div>
-            <Link to={anexoFaturamento.url}>
-              <Button className="cursor-pointer" > <CircleArrowDown /> Fazer Download do Arquivo</Button>
-            </Link>
+              <Link to={anexoFaturamento.url}>
+                <Button className="cursor-pointer" > <CircleArrowDown /> Fazer Download do Arquivo</Button>
+              </Link>
             </div>
             {
               anexoFaturamento.path.split('.').reverse()[0] != "pdf" ? <><img src={anexoFaturamento.url}></img></>

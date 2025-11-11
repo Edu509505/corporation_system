@@ -8,8 +8,8 @@ import { Badge } from "../ui/badge";
 import { Minus, TrendingDown, TrendingUp } from "lucide-react";
 
 type CardFaturamentoPropos = {
-  faturamentoMesAtual: number;
-  variacaoPercentual: number;
+  totalAtual: number;
+  variacaoPercentual: string | number;
 };
 
 function CardListFaturamento() {
@@ -31,20 +31,31 @@ function CardListFaturamento() {
   const valorFormatado = Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL"
-  }).format(Number(faturamentoData.faturamentoMesAtual) || 0);
+  }).format(Number(faturamentoData.totalAtual) || 0);
 
-  const variacao = Number(faturamentoData.variacaoPercentual);
-  const variacaoFormatada = isFinite(variacao) ? `${variacao.toFixed(2)}%` : null;
+  const variacaoRaw = faturamentoData.variacaoPercentual;
+  const variacao = typeof variacaoRaw === "string" && variacaoRaw === "N/A"
+    ? null
+    : Number(variacaoRaw);
+
+  const variacaoFormatada = variacao !== null && isFinite(variacao)
+    ? `${variacao.toFixed(2)}%`
+    : "N/A";
 
   const badgeClass =
-    variacao > 0 ? "text-green-600 border-green-600" :
-    variacao < 0 ? "text-red-600 border-red-600" :
-    variacao === 0 ? "text-black border-black" : "";
+    variacao === null ? "text-muted-foreground border-muted-foreground" :
+      variacao > 0 ? "text-green-600 border-green-600" :
+        variacao < 0 ? "text-red-600 border-red-600" :
+          "text-black border-black";
 
   const badgeIcon =
-    variacao > 0 ? <TrendingUp /> :
-    variacao < 0 ? <TrendingDown /> :
-    variacao === 0 ? null : <Minus />;
+    variacao === null ? <Minus /> :
+      variacao > 0 ? <TrendingUp /> :
+        variacao < 0 ? <TrendingDown /> :
+          <Minus />;
+
+  console.log({ variacao, variacaoPercentual: faturamentoData.variacaoPercentual });
+
 
   return (
     <CardBase>
@@ -56,18 +67,23 @@ function CardListFaturamento() {
 
       <CardAction>
         <Badge variant="outline" className={badgeClass}>
-          {badgeIcon}
-          {variacaoFormatada}
+          <span className="flex items-center gap-1">
+            {badgeIcon}
+            {variacaoFormatada}
+          </span>
         </Badge>
       </CardAction>
 
       <div className="mt-2 text-sm text-muted-foreground">
-        {variacao > 0 && (
+        {variacao === null && (
+          <span>Não há dados suficientes para calcular a variação.</span>
+        )}
+        {typeof variacao === "number" && variacao > 0 && (
           <span className="text-green-600">
             O faturamento aumentou em {variacao.toFixed(2)}% em relação ao mês anterior.
           </span>
         )}
-        {variacao < 0 && (
+        {typeof variacao === "number" && variacao < 0 && (
           <span className="text-red-600">
             O faturamento caiu {Math.abs(variacao).toFixed(2)}% em relação ao mês anterior.
           </span>
@@ -81,28 +97,26 @@ function CardListFaturamento() {
 }
 
 
-
-
 function SkeletonCardFaturamento() {
-    return (
-        <div className="bg-white shadow-md rounded-lg p-6 max-w-md mx-auto mt-10 animate-pulse">
-            <div className="h-6 bg-gray-300 rounded w-2/3 mb-4"></div>
-            <div className="space-y-2">
-                {[...Array(4)].map((_, i) => (
-                    <div key={i} className="h-4 bg-gray-200 rounded w-full"></div>
-                ))}
-            </div>
-        </div>
-    );
+  return (
+    <div className="bg-white shadow-md rounded-lg p-6 max-w-md mx-auto mt-10 animate-pulse">
+      <div className="h-6 bg-gray-300 rounded w-2/3 mb-4"></div>
+      <div className="space-y-2">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-4 bg-gray-200 rounded w-full"></div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function ErrorFallback({
-    error,
+  error,
 }: {
-    error: Error;
-    resetErrorBoundary: () => void;
+  error: Error;
+  resetErrorBoundary: () => void;
 }) {
-    return <div className="p-5 text-destructive">Erro: {error.message}</div>;
+  return <div className="p-5 text-destructive">Erro: {error.message}</div>;
 }
 
 
@@ -110,15 +124,15 @@ function ErrorFallback({
 
 
 export function CardFaturamento() {
-    const { reset } = useQueryErrorResetBoundary();
+  const { reset } = useQueryErrorResetBoundary();
 
-    return (
-        <ErrorBoundary onReset={reset} fallbackRender={({ error,
-            resetErrorBoundary }) => <ErrorFallback error={error}
-                resetErrorBoundary={resetErrorBoundary} />} >
-            <Suspense fallback={<SkeletonCardFaturamento />} >
-                <CardListFaturamento />
-            </Suspense>
-        </ErrorBoundary>
-    )
+  return (
+    <ErrorBoundary onReset={reset} fallbackRender={({ error,
+      resetErrorBoundary }) => <ErrorFallback error={error}
+        resetErrorBoundary={resetErrorBoundary} />} >
+      <Suspense fallback={<SkeletonCardFaturamento />} >
+        <CardListFaturamento />
+      </Suspense>
+    </ErrorBoundary>
+  )
 }
