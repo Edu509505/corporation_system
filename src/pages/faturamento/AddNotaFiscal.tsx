@@ -151,6 +151,7 @@ function AdicionarNotaFiscal() {
     valor: z.string().min(1, "Deina um valor"),
     vencimento: z.date("Defina a data para o vencimento"),
     tipo: z.string().min(1, "Selecione o tipo"),
+    numeroDaNota: z.string().min(1, "Precisa conter um número"),
     anexo: z
       .instanceof(File)
       .refine((file) => !!file, "Você deve selecionar ao menos um arquivo")
@@ -174,6 +175,7 @@ function AdicionarNotaFiscal() {
       idProposta: "",
       tipo: "",
       valor: "",
+      numeroDaNota: ""
     },
   });
 
@@ -190,9 +192,10 @@ function AdicionarNotaFiscal() {
       form.set("idCliente", data.idCliente);
       form.set("idProposta", data.idProposta);
       form.set("idMedicao", data.idMedicao);
-      form.set("valor", data.valor);
+      form.set("valor", data.valor.replace(',', '.'));
       form.set("vencimento", data.vencimento.toString());
       form.set("tipo", data.tipo);
+      form.set("numeroDaNota", data.numeroDaNota)
       form.append("anexo", data.anexo);
 
       for (let [key, value] of form.entries()) {
@@ -219,7 +222,7 @@ function AdicionarNotaFiscal() {
       setResponseOk(true);
       setResponseNotOk(false);
       console.log("Cliente criado com sucesso:", body);
-    } catch {}
+    } catch { }
   };
   return (
     <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
@@ -251,15 +254,17 @@ function AdicionarNotaFiscal() {
                   <FormItem>
                     <FormLabel>Cliente</FormLabel>
                     <Select
+
                       onValueChange={(value) => {
                         setIdCliente(value.toString());
                         field.onChange(value);
                         propostasAprovadas;
                       }}
                       defaultValue={field.value}
+
                     >
                       <FormControl>
-                        <SelectTrigger className="w-[300px]">
+                        <SelectTrigger className="w-[300px] bg-white">
                           <SelectValue placeholder="Selecionar cliente" />
                         </SelectTrigger>
                       </FormControl>
@@ -288,6 +293,7 @@ function AdicionarNotaFiscal() {
                   <FormItem>
                     <FormLabel>Proposta</FormLabel>
                     <Select
+
                       onValueChange={(value) => {
                         field.onChange(value);
                         setIdProposta(value.toString());
@@ -297,12 +303,12 @@ function AdicionarNotaFiscal() {
                       disabled={false}
                     >
                       <FormControl>
-                        <SelectTrigger className="w-[300px]">
+                        <SelectTrigger className="w-[300px] bg-white">
                           <SelectValue placeholder="Selecionar Proposta" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="w-[300px]">
-                        <SelectGroup>
+                        <SelectGroup >
                           <SelectLabel>Proposta</SelectLabel>
                           {propostasAprovadas?.map((proposta) => (
                             <SelectItem
@@ -331,7 +337,7 @@ function AdicionarNotaFiscal() {
                       disabled={false}
                     >
                       <FormControl>
-                        <SelectTrigger className="w-[300px]">
+                        <SelectTrigger className="w-[300px] bg-white">
                           <SelectValue placeholder="Selecionar Medição" />
                         </SelectTrigger>
                       </FormControl>
@@ -353,6 +359,26 @@ function AdicionarNotaFiscal() {
                       </SelectContent>
                       <FormMessage />
                     </Select>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="numeroDaNota"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número Da Nota</FormLabel>
+                    <FormControl>
+                      <Input
+                        className="bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        type="number"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        // onInputCapture={(value) => value.replace(/[^0-9]/g, '')}
+                        placeholder="R$ - "
+                        {...field} />
+                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -406,7 +432,7 @@ function AdicionarNotaFiscal() {
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className="w-[300px]">
+                        <SelectTrigger className="w-[300px] bg-white">
                           <SelectValue placeholder="Selecionar tipo" />
                         </SelectTrigger>
                       </FormControl>
@@ -427,9 +453,16 @@ function AdicionarNotaFiscal() {
                 name="valor"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Unidade</FormLabel>
+                    <FormLabel>Valor</FormLabel>
                     <FormControl>
-                      <Input placeholder="R$ - " {...field} />
+                      <Input
+                        className="bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        type="number"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        // onInputCapture={(value) => value.replace(/[^0-9]/g, '')}
+                        placeholder="R$ - "
+                        {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -443,7 +476,7 @@ function AdicionarNotaFiscal() {
                 <FormItem>
                   <FormLabel>Escolha um arquivo</FormLabel>
                   <FormControl>
-                    <Empty className="border border-dashed">
+                    <Empty className="border border-dashed bg-white">
                       <EmptyHeader>
                         <EmptyMedia variant="icon">
                           <Paperclip />

@@ -6,10 +6,12 @@ import {
 } from "@tanstack/react-query";
 import { Suspense } from "react";
 import {
+  AlertCircleIcon,
   CircleArrowDown,
   CircleArrowLeftIcon,
   CircleCheck,
   CircleX,
+  Timer,
 } from "lucide-react";
 import { Link, useParams } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,11 +20,13 @@ import { format } from "date-fns/format";
 import { Label } from "@/components/ui/label";
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
+import { Badge } from "@/components/ui/badge";
 
 const url = import.meta.env.VITE_API_URL;
 
 interface Faturamento {
   id: number;
+  numeroDaNota: string;
   idCliente: number;
   idFaturamento: number;
   idMedicao: number;
@@ -126,6 +130,18 @@ function VisualizarNotaFiscal() {
     
   })
 
+  function situacao (){
+    if (faturamento.pagamento === null) {
+        if (new Date() > new Date(faturamento.vencimento as string)) {
+        return <Badge className="text-orange-600 bg-orange-100 border border-orange-500"> <AlertCircleIcon /> Em Atraso </Badge>
+        }
+        return <Badge className="text-blue-600 bg-blue-100 border border-blue-500"><Timer /> Em aberto</Badge>
+      } else if (faturamento.pagamento === "PAGA") {
+        return <Badge className="text-green-600 bg-green-100 border border-green-500"> <CircleCheck /> Paga </Badge>
+      } else if (faturamento.pagamento === "CANCELADA") {
+        return <Badge className="text-red-600 bg-red-100 border border-red-500"> <CircleX /> Cancelada </Badge>
+      } 
+  }
   
   return (
     <div className="flex flex-col h-auto gap-3 bg-gray-50 p-4">
@@ -156,7 +172,7 @@ function VisualizarNotaFiscal() {
           <div className="flex flex-col gap-2">
             <Label>Número Da Nota</Label>
             <div className="rounded-[0.5rem] border-1 border-gray-300 bg-white pl-2 pr-10 pt-1 pb-1 flex justify-start">
-              <h1>68</h1>
+              <h1>N°{faturamento.numeroDaNota}</h1>
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -179,9 +195,9 @@ function VisualizarNotaFiscal() {
           </div>
           <div className="flex flex-col gap-2">
             <Label>Situação</Label>
-            <div className="rounded-[0.5rem] border-1 border-gray-300 bg-white pl-2 pr-10 pt-1 pb-1 flex justify-start">
-              <h1>{faturamento.pagamento === null ? "Em Aberto" : new Date(faturamento.createdAt) > new Date() ? "Atrasada" : faturamento.pagamento === "PAGO" ? "Pago" : ""}</h1>
-            </div>
+            <div className=" pl-2 pr-10 pt-1 pb-1 flex justify-start items-center">
+              {situacao()}
+              </div>
           </div>
         </div>
 

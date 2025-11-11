@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Link } from "react-router-dom";
+import { Badge } from "../ui/badge";
+import { AlertCircleIcon, CircleCheck, CircleX, Timer, TimerIcon } from "lucide-react";
+import { format } from "date-fns";
 
 export interface Faturamento {
   id: number;
@@ -13,7 +16,7 @@ export interface Faturamento {
   valor: number;
   vencimento: String;
   pagamento: null;
-  createdAt: String;
+  createdAt: string;
   clienteFaturamento: {
     cnpj: String;
     createdAt: String;
@@ -55,6 +58,11 @@ export const columns: ColumnDef<Faturamento>[] = [
   //   header: "Número",
   // },
   {
+    id: "numeroDaNota",
+    accessorKey: "numeroDaNota",
+    header: "Número",
+  },
+  {
     id: "clienteFaturamento.name",
     accessorKey: "clienteFaturamento.name",
     header: "Empresa",
@@ -74,19 +82,43 @@ export const columns: ColumnDef<Faturamento>[] = [
     },
   },
   {
+    id: "createdAt",
+    accessorKey: "createdAt",
+    header: () => <>Emissão</>,
+    cell: ({ row }) => {
+      const tipo = row.getValue("createdAt");
+      return format(new Date(tipo as string), "dd/MM/yyyy")
+    },
+  },
+  {
+    id: "vencimento",
+    accessorKey: "vencimento",
+    header: () => <>Vencimento</>,
+    cell: ({ row }) => {
+      const tipo = row.getValue("vencimento");
+      return format(new Date(tipo as string), "dd/MM/yyyy")
+    },
+  },
+  {
     id: "pagamento",
     accessorKey: "pagamento",
-    header: () => <>Pagamento</>,
+    header: () => <>Situação</>,
     cell: ({ row }) => {
       const pagamento = row.getValue("pagamento");
-      let status = "";
+      const data = row.original.vencimento
 
+      console.log("CREATEDAT", data)
       if (pagamento === null) {
-        status = "Em Aberto";
-      } else if (pagamento === "pago") {
-        status = "Pago";
-      }
-      return status;
+        if (new Date() > new Date(data as string)) {
+        return <Badge className="text-orange-600 bg-orange-100 border border-orange-500"> <AlertCircleIcon /> Em Atraso </Badge>
+        }
+        return <Badge className="text-blue-600 bg-blue-100 border border-blue-500"><Timer /> Em aberto</Badge>
+      } else if (pagamento === "PAGA") {
+        return <Badge className="text-green-600 bg-green-100 border border-green-500"> <CircleCheck /> Paga </Badge>
+      } else if (pagamento === "CANCELADA") {
+        return <Badge className="text-red-600 bg-red-100 border border-red-500"> <CircleX /> Cancelada </Badge>
+      } 
+    
     },
   },
   {

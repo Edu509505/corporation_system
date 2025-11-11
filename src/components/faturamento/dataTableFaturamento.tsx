@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { useQuery } from "@tanstack/react-query";
+import { Input } from "../ui/input";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -108,8 +109,20 @@ export function DataTableFaturamento<TData, TValue>({
           <Filter />
           <h1 className="font-bold">Filtros</h1>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <div className="flex flex-col gap-3 py-4">
+        <div className="flex flex-wrap gap-3 py-3">
+          <div className="flex flex-col gap-3">
+            <Label>Número da Nota</Label>
+            <Input
+            placeholder="Número da Nota"
+              type="number"
+              value={(table.getColumn("numeroDaNota")?.getFilterValue() as string) ?? ""}
+              onChange={(event) =>
+                table.getColumn("numeroDaNota")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
+          <div className="flex flex-col gap-3">
             <Label>Empresa</Label>
 
             <Select
@@ -140,7 +153,7 @@ export function DataTableFaturamento<TData, TValue>({
               </SelectContent>
             </Select>
           </div>
-          <div className="flex flex-col gap-3 py-4">
+          <div className="flex flex-col gap-3">
             <Label>Obra</Label>
 
             <Select
@@ -174,7 +187,7 @@ export function DataTableFaturamento<TData, TValue>({
               </SelectContent>
             </Select>
           </div>
-          <div className="flex flex-col gap-3 py-4">
+          <div className="flex flex-col gap-3">
             <Label>Tipo</Label>
             <Select
               onValueChange={(event) =>
@@ -213,9 +226,9 @@ export function DataTableFaturamento<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}
