@@ -7,7 +7,6 @@ import {
   CirclePlus,
   CircleX,
   Eye,
-  FileImage,
   Paperclip,
   Trash2,
 } from "lucide-react";
