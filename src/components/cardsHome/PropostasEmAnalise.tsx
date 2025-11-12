@@ -5,7 +5,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Suspense } from "react";
 
 type PropostasEmAnaliseProps = {
-    statusProposta: string;
+    statusProposta: number;
 };
 
 function CardPropostasEmAnaliseList() {
@@ -16,7 +16,6 @@ function CardPropostasEmAnaliseList() {
       method: "GET",
       credentials: "include"
     });
-    if (!response.ok) throw new Error("erro ao encontrar propostas em analise");
 
     const data = await response.json();
     return data as PropostasEmAnaliseProps[];
