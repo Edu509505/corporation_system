@@ -206,59 +206,63 @@ function VisualizarNotaFiscal() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <Label>Ações</Label>
-          <h1 className="text-[0.9rem]"> Qualquer ação feita aqui não poderá ser desfeita </h1>
-          <div className="flex gap-3">
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button className="cursor-pointer" disabled={faturamento.pagamento === "PAGA" ? true : faturamento.pagamento === "CANCELADA" ? true : undefined}> <CircleCheck /> Paga</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Marcar a nota como Paga?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Essa ação não poderá ser desfeita
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="cursor-pointer" >voltar</AlertDialogCancel>
-                  <AlertDialogAction
-                    className="cursor-pointer"
-                    onClick={
-                      async () => {
-                        await updateStatusFaturamento({ pagamento: "PAGA" }),
-                          refetchFaturamento()
-                      }
-                    }>Continuar</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+        {faturamento.pagamento === "PAGA" ? <></>
+          : faturamento.pagamento === "CANCELADA" ? <></>
+            :
+            <div className="flex flex-col gap-3">
+              <Label>Ações</Label>
+              <h1 className="text-[0.9rem]"> Qualquer ação feita aqui não poderá ser desfeita </h1>
+              <div className="flex gap-3">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button className="cursor-pointer"> <CircleCheck /> Paga</Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Marcar a nota como Paga?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Essa ação não poderá ser desfeita
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="cursor-pointer" >voltar</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="cursor-pointer"
+                        onClick={
+                          async () => {
+                            await updateStatusFaturamento({ pagamento: "PAGA" }),
+                              refetchFaturamento()
+                          }
+                        }>Continuar</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
 
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button className="cursor-pointer" variant="destructive" disabled={faturamento.pagamento === "PAGA" ? true : faturamento.pagamento === "CANCELADA" ? true : undefined} > <CircleX /> Cancelada</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Marcar a nota como Cancelada?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Essa ação não poderá ser desfeita
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="cursor-pointer" >voltar</AlertDialogCancel>
-                  <AlertDialogAction className="cursor-pointer" onClick={
-                    async () => {
-                      await updateStatusFaturamento({ pagamento: "CANCELADA" }),
-                        refetchFaturamento()
-                    }
-                  }>Continuar</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        </div>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button className="cursor-pointer" variant="destructive"> <CircleX /> Cancelada</Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Marcar a nota como Cancelada?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Essa ação não poderá ser desfeita
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="cursor-pointer" >voltar</AlertDialogCancel>
+                      <AlertDialogAction className="cursor-pointer" onClick={
+                        async () => {
+                          await updateStatusFaturamento({ pagamento: "CANCELADA" }),
+                            refetchFaturamento()
+                        }
+                      }>Continuar</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+        }
 
         <div className="flex flex-col gap-3">
           <Label>Arquivo</Label>
@@ -275,7 +279,7 @@ function VisualizarNotaFiscal() {
 
               </>
                 :
-                <div className="h-[720px]">
+                <div className="h-[500px]">
                   <PdfView url={anexoFaturamento.url} />
                 </div>
             }

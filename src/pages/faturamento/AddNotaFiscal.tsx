@@ -227,7 +227,7 @@ function AdicionarNotaFiscal() {
   return (
     <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
       <header>
-        <Link to="/contratos">
+        <Link to="/notasFiscais">
           <Button>
             <CircleArrowLeftIcon /> Retornar
           </Button>
@@ -375,7 +375,7 @@ function AdicionarNotaFiscal() {
                         inputMode="numeric"
                         pattern="[0-9]*"
                         // onInputCapture={(value) => value.replace(/[^0-9]/g, '')}
-                        placeholder="R$ - "
+                        placeholder="N° - "
                         {...field} />
                     </FormControl>
                     <FormMessage />
@@ -524,7 +524,7 @@ function AdicionarNotaFiscal() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <Link to="/contratos">
+                  <Link to="/notasFiscais">
                     <AlertDialogAction>Continuar</AlertDialogAction>
                   </Link>
                 </AlertDialogFooter>

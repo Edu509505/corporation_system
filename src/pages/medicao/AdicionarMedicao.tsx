@@ -412,7 +412,7 @@ function AdicionarContrato() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <Link to="/contratos">
+                  <Link to="/medicao">
                     <AlertDialogAction>Continuar</AlertDialogAction>
                   </Link>
                 </AlertDialogFooter>
