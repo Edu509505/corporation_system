@@ -5,6 +5,7 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { Spinner } from "@/components/ui/spinner"
 import {
   CircleArrowLeftIcon,
   CircleCheck,
@@ -51,8 +52,9 @@ const criarClienteSchema = z.object({
     .nonempty("Campo Obrigatório"),
   cnpj: z
     .string()
+    .refine((val) => val.length >= 14 ? cnpj.format(val) : !cnpj.format(val) ? { error: "Cnpj invélido" }:"")
+    .refine((val) => cnpj.isValid(val), { error: "Cnpj Inválido" })
     .min(18, "Escreva um cnpj válido")
-    .refine((val) => cnpj.isValid(val), "Cnpj Inválido")
     .nonempty("Campo Obrigatório"),
   local: z
     .string()
@@ -60,7 +62,7 @@ const criarClienteSchema = z.object({
     .nonempty("Campo Obrigatório"),
   status: z.literal(["ATIVO", "INATIVO"], "Campo Obrigatório"),
   path: z.string(),
-});
+})
 
 export default function CriarCliente() {
   //type CriarClienteFromData = z.infer<typeof criarClienteSchema>;
@@ -69,17 +71,21 @@ export default function CriarCliente() {
     resolver: zodResolver(criarClienteSchema),
     defaultValues: {
       name: "",
-      cnpj: "",
+      cnpj: cnpj.format(""),
       local: "",
       status: "" as "ATIVO" | "INATIVO",
       path: "",
     },
   });
 
+  const [ isLoading, setIsLoading ] = useState<boolean>(false)
+  const [ alertDialog, setAlertDialog ] = useState<boolean>(false)
+
   const onSubmit = async (data: z.infer<typeof criarClienteSchema>) => {
     console.log(data);
 
     try {
+      setIsLoading(true)
       const response = await fetch(`${url}/clientes`, {
         method: "POST",
         credentials: "include",
@@ -99,11 +105,15 @@ export default function CriarCliente() {
       }
       console.log("estou aqui");
       const body = await response.json();
-      setResponseOk(true);
       console.log("Cliente criado com sucesso:", body);
+      setResponseOk(true);
+      setIsLoading(false);
+      setAlertDialog(true);
     } catch (error) {
       console.error("Falha ao criar cliente:", error);
       setResponseOk(false);
+      setIsLoading(false);
+      setAlertDialog(true)
     }
   };
 
@@ -205,7 +215,7 @@ export default function CriarCliente() {
             )}
           />
           <div className="flex gap-3">
-            <Link to={"/clientes"}>
+            <Link to="/clientes">
               <Button
                 type="button"
                 variant="destructive"
@@ -214,14 +224,16 @@ export default function CriarCliente() {
                 <CircleArrowLeftIcon /> Voltar
               </Button>
             </Link>
-            <AlertDialog>
+            <AlertDialog open={alertDialog} defaultOpen={alertDialog}>
               <AlertDialogTrigger asChild>
                 <Button
                   type="submit"
                   variant="default"
                   className="cursor-pointer"
+                  disabled={isLoading}
                 >
-                  <CircleCheck /> Cadastrar
+                  {isLoading? <><Spinner /> Cadastrar</> : <><CircleCheck /> Cadastrar</>}
+                  
                 </Button>
               </AlertDialogTrigger>
               {!responseOk ? (
@@ -235,8 +247,11 @@ export default function CriarCliente() {
                       Tente novamente mais tarde
                     </AlertDialogDescription>
                     <AlertDialogFooter>
-                      <AlertDialogCancel className="cursor-pointer">
-                        Continuar
+                      <AlertDialogCancel 
+                      className="cursor-pointer"
+                      onClick={() => setAlertDialog(false)}
+                      >
+                        Voltar
                       </AlertDialogCancel>
                     </AlertDialogFooter>
                   </AlertDialogHeader>

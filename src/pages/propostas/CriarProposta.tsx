@@ -1,206 +1,409 @@
-import { Button } from "@/components/ui/button";
+import z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Form } from "@/components/ui/form";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import {
+  useQueryErrorResetBoundary,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import {
   Select,
   SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
+  SelectItem,
+  SelectLabel,
+  SelectGroup,
 } from "@/components/ui/select";
-import type { Cliente } from "@/Tipagens";
-//import { formatToBRL } from "brazilian-values";
-import { CircleCheck, CirclePlusIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Suspense, useState } from "react";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import {
+  CircleArrowLeftIcon,
+  CircleCheckBigIcon,
+  CircleX,
+  Paperclip,
+} from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Link } from "react-router";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorBoundary } from "react-error-boundary";
+import { Spinner } from "@/components/ui/spinner";
 
 const url = import.meta.env.VITE_API_URL;
 
-interface formularioComImagem {
-  nomeDaProposta: string;
-  descricao: string;
-  valorProposta: string;
-  files: FileList | File[] | null;
+interface Cliente {
+  id: number;
+  name: string;
+  cnpj: string;
+  proposta: string;
 }
 
-export default function CriarProposta() {
-  const [clientes, setClientes] = useState<Cliente[]>([]);
-
-  useEffect(() => {
-    async function buscarClientes() {
-      const empresas = await fetch(`${url}/clientes`,{
+function AddProposta() {
+  const { data: clientes } = useSuspenseQuery({
+    queryKey: ["clientes", ""],
+    queryFn: async () => {
+      const response = await fetch(`${url}/clientes`, {
         method: "GET",
         credentials: "include"
+      });
+      if (!response.ok) throw new Error("Clientes não encontrados");
+      const data = await response.json();
+      return data as Cliente[];
+    },
+  });
+
+  const propostaSchema = z.object({
+    idCliente: z.string().min(1, "Selecione ao menos um cliente"),
+    nomeDaProposta: z.string().min(1, "Escreva o nome da Proposta"),
+    descricao: z.string().min(1, "Recomendado ter uma descrição"),
+    valorProposta: z.coerce.number(),
+    files: z
+      .instanceof(FileList)
+      .refine(
+        (files) => files?.length >= 1,
+        "Você deve selecionar ao menos um arquivo"
+      )
+      .refine(
+        (files) => files?.[0]?.size <= 15 * 1024 * 1024,
+        "Arquivo deve ter até 50MB"
+      )
+      .refine(
+        (files) =>
+          ["application/pdf"].includes(
+            files?.[0]?.type
+          ),
+        "Tipo de arquivo inválido"
+      ),
+  });
+
+  const form = useForm<z.infer<typeof propostaSchema>>({
+    resolver: zodResolver(propostaSchema) as any,
+    defaultValues: {
+      idCliente: "",
+      nomeDaProposta: "",
+      descricao: "",
+      valorProposta: 0,
+      files: undefined
+    },
+  });
+
+  const [responseOk, setResponseOk] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [alertDialog, setAlertDialog] = useState<boolean>(false)
+
+  const onSubmit = async (data: z.infer<typeof propostaSchema>) => {
+    try {
+      setIsLoading(true)
+
+      const form = new FormData();
+
+      form.set("idCliente", data.idCliente);
+      form.set("nomeDaProposta", data.nomeDaProposta);
+      form.set("descricao", data.descricao);
+      form.set("valorProposta", data.valorProposta.toString());
+
+      for (let i = 0; i < data.files.length; i++) {
+        form.append("files", data.files[i]);
       }
-      );
-      const body = await empresas.json();
-      setClientes(body);
-    }
-    buscarClientes();
-  }, []);
 
-  const [clienteSelecionado, setClienteSelecionado] = useState({
-    idCliente: "",
-  });
+      const response = await fetch(`${url}/proposta`, {
+        method: "POST",
+        credentials: "include",
+        body: form,
+      });
+      if (!response.ok) {
+        // Aqui você lida com o erro de forma clara
+        const errorText = await response.text();
+        throw new Error(`Erro ${response.status}: ${errorText}`);
+      }
+      // const body = await response.json();
+      setResponseOk(true);
+    } catch { } finally { setIsLoading(false), setAlertDialog(true) }
 
-  const [novaProposta, setNovaProposta] = useState<formularioComImagem>({
-    nomeDaProposta: "",
-    descricao: "",
-    valorProposta: "",
-    files: null,
-  });
-
-  console.log(novaProposta.valorProposta);
-
-  async function criarProposta(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (!novaProposta.files) return;
-    console.log(
-      "Quantidade de arquivos no frontend:",
-      novaProposta.files.length
-    );
-    console.log("Arquivos:", novaProposta.files);
-
-    const form = new FormData();
-
-    form.set("idCliente", clienteSelecionado.idCliente);
-    form.set("nomeDaProposta", novaProposta.nomeDaProposta);
-    form.set("descricao", novaProposta.descricao);
-    form.set("valorProposta", novaProposta.valorProposta);
-
-    // Este código itera sobre todos os arquivos selecionados no input
-    // e adiciona cada um individualmente ao FormData com a chave 'files'
-    for (let i = 0; i < novaProposta.files.length; i++) {
-      console.log("Adicionando arquivo:", novaProposta.files);
-      form.append("files", novaProposta.files[i]);
-    }
-
-    console.log("Parei aqui");
-    const response = await fetch(`${url}/proposta`, {
-      method: "POST",
-      credentials: "include",
-      body: form,
-    });
-
-    const body = await response.json();
-    console.log(body);
-  }
-
-  console.log("Cliente Selecionado: ", clienteSelecionado);
-  console.log("Nova Proposta: ", novaProposta);
-
-  const navigate = useNavigate();
-
+  };
   return (
-    <>
-      <div className="h-full p-5">
-        <form onSubmit={criarProposta} className="flex flex-col gap-3">
-          <div className="flex gap-3 items-center">
-            <CirclePlusIcon className="size-8" />
-            <h1 className="text-2xl font-bold">Criar nova Proposta</h1>
-          </div>
-
-          <Label>Selecione o Cliente</Label>
-          <Select
-            value={clienteSelecionado.idCliente}
-            onValueChange={(value) => {
-              setClienteSelecionado({
-                ...clienteSelecionado,
-                idCliente: value.toString(),
-              });
-            }}
+    <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
+      <header>
+        <Link to="/propostas">
+          <Button>
+            <CircleArrowLeftIcon /> Retornar
+          </Button>
+        </Link>
+        <h1 className="text-2xl font-bold">Adicionar Proposta</h1>
+        <p className="text-gray-600">
+          Preencha os detalhes da proposta abaixo.
+        </p>
+      </header>
+      <main className="">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col gap-4"
           >
-            <SelectTrigger className="w-[300px]">
-              <SelectValue placeholder="Selecionar cliente" />
-            </SelectTrigger>
-            <SelectContent className="w-[300px]">
-              <SelectGroup>
-                <SelectLabel>Cliente</SelectLabel>
-                {clientes.map((cliente) => (
-                  <SelectItem key={cliente.id} value={cliente.id.toString()}>
-                    {cliente.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+            <div className="flex gap-4 flex-wrap">
+              <FormField
+                control={form.control}
+                name="idCliente"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cliente</FormLabel>
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                      }}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-[300px]">
+                          <SelectValue placeholder="Selecionar cliente" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="w-[300px]">
+                        <SelectGroup>
+                          <SelectLabel>Clientes</SelectLabel>
+                          {clientes?.map((cliente) => (
+                            <SelectItem
+                              key={cliente.id}
+                              value={cliente.id.toString()}
+                            >
+                              {cliente.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                      <FormMessage />
+                    </Select>
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="nomeDaProposta"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome Da Proposta</FormLabel>
+                  <FormMessage />
+                  <FormControl>
+                    <Input placeholder="Nome Da Proposta" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Insira o nome da proposta
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="descricao"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descrição</FormLabel>
+                  <FormMessage />
+                  <FormControl>
+                    <Input placeholder="Descrição" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Insira a descrição.
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
 
-          <Label>Insira o nome da proposta</Label>
-          <Input
-            type="text"
-            name="nome da proposta"
-            placeholder="digite aqui"
-            value={novaProposta.nomeDaProposta}
-            onChange={(event) =>
-              setNovaProposta({
-                ...novaProposta,
-                nomeDaProposta: event.target.value,
-              })
-            }
-          />
+            <FormField
+              control={form.control}
+              name="valorProposta"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Valor Da Proposta</FormLabel>
+                  <FormMessage />
+                  <FormControl>
+                    <Input placeholder="R$ - " type="number" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Escreva um valor
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
 
-          <Label>Adicione uma descrição</Label>
-          <Input
-            type="text"
-            name="descrição"
-            placeholder="digite aqui"
-            value={novaProposta.descricao}
-            onChange={(event) =>
-              setNovaProposta({
-                ...novaProposta,
-                descricao: event.target.value,
-              })
-            }
-          />
+            <FormField
+              control={form.control}
+              name="files"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Escolha um arquivo</FormLabel>
+                  <FormControl>
+                    <Empty className="border border-dashed">
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon">
+                          <Paperclip />
+                        </EmptyMedia>
+                        <EmptyTitle>Selecione um Arquivo</EmptyTitle>
+                        <EmptyDescription>
+                          Escolha um aruivo de seu dispositivo para realizar o
+                          Upload
+                          <Input
+                            className="cursor-pointer"
+                            type="file"
+                            multiple
+                            accept=".pdf"
+                            onChange={(e) => field.onChange(e.target.files)}
+                          />
+                        </EmptyDescription>
+                      </EmptyHeader>
+                    </Empty>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <Label>Qual o valor da proposta?</Label>
-          <Input
-            type="text"
-            name="valor da proposta"
-            placeholder="R$ -"
-            value={novaProposta.valorProposta ?? ""}
-            onChange={(event) =>
-              setNovaProposta({
-                ...novaProposta,
-                valorProposta: event.target.value,
-              })
-            }
-          />
-
-          <Label>Adicionar Anexo</Label>
-          <Input
-            type="file"
-            multiple
-            onChange={(event) => {
-              const files = event.target.files;
-              if (!files) return;
-              const filesArray = Array.from(files);
-              setNovaProposta({
-                ...novaProposta,
-                files: filesArray,
-              });
-            }}
-          />
-          <div className="flex gap-3 ">
-            <Button
-              type="button"
-              variant="destructive"
-              className="cursor-pointer"
-              onClick={() => navigate(-1)}
+            <AlertDialog
+              open={alertDialog}
+              defaultOpen={alertDialog}
             >
-              Retornar
-            </Button>
+              <AlertDialogTrigger>
+                <Button
+                  type="submit"
+                  className="mt-4 cursor-pointer"
+                  variant="default"
+                  disabled={isLoading}
+                >
+                  {isLoading ? <><Spinner /> Criar Proposta</> : <>Criar Proposta</>}
 
-            <Button type="submit" variant="default" className="cursor-pointer">
-              <CircleCheck />
-              Criar
-            </Button>
-          </div>
-        </form>
-      </div>
-    </>
+                </Button>
+              </AlertDialogTrigger>
+              {responseOk ?
+              (
+
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-ring flex items-center gap-3">
+                      <CircleCheckBigIcon /> Contrato cadastrado com sucesso
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Seu contrato foi cadastrado e inserido no sistema
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <Link to="/propostas">
+                      <AlertDialogAction 
+                      className="cursor-pointer">Continuar</AlertDialogAction>
+                    </Link>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+
+              ):(
+
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-destructive flex items-center gap-3">
+                      <CircleX /> Erro ao cadastrar proposta
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      A ação de cadastrar o proposta foi mal-sucedida
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel
+                    className="cursor-pointer"
+                    onClick={() => setAlertDialog(false)}
+                    >Voltar</AlertDialogCancel>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              )}
+            </AlertDialog>
+          </form>
+        </Form>
+      </main>
+    </div>
   );
 }
+
+function AddPropostaIsLoading() {
+  return (
+    <div className="w-full flex flex-col flex-wrap gap-2 p-4 ">
+      <Skeleton className="h-9 w-25" />
+      <Skeleton className="h-9 w-80" />
+      <Skeleton className="h-5 w-115" />
+      <Skeleton className="h-5 w-full" />
+      <Skeleton className="h-5 w-full" />
+      <Skeleton className="h-5 w-75" />
+      <div className="flex gap-3 flex-wrap">
+        <div className="flex flex-col gap-3">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-12 w-90" />
+        </div>
+        <div className="flex flex-col gap-3">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-12 w-90" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-3">
+        <Skeleton className="h-5 w-25" />
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-5 w-50" />
+      </div>
+      <div className=" flex flex-wrap gap-3">
+        <Skeleton className="h-5 w-25" />
+        <Skeleton className="h-100 w-full" />
+      </div>
+      <div className="w-full flex justify-center items-center flex-wrap gap-3">
+        <Skeleton className="h-12 w-100" />
+      </div>
+    </div>
+  );
+}
+function ErrorFallback({
+  error,
+}: {
+  error: Error;
+  resetErrorBoundary: () => void;
+}) {
+  return <div className="p-5 text-destructive">Erro: {error.message}</div>;
+}
+
+function AdicionarProposta() {
+  const { reset } = useQueryErrorResetBoundary();
+  return (
+    <ErrorBoundary
+      onReset={reset}
+      fallbackRender={({ error, resetErrorBoundary }) => (
+        <ErrorFallback error={error} resetErrorBoundary={resetErrorBoundary} />
+      )}
+    >
+      <Suspense fallback={<AddPropostaIsLoading />}>
+        <AddProposta />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
+export default AdicionarProposta;

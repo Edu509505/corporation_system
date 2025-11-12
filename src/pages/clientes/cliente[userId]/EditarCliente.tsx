@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CircleArrowLeftIcon, CircleCheck, CircleX, Edit } from "lucide-react";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { cnpj } from "cpf-cnpj-validator";
 import {
@@ -28,7 +28,6 @@ import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  useMutation,
   useQueryErrorResetBoundary,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -42,9 +41,10 @@ import {
 } from "@/components/ui/form";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
+import { Spinner } from "@/components/ui/spinner";
 
 interface Cliente {
-  cliente: string;
+  name: string;
   cnpj: string;
   local: string;
   status: string;
@@ -54,7 +54,7 @@ interface Cliente {
 const url = import.meta.env.VITE_API_URL;
 
 const editarClienteSchema = z.object({
-  cliente: z
+  name: z
     .string()
     .min(3, "Escreva um nome válido")
     .nonempty("Campo Obrigatório"),
@@ -75,7 +75,10 @@ const editarClienteSchema = z.object({
 function UpdateCliente() {
   const { id } = useParams<{ id: string }>(); // Pega o ID da URL
 
-  const { data: cliente } = useSuspenseQuery({
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [alertDialog, setAlertDialog] = useState<boolean>(false)
+
+  const { data: cliente, refetch: clienteRefetch} = useSuspenseQuery({
     queryKey: ["cliente", id],
     queryFn: async () => {
       const response = await fetch(`${url}/cliente/${id}`, {
@@ -87,10 +90,15 @@ function UpdateCliente() {
       return data as Cliente;
     },
   });
+
+  console.log(cliente)
+
+  clienteRefetch()
+
   const formCliente = useForm<z.infer<typeof editarClienteSchema>>({
     resolver: zodResolver(editarClienteSchema),
     defaultValues: {
-      cliente: cliente?.cliente,
+      name: cliente?.name,
       cnpj: cliente?.cnpj,
       local: cliente?.local,
       status: "ATIVO" as "ATIVO" | "INATIVO",
@@ -98,71 +106,39 @@ function UpdateCliente() {
     },
   });
 
-  useEffect(() => {
-    console.log(cliente);
-    if (cliente) {
-      formCliente.reset({
-        cliente: cliente?.cliente,
-        cnpj: cliente?.cnpj,
-        local: cliente?.local,
-        status: cliente.status as "ATIVO",
-        path: cliente?.path,
-      });
-    }
-  }, [cliente, formCliente.reset]);
-
-  const { mutateAsync: updateUsuario } = useMutation({
-    mutationKey: ["editar-cliente", id],
-    mutationFn: async ({
-      id,
-      cliente,
-      cnpj,
-      local,
-      status,
-      path,
-    }: {
-      id: number;
-      cliente: string;
-      cnpj: string;
-      local: string;
-      status: string;
-      path: string;
-    }) => {
-      const response = await fetch(`${url}/cliente/${id}`, {
-        method: "PUT", // ou PATCH, dependendo da sua API
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          cliente,
-          cnpj,
-          local,
-          status,
-          path,
-        }),
-      });
-      console.log("parei aqui", response);
-      if (!response.ok) throw new Error("Erro ao atualizar cliente");
-      console.log("cheguei aqui");
-      setResponseOk(true);
-    },
-  });
-
   const onSubmit = async (data: z.infer<typeof editarClienteSchema>) => {
     console.log(data);
+    try {
+      setIsLoading(true)
+  
+          const response = await fetch(`${url}/cliente/${id}`, {
+            method: "PUT", // ou PATCH, dependendo da sua API
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          });
+          console.log("parei aqui", response);
+          if (!response.ok) {
+            setResponseOk(false);
+            throw new Error("Erro ao atualizar cliente");
+          }
+          setResponseOk(true);
+          setIsLoading(false);
+          setAlertDialog(true);
 
-    await updateUsuario({
-      id: Number(id),
-      cliente: data.cliente,
-      cnpj: data.cnpj,
-      local: data.local,
-      status: data.status,
-      path: data.path,
-    });
+          console.log("cheguei aqui");
+    } catch (error){
+      console.error("Falha ao criar cliente:", error);
+      setResponseOk(false);
+      setIsLoading(false);
+      setAlertDialog(true)
+    }finally{setIsLoading(false)}
   };
 
   const [responseOk, setResponseOk] = useState(false);
+
   return (
     <div className="w-full h-screen flex flex-col p-4 gap-3 bg-gray-50">
       <div className="flex gap-3 items-center">
@@ -176,7 +152,7 @@ function UpdateCliente() {
         >
           <FormField
             control={formCliente.control}
-            name="cliente"
+            name="name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Nome do Cliente</FormLabel>
@@ -266,14 +242,15 @@ function UpdateCliente() {
                 <CircleArrowLeftIcon /> Voltar
               </Button>
             </Link>
-            <AlertDialog>
+            <AlertDialog open={alertDialog} defaultOpen={alertDialog}>
               <AlertDialogTrigger asChild>
                 <Button
                   type="submit"
                   variant="default"
                   className="cursor-pointer"
+                  disabled={isLoading}
                 >
-                  <CircleCheck /> Cadastrar
+                  {isLoading? <><Spinner /> Cadastrar</> : <><CircleCheck /> Cadastrar</>}
                 </Button>
               </AlertDialogTrigger>
               {!responseOk ? (
@@ -287,7 +264,10 @@ function UpdateCliente() {
                       Tente novamente mais tarde
                     </AlertDialogDescription>
                     <AlertDialogFooter>
-                      <AlertDialogCancel className="cursor-pointer">
+                      <AlertDialogCancel 
+                      className="cursor-pointer"
+                      onClick={() => setAlertDialog(false)}
+                      >
                         Continuar
                       </AlertDialogCancel>
                     </AlertDialogFooter>

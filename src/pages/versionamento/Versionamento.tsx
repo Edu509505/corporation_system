@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import {
+  ChevronLeft,
+  ChevronRight,
   CircleArrowLeftIcon,
   CircleCheckBig,
   CirclePlus,
@@ -9,7 +11,7 @@ import {
   Paperclip,
   Trash2,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 
@@ -56,7 +58,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query";
 import StatusDeAprovacao from "@/components/componentsVersionamento/StatusDeAprovaao";
 import InfoClientes from "@/components/componentsVersionamento/informacoesCliente";
 import {
@@ -68,6 +70,10 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { formatToBRL, formatToNumber } from "brazilian-values";
+import { ErrorBoundary } from "react-error-boundary";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
+import PdfView from "@/components/pdfView";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -117,67 +123,72 @@ interface Quantitativa {
 interface formularioComImagem {
   files: FileList | File[] | null;
 }
-function Versionamento() {
+
+interface AnexoVersionamento {
+  url: string;
+  path: string;
+}
+
+function VersionamentoPage() {
   const { id } = useParams<{ id: string }>();
 
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [idVersao, setidVersao] = useState<number | null>(null);
   const [idVersionamento, setIdVersionamento] = useState<number | null>(null);
+  const [isLoadingRefetch, setIsLoadingRefetch] = useState(false);
 
-  const [anexoVersionamento, setAnexoVersionamento] = useState<
-    { url: string }[]
-  >([]);
+  //Carroucel
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prev) =>
+      prev === fetchAnexoVersionamento.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? fetchAnexoVersionamento.length - 1 : prev - 1
+    );
+  };
 
   //ATUALIZA O STATUS DO VERSINAMENTO E JOGA PARA O BANCO
 
-  const [atualizarStatusVersionamento] =
-    useState<string | null>(null);
-  useEffect(() => {
-    async function atualizarVersionamento() {
-      const response = await fetch(`${url}/versionamento/${idVersao}`, {
-        method: "PUT", // ou PATCH, dependendo da sua API
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          status: atualizarStatusVersionamento,
-        }),
-      });
-      if (!response.ok) throw new Error("Versionamento não encontrado");
-    }
-    if (atualizarStatusVersionamento) {
-      atualizarVersionamento();
-    }
-  }, [atualizarStatusVersionamento]);
+  const { data: fetchAnexoVersionamento = [], refetch: refetchAnexoVersionamentos } = useQuery({
+    queryKey: ["fetchAnexoVersionamento", idVersao],
+    queryFn: async () => {
+      if (!idVersao) return [] // Retorna array vazio se idVersao for null
 
-  useEffect(() => {
-    async function fetchAnexoVersionamento() {
-      const response = await fetch(
-        `${url}/versionamento/${idVersao}/anexos/urls`, {
-          method: "GET",
-          credentials: "include"
-        }
-      );
-      console.log(response);
-      if (!response.ok) throw new Error("Versionamento Não encontrado");
-      const data = await response.json();
+      const response = await fetch(`${url}/versionamento/${idVersao}/anexos/urls`, {
+        method: "GET",
+        credentials: "include"
+      })
+      if (!response.ok) throw new Error("Não foi possível encontrar o anexo do Versionamento")
+      const data = await response.json()
 
-      const anexos = data.url.map((link: string) => ({ url: link }));
+      console.log("Resposta da API de anexos:", data) // Adiciona log para debug
 
-      setAnexoVersionamento(anexos);
-      console.log("data", anexos);
-    }
-    console.log(idVersao);
-    if (idVersao) {
-      fetchAnexoVersionamento();
-    }
-  }, [idVersao]);
+      // A API retorna { url: [...urls] }, então pegamos o array de urls
+      const urlArray = data.url || data.urls || data.anexos || []
+
+      // Transformamos em array de objetos com a estrutura esperada
+      const anexos = Array.isArray(urlArray)
+        ? urlArray.map((urlString: string) => ({ url: urlString }))
+        : []
+
+      console.log("Anexos processados:", anexos) // Log adicional
+
+      return anexos as AnexoVersionamento[]
+    },
+    enabled: !!idVersao // Só executa a query se idVersao existir
+  })
+
+  console.log("ANEXO VERSIONAMENTO", fetchAnexoVersionamento)
 
   const {
-    //isPending: propostaLoading,
-    //error: propostaError,
     data: proposta,
-  } = useQuery({
+    refetch: refetchProposta
+  } = useSuspenseQuery({
     queryKey: ["proposta", id],
     queryFn: async () => {
       const response = await fetch(`${url}/proposta/${id}`, {
@@ -190,11 +201,10 @@ function Versionamento() {
     },
   });
 
-  const [, setTest] = useState<Versionamento | null>(null);
   const {
     data: versionamentos,
     refetch: refetchVersionamentos,
-  } = useQuery({
+  } = useSuspenseQuery({
     queryKey: ["versionamento", id],
     queryFn: async () => {
       const response = await fetch(`${url}/proposta/${id}/versionamentos`, {
@@ -203,19 +213,18 @@ function Versionamento() {
       });
       if (!response.ok) throw new Error("Versionamento Não encontrado");
       const data = await response.json();
-      setTest(data);
       return data as Versionamento[];
     },
   });
 
-   const { data: versionamentoAprovado } = useQuery({
+  const { data: versionamentoAprovado, refetch: refetchVersionamentoAprovado } = useSuspenseQuery({
     queryKey: ["versionamento", proposta?.id],
     queryFn: async () => {
       const response = await fetch(
         `${url}/proposta/${proposta?.id.toString()}/verAprovado`, {
-          method: "GET",
-          credentials: "include"
-        }
+        method: "GET",
+        credentials: "include"
+      }
       );
       if (!response.ok) throw new Error("Versionamento não encontrada");
       const data = await response.json();
@@ -226,7 +235,7 @@ function Versionamento() {
   console.log("Versionamento Aprovado ", versionamentoAprovado?.map((ver) => ver.id))
 
 
-  const { data: quantitativa } = useQuery({
+  const { data: quantitativa, refetch: refetchQuantitativa } = useQuery({
     queryKey: ["quantitativa", versionamentoAprovado?.map((ver) => ver.id)],
     queryFn: async () => {
       const response = await fetch(`${url}/quantitativa/${versionamentoAprovado?.map((ver) => ver.id.toString())}`, {
@@ -239,11 +248,20 @@ function Versionamento() {
     }
   })
 
+  async function refetchAll() {
+    await refetchQuantitativa()
+    await refetchVersionamentoAprovado()
+    await refetchVersionamentos()
+    await refetchProposta()
+    await refetchAnexoVersionamentos()
+    return
+  }
+
   console.log("Quantitativa", quantitativa);
 
   const { mutateAsync: updateVersionamento } = useMutation({
     mutationKey: ["updateVersionamento"],
-    mutationFn: async ({ id, status }: { id: number;  status: string }) => {
+    mutationFn: async ({ id, status }: { id: number; status: string }) => {
       const response = await fetch(`${url}/versionamento/${id}`, {
         method: "PUT", // ou PATCH, dependendo da sua API
         credentials: "include",
@@ -257,22 +275,6 @@ function Versionamento() {
       if (!response.ok) throw new Error("Versionamento não encontrado");
     },
   });
-
-  // const { mutateAsync: updateProposta } = useMutation({
-  //   mutationKey: ["updateProposta"],
-  //   mutationFn: async ({ id, status }: { id: string; status: string }) => {
-  //     const response = await fetch(`${url}/proposta/${id}`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         status: status,
-  //       }),
-  //     });
-  //     if (!response.ok) throw new Error("Proposta não encontrada");
-  //   },
-  // });
 
   const [novoVersionamento, setNovoVersionamento] =
     useState<formularioComImagem>({
@@ -310,6 +312,7 @@ function Versionamento() {
   }
 
   const [openDialog, setOpenDialog] = useState(false);
+  const [open, setOpen] = useState(false);
 
   //FORM DA QUATITATIVA
 
@@ -352,6 +355,8 @@ function Versionamento() {
     console.log(data);
 
     try {
+      setIsLoadingRefetch(true);
+
       await updateVersionamento({
         id: idVersionamento!,
         status: "APROVADA",
@@ -367,12 +372,18 @@ function Versionamento() {
         },
         body: JSON.stringify(data),
       });
-      refetchVersionamentos();
-    } catch { }
+
+      await refetchAll();
+      setOpen(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoadingRefetch(false);
+    }
   };
 
   return (
-    <div className="h-full flex flex-col p-3 gap-4">
+    <div className="h-screen bg-gray-50 flex flex-col p-3 gap-4">
       <Link to="/propostas">
         <Button variant="ghost" className="cursor-pointer">
           <CircleArrowLeftIcon />
@@ -387,8 +398,8 @@ function Versionamento() {
           cnpjCliente={proposta.cliente.cnpj}
         />
       )}
-      <div className="h-max-[800px] border-1 border-gray-400 rounded-2xl space-x-2 py-4">
-        <Table className="h-[100%] space-x-2 py-4">
+      <div className="h-max-[800px] rounded-2xl space-x-2 py-4">
+        <Table className="h-[100%] space-x-2 py-4 bg-white">
           <TableHeader>
             <TableRow>
               <TableHead>Versão</TableHead>
@@ -425,32 +436,67 @@ function Versionamento() {
                     >
                       <Eye />
                     </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
+                    <DialogContent className="sm:max-w-[70%] h-[90%] overflow-auto">
+                      <DialogHeader className="p-0 m-0">
                         <DialogTitle>Visualização da proposta</DialogTitle>
                       </DialogHeader>
                       <DialogDescription className="flex flex-col gap-4 text-black">
-                        Situação da proposta
-                        <StatusDeAprovacao status={itemVersionamento.status} />
-                        <DialogDescription className="font-bold text-2xl flex items-center justify-start gap-3">
-                          Itens anexados <Paperclip />
-                        </DialogDescription>
+                          Situação da proposta
+                          <StatusDeAprovacao status={itemVersionamento.status} />
+                        {/* <DialogDescription className=" flex flex-col w-full items-center justify-start gap-3">
+                        </DialogDescription> */}
                         <div className="flex gap-3 flex-wrap">
-                          {anexoVersionamento.length > 0 ? (
-                            anexoVersionamento.map((anexo, idx) => (
-                              <a
-                                key={idx}
-                                href={anexo.url}
-                                className="bg-green-200 rounded-2xl p-2 transition-all hover:scale-110"
-                              >
-                                <h1 className="flex font-bold">
-                                  {idx + 1} - <FileImage />
-                                </h1>
-                              </a>
-                            ))
-                          ) : (
-                            <span>Nenhum anexo encontrado.</span>
-                          )}
+                          {(() => {
+                            const pdfAnexos = (fetchAnexoVersionamento || []).filter((anexo) => {
+                              const extFromPath = anexo?.path?.split(".").pop()?.toLowerCase();
+                              const extFromUrl = anexo?.url?.split(".").pop()?.split("?")[0]?.toLowerCase();
+                              return extFromPath === "pdf" || extFromUrl === "pdf";
+                            });
+
+                            if (pdfAnexos.length === 0) {
+                              return <span>Nenhum anexo PDF encontrado.</span>;
+                            }
+
+                            return (
+                              <div className="w-full flex flex-col gap-4">
+                                <div className="flex items-center justify-between bg-gray-100 rounded-2xl p-2">
+                                  <button
+                                    onClick={handlePrevImage}
+                                    className="p-2 rounded hover:bg-gray-200"
+                                  >
+                                    <ChevronLeft className="w-6 h-6" />
+                                  </button>
+
+                                  <div className="flex flex-col items-center gap-3 flex-1 mx-4">
+                                    <div className="w-full h-auto bg-white rounded overflow-hidden shadow-sm">
+                                      <PdfView url={pdfAnexos[currentImageIndex]?.url} />
+                                    </div>
+
+                                    <span className="text-sm font-semibold text-gray-600">
+                                      {currentImageIndex + 1} de {pdfAnexos.length}
+                                    </span>
+                                  </div>
+
+                                  <button
+                                    onClick={handleNextImage}
+                                    className="p-2 rounded hover:bg-gray-200"
+                                  >
+                                    <ChevronRight className="w-6 h-6" />
+                                  </button>
+                                </div>
+
+                                <div className="flex gap-2 justify-center mt-2">
+                                  {pdfAnexos.map((_, idx) => (
+                                    <button
+                                      key={idx}
+                                      onClick={() => setCurrentImageIndex(idx)}
+                                      className={`h-2 rounded-full transition-all ${idx === currentImageIndex ? "w-6 bg-blue-500" : "w-2 bg-gray-300"}`}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
                         {itemVersionamento.status == "EM_ANALISE" ? (
                           <>
@@ -490,6 +536,7 @@ function Versionamento() {
                                         });
                                         setOpenDialog(false);
                                         refetchVersionamentos();
+                                        refetchAll();
                                       }}
                                     >
                                       Continue
@@ -531,13 +578,15 @@ function Versionamento() {
                                   </AlertDialogCancel>
 
                                   {/* A baixo está o Dialog para adicionar as quantitativas */}
-                                  <Dialog>
+                                  <Dialog open={open} onOpenChange={setOpen}>
                                     <DialogTrigger asChild>
                                       <Button className="cursor-pointer">
                                         Aprovar
                                       </Button>
                                     </DialogTrigger>
-                                    <DialogContent className="sm:max-w-[70%] [&>button]:hidden flex flex-col gap-3">
+                                    <DialogContent className="sm:max-w-[70%] [&>button]:hidden flex flex-col gap-3"
+
+                                    >
                                       <DialogHeader>
                                         <DialogTitle>
                                           Adicionar quantitativa
@@ -676,8 +725,9 @@ function Versionamento() {
                                             <Button
                                               className="cursor-pointer"
                                               type="submit"
+                                              disabled={isLoadingRefetch}
                                             >
-                                              Definir Quantitativa
+                                              {isLoadingRefetch ? <><Spinner className="size-3" />Carregando... </> : "Definir Quantitativa"}
                                             </Button>
                                           </DialogFooter>
                                         </form>
@@ -693,10 +743,6 @@ function Versionamento() {
                           <>
                             <strong>PROPOSTA RECUSADA</strong>
                           </>
-                        ) : itemVersionamento.status === "APROVADA" ? (
-                          <>
-                            <strong>PROPOSTA APROVADA</strong>
-                          </>
                         ) : (
                           ""
                         )}
@@ -707,7 +753,7 @@ function Versionamento() {
               </TableRow>
             ))}
           </TableBody>
-          <TableFooter>
+          <TableFooter className="bg-gray-200">
             <TableRow>
               <TableCell colSpan={5}>
                 <div className="flex items-center justify-between">
@@ -723,7 +769,7 @@ function Versionamento() {
                           )}
                         >
                           <CirclePlus />
-                          Criar Nova Proposta
+                          Criar Novo Versionamento
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
@@ -767,8 +813,9 @@ function Versionamento() {
                                       variant="outline"
                                       type="submit"
                                       className="cursor-pointer"
+                                      onClick={() => refetchAll()}
                                     >
-                                      Enviar
+                                      Criar
                                     </Button>
                                   </DialogClose>
                                 </EmptyContent>
@@ -790,33 +837,95 @@ function Versionamento() {
           <span></span>
         ) : (
           <>
-          <h1 className="font-bold">Quantitativa</h1>
-          <Table className="rounded-2xl">
-            <TableHeader className="bg-gray-300">
-              <TableRow>
-                <TableHead>item:</TableHead>
-                <TableHead>Quantidade:</TableHead>
-                <TableHead>Unidade de Medida:</TableHead>
-                <TableHead>Valor Unitário:</TableHead> 
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-          {quantitativa.map((item) => (
-            <TableRow>
-            <TableCell > {item.descricao}</TableCell>
-            <TableCell > {formatToNumber(item.quantidade)}</TableCell>
-            <TableCell > {item.unidadeDeMedida}</TableCell>
-            <TableCell >{formatToBRL(item.valorUnitario)}</TableCell>
-            </TableRow>
-          ))
-          }
-            </TableBody>
-          </Table>
+            <h1 className="font-bold">Quantitativa</h1>
+            <Table className="rounded-2xl">
+              <TableHeader className="bg-gray-300">
+                <TableRow>
+                  <TableHead>item:</TableHead>
+                  <TableHead>Quantidade:</TableHead>
+                  <TableHead>Unidade de Medida:</TableHead>
+                  <TableHead>Valor Unitário:</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {quantitativa.map((item) => (
+                  <TableRow>
+                    <TableCell > {item.descricao}</TableCell>
+                    <TableCell > {formatToNumber(item.quantidade)}</TableCell>
+                    <TableCell > {item.unidadeDeMedida}</TableCell>
+                    <TableCell >{formatToBRL(item.valorUnitario)}</TableCell>
+                  </TableRow>
+                ))
+                }
+              </TableBody>
+            </Table>
           </>
         )}
-        </div>
+      </div>
     </div>
   );
 }
 
+function VersionamentoIsLoading() {
+  return (
+    <div className="w-full flex flex-col flex-wrap gap-2 p-4 ">
+      <Skeleton className="h-9 w-25" />
+      <Skeleton className="h-9 w-80" />
+      <Skeleton className="h-5 w-115" />
+      <Skeleton className="h-5 w-full" />
+      <Skeleton className="h-5 w-full" />
+      <Skeleton className="h-5 w-75" />
+      <div className="flex gap-3 flex-wrap">
+        <div className="flex flex-col gap-3">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-12 w-90" />
+        </div>
+        <div className="flex flex-col gap-3">
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-12 w-90" />
+        </div>
+      </div>
+      <div className="flex flex-col gap-3">
+        <Skeleton className="h-5 w-25" />
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-5 w-50" />
+      </div>
+      <div className=" flex flex-wrap gap-3">
+        <Skeleton className="h-5 w-25" />
+        <Skeleton className="h-100 w-full" />
+      </div>
+      <div className="w-full flex justify-center items-center flex-wrap gap-3">
+        <Skeleton className="h-12 w-100" />
+      </div>
+    </div>
+  );
+}
+function ErrorFallback({
+  error,
+}: {
+  error: Error;
+  resetErrorBoundary: () => void;
+}) {
+  return <div className="p-5 text-destructive">Erro: {error.message}</div>;
+}
+
+function Versionamento() {
+  const { reset } = useQueryErrorResetBoundary();
+  return (
+    <ErrorBoundary
+      onReset={reset}
+      fallbackRender={({ error, resetErrorBoundary }) => (
+        <ErrorFallback error={error} resetErrorBoundary={resetErrorBoundary} />
+      )}
+    >
+      <Suspense fallback={<VersionamentoIsLoading />}>
+        <VersionamentoPage />
+      </Suspense>
+    </ErrorBoundary>
+  );
+}
+
 export default Versionamento;
+
+
+
