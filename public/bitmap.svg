@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="200"
+   height="200"
+   viewBox="0 0 52.916665 52.916666"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="bitmap.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="52.916664"
+       height="52.916664"
+       id="page2"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient27">
+      <stop
+         style="stop-color:#00ff1f;stop-opacity:1;"
+         offset="0"
+         id="stop27" />
+      <stop
+         style="stop-color:#b1ff04;stop-opacity:1;"
+         offset="1"
+         id="stop28" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient21">
+      <stop
+         style="stop-color:#66ff00;stop-opacity:1;"
+         offset="0"
+         id="stop21" />
+      <stop
+         style="stop-color:#c8ff00;stop-opacity:1;"
+         offset="0.74826789"
+         id="stop22" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient18">
+      <stop
+         style="stop-color:#1f1f1f;stop-opacity:0;"
+         offset="0"
+         id="stop18" />
+      <stop
+         style="stop-color:#1f1f1f;stop-opacity:0;"
+         offset="1"
+         id="stop19" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#linearGradient18"
+       id="linearGradient19"
+       x1="20.606043"
+       y1="37.584526"
+       x2="20.606043"
+       y2="11.750701"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-3.3401306,6.6802613)" />
+    <linearGradient
+       xlink:href="#linearGradient21"
+       id="linearGradient22"
+       x1="20.606043"
+       y1="37.584526"
+       x2="20.606043"
+       y2="11.750701"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-3.3401306,6.6802613)" />
+    <linearGradient
+       xlink:href="#linearGradient21"
+       id="linearGradient23"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.98980469,0,0,1.2178886,6.1528476,-1.6502412)"
+       x1="20.606043"
+       y1="37.584526"
+       x2="20.606043"
+       y2="11.750701" />
+    <linearGradient
+       xlink:href="#linearGradient18"
+       id="linearGradient24"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.98980469,0,0,1.2178886,6.1528476,-1.6502412)"
+       x1="20.606043"
+       y1="37.584526"
+       x2="20.606043"
+       y2="11.750701" />
+    <linearGradient
+       xlink:href="#linearGradient21"
+       id="linearGradient25"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.97963853,0,0,1.4591693,15.540866,-10.870209)"
+       x1="20.606043"
+       y1="37.584526"
+       x2="20.606043"
+       y2="11.750701" />
+    <linearGradient
+       xlink:href="#linearGradient18"
+       id="linearGradient26"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.97963853,0,0,1.4591693,15.540866,-10.870209)"
+       x1="20.606043"
+       y1="37.584526"
+       x2="20.606043"
+       y2="11.750701" />
+    <linearGradient
+       xlink:href="#linearGradient27"
+       id="linearGradient28"
+       x1="14.911242"
+       y1="5.5903783"
+       x2="11.674387"
+       y2="23.334824"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.91793728,0,0,0.91793728,2.0178283,2.0299418)" />
+  </defs>
+  <g
+     id="layer1">
+    <g
+       id="rect4"
+       style="opacity:1">
+      <path
+         style="baseline-shift:baseline;display:inline;overflow:visible;vector-effect:none;fill:url(#linearGradient22);stroke:url(#linearGradient19);stroke-width:0.904057;stroke-linecap:square;stroke-opacity:0;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+         d="m 13.547678,18.768662 h 6.093661 c 0.717717,0 1.295519,1.00287 1.295519,2.248588 v 21.444091 c 0,1.245719 -0.577802,2.248589 -1.295519,2.248589 h -6.093661 c -0.717717,0 -1.295519,-1.00287 -1.295519,-2.248589 V 21.01725 c 0,-1.245718 0.577802,-2.248588 1.295519,-2.248588 z"
+         id="path15" />
+      <path
+         style="baseline-shift:baseline;display:inline;overflow:visible;vector-effect:none;fill:url(#linearGradient23);stroke:url(#linearGradient24);stroke-width:0.9926;stroke-linecap:square;stroke-opacity:0;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+         d="m 22.868479,13.072084 h 6.031535 c 0.710399,0 1.28231,1.221384 1.28231,2.73853 v 26.116514 c 0,1.517146 -0.571911,2.73853 -1.28231,2.73853 h -6.031535 c -0.710399,0 -1.28231,-1.221384 -1.28231,-2.73853 V 15.810614 c 0,-1.517146 0.571911,-2.73853 1.28231,-2.73853 z"
+         id="path22" />
+      <path
+         style="baseline-shift:baseline;display:inline;overflow:visible;vector-effect:none;fill:url(#linearGradient25);stroke:url(#linearGradient26);stroke-width:1.08089;stroke-linecap:square;stroke-opacity:0;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+         d="m 32.084813,6.7688135 h 5.969585 c 0.703103,0 1.26914,1.4633571 1.26914,3.2810705 v 32.02863 c 0,1.817714 -0.566037,2.542999 -1.26914,2.542999 h -5.969585 c -0.703103,0 -1.26914,-0.725285 -1.26914,-2.542999 v -32.02863 c 0,-1.8177134 0.566037,-3.2810705 1.26914,-3.2810705 z"
+         id="path24" />
+      <ellipse
+         style="fill:#66ff00;fill-opacity:0;stroke:url(#linearGradient28);stroke-width:1.56049;stroke-linecap:square;stroke-dasharray:none"
+         id="path26"
+         ry="24.254622"
+         rx="24.322372"
+         cy="26.420061"
+         cx="26.3402" />
+    </g>
+  </g>
+</svg>

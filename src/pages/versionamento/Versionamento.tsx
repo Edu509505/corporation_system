@@ -111,14 +111,6 @@ interface Quantitativa {
   unidadeDeMedida: string;
 }
 
-// interface Cliente {
-//   cliente: string;
-//   cnpj: string;
-//   local: string;
-//   status: string;
-//   file: File | null;
-// }
-
 interface AnexoVersionamento {
   url: string;
   path: string;
