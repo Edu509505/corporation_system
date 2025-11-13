@@ -241,7 +241,9 @@ function VersionamentoPage() {
 
   const novoVersionamentoSchema = z.object({
     files: z
-      .instanceof(FileList)
+      .instanceof(FileList, {
+        error: 'Selecione um Arquivo'
+      })
       .refine(
         (files) => files?.length >= 1,
         "Você deve selecionar ao menos um arquivo"
