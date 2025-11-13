@@ -1,4 +1,5 @@
 import { CircleCheckBig, CircleX, TimerIcon } from "lucide-react";
+import { Badge } from "../ui/badge";
 
 interface StatusEstilizadoProps {
   status: string;
@@ -9,22 +10,22 @@ function StatusDeAprovacao({ status }: StatusEstilizadoProps) {
     <>
       {status === "EM_ANALISE" ? (
         <>
-          <div className="flex items-center justify-center gap-3 h-7 text-chart-1 bg-amber-50 rounded-2xl">
+          <Badge className="border-1 border-chart-1 text-chart-1 bg-amber-50">
             <TimerIcon className="size-5" />
             Em Análise
-          </div>
+          </Badge>
         </>
       ) : status === "REPROVADA" ? (
         <>
-          <div className="flex items-center justify-center gap-3 h-7 text-destructive bg-red-100 rounded-2xl">
+          <Badge className="border-1 border-destructive text-destructive bg-red-50">
             <CircleX className="size-5" /> Reprovada
-          </div>
+          </Badge>
         </>
       ) : status === "APROVADA" ? (
         <>
-          <div className="flex items-center justify-center gap-3 h-7 text-ring bg-green-100 rounded-2xl">
+          <Badge className="border-1 border-ring text-ring bg-green-50">
             <CircleCheckBig className="size-5" /> Aprovada
-          </div>
+          </Badge>
         </>
       ) : (
         ""

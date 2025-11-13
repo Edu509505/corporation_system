@@ -95,6 +95,7 @@ function PdfView(url: PdfProp) {
                 )}
 
                 <Viewer 
+                    key={url.url}
                     fileUrl={url.url ?? ".pdf"}
                     plugins={[zoomPluginInstance, pageNavigationPluginInstance, getFilePluginInstance, printPluginInstance]}
                 />

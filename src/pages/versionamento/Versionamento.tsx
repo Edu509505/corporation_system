@@ -145,6 +145,8 @@ function VersionamentoPage() {
     );
   };
 
+  console.log(currentImageIndex)
+
   const handlePrevImage = () => {
     setCurrentImageIndex((prev) =>
       prev === 0 ? fetchAnexoVersionamento.length - 1 : prev - 1
@@ -445,11 +447,12 @@ function VersionamentoPage() {
                         {/* <DialogDescription className=" flex flex-col w-full items-center justify-start gap-3">
                         </DialogDescription> */}
                         <div className="flex gap-3 flex-wrap">
+                          
                           {(() => {
                             const pdfAnexos = (fetchAnexoVersionamento || []).filter((anexo) => {
-                              const extFromPath = anexo?.path?.split(".").pop()?.toLowerCase();
+                              // const extFromPath = anexo?.path?.split(".").pop()?.toLowerCase();
                               const extFromUrl = anexo?.url?.split(".").pop()?.split("?")[0]?.toLowerCase();
-                              return extFromPath === "pdf" || extFromUrl === "pdf";
+                              return extFromUrl === "pdf";
                             });
 
                             if (pdfAnexos.length === 0) {
@@ -461,13 +464,13 @@ function VersionamentoPage() {
                                 <div className="flex items-center justify-between bg-gray-100 rounded-2xl p-2">
                                   <button
                                     onClick={handlePrevImage}
-                                    className="p-2 rounded hover:bg-gray-200"
+                                    className="p-1 rounded hover:bg-gray-200"
                                   >
                                     <ChevronLeft className="w-6 h-6" />
                                   </button>
 
                                   <div className="flex flex-col items-center gap-3 flex-1 mx-4">
-                                    <div className="w-full h-auto bg-white rounded overflow-hidden shadow-sm">
+                                    <div className="w-full h-[500px] bg-white rounded overflow-hidden shadow-sm">
                                       <PdfView url={pdfAnexos[currentImageIndex]?.url} />
                                     </div>
 
@@ -478,7 +481,7 @@ function VersionamentoPage() {
 
                                   <button
                                     onClick={handleNextImage}
-                                    className="p-2 rounded hover:bg-gray-200"
+                                    className="p-1 rounded hover:bg-gray-200"
                                   >
                                     <ChevronRight className="w-6 h-6" />
                                   </button>
