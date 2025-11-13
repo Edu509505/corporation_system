@@ -135,7 +135,7 @@ function ErrorFallback({
     return <div className="p-5 text-destructive">Erro: {error.message}</div>;
 }
 
-export function Grafico() {
+export function GraficoM2() {
     const { reset } = useQueryErrorResetBoundary();
 
     return (
@@ -151,4 +151,4 @@ export function Grafico() {
 
 
 
-export default Grafico
+export default GraficoM2
