@@ -12,7 +12,7 @@ export default function Layout() {
   if (loading) return <GlobalLoader />;
 
   return (
-    <SidebarProvider>
+    <SidebarProvider >
       {!hideSidebar && <AppSidebar />}
       <main className="flex flex-col h-screen w-screen">
         {!hideSidebar && (

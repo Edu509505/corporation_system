@@ -105,6 +105,8 @@ export default function CriarDiarioDeObra() {
   const dataDia = form.watch("dataDia");
   const idPropostaSelecionada = form.watch("idProposta");
 
+  console.log(idPropostaSelecionada)
+
   const { data: quantitativasForProposta } = useQuery({
     queryKey: ["quantitativas", idPropostaSelecionada],
     queryFn: async () => {

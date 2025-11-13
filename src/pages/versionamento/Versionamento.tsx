@@ -6,7 +6,6 @@ import {
   CircleCheckBig,
   CirclePlus,
   CircleX,
-  Eye,
   Paperclip,
   Trash2,
 } from "lucide-react";
@@ -62,7 +61,6 @@ import StatusDeAprovacao from "@/components/componentsVersionamento/StatusDeApro
 import InfoClientes from "@/components/componentsVersionamento/informacoesCliente";
 import {
   Empty,
-  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
@@ -73,6 +71,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import PdfView from "@/components/pdfView";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -119,9 +118,6 @@ interface Quantitativa {
 //   status: string;
 //   file: File | null;
 // }
-interface formularioComImagem {
-  files: FileList | File[] | null;
-}
 
 interface AnexoVersionamento {
   url: string;
@@ -130,7 +126,6 @@ interface AnexoVersionamento {
 
 function VersionamentoPage() {
   const { id } = useParams<{ id: string }>();
-
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [idVersao, setidVersao] = useState<number | null>(null);
@@ -144,8 +139,6 @@ function VersionamentoPage() {
       prev === fetchAnexoVersionamento.length - 1 ? 0 : prev + 1
     );
   };
-
-  console.log(currentImageIndex)
 
   const handlePrevImage = () => {
     setCurrentImageIndex((prev) =>
@@ -167,8 +160,6 @@ function VersionamentoPage() {
       if (!response.ok) throw new Error("Não foi possível encontrar o anexo do Versionamento")
       const data = await response.json()
 
-      console.log("Resposta da API de anexos:", data) // Adiciona log para debug
-
       // A API retorna { url: [...urls] }, então pegamos o array de urls
       const urlArray = data.url || data.urls || data.anexos || []
 
@@ -176,15 +167,10 @@ function VersionamentoPage() {
       const anexos = Array.isArray(urlArray)
         ? urlArray.map((urlString: string) => ({ url: urlString }))
         : []
-
-      console.log("Anexos processados:", anexos) // Log adicional
-
       return anexos as AnexoVersionamento[]
     },
     enabled: !!idVersao // Só executa a query se idVersao existir
   })
-
-  console.log("ANEXO VERSIONAMENTO", fetchAnexoVersionamento)
 
   const {
     data: proposta,
@@ -218,47 +204,31 @@ function VersionamentoPage() {
     },
   });
 
-  const { data: versionamentoAprovado, refetch: refetchVersionamentoAprovado } = useSuspenseQuery({
-    queryKey: ["versionamento", proposta?.id],
+  const { data: quantitativa, refetch: refetchQuantitativa } = useQuery({
+    queryKey: ["quantitativas", proposta?.id],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/proposta/${proposta?.id.toString()}/verAprovado`, {
-        method: "GET",
-        credentials: "include"
-      }
+        `${url}/quantitativa/${proposta?.id}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
       );
-      if (!response.ok) throw new Error("Versionamento não encontrada");
+      if (!response.ok) throw new Error("Versionamento não quantitativa");
       const data = await response.json();
-      return data as Versionamento[];
-    },
-  });
-
-  console.log("Versionamento Aprovado ", versionamentoAprovado?.map((ver) => ver.id))
-
-
-  const { data: quantitativa, refetch: refetchQuantitativa } = useQuery({
-    queryKey: ["quantitativa", versionamentoAprovado?.map((ver) => ver.id)],
-    queryFn: async () => {
-      const response = await fetch(`${url}/quantitativa/${versionamentoAprovado?.map((ver) => ver.id.toString())}`, {
-        method: "GET",
-        credentials: "include"
-      })
-      if (!response.ok) throw new Error("Não foi encontrato nenhuma quantitativa")
-      const data = await response.json()
       return data as Quantitativa[]
-    }
-  })
+    },
+    // O método .some retorna um valor booleano se a condição for verdadeira hehehe
+    enabled: versionamentos.some((val) => val.status === "APROVADA" ? true : false)
+  });
 
   async function refetchAll() {
     await refetchQuantitativa()
-    await refetchVersionamentoAprovado()
     await refetchVersionamentos()
     await refetchProposta()
     await refetchAnexoVersionamentos()
     return
   }
-
-  console.log("Quantitativa", quantitativa);
 
   const { mutateAsync: updateVersionamento } = useMutation({
     mutationKey: ["updateVersionamento"],
@@ -277,43 +247,61 @@ function VersionamentoPage() {
     },
   });
 
-  const [novoVersionamento, setNovoVersionamento] =
-    useState<formularioComImagem>({
-      files: null,
-    });
-
-  async function criarNovoVersionamento(
-    event: React.FormEvent<HTMLFormElement>
-  ) {
-    event.preventDefault();
-
-    if (!novoVersionamento.files) return;
-
-    console.log(
-      "Quantidade de arquivos no frontend:",
-      novoVersionamento.files.length
-    );
-    console.log("Arquivos:", novoVersionamento.files);
-
-    const form = new FormData();
-
-    for (let i = 0; i < novoVersionamento.files.length; i++) {
-      form.append("files", novoVersionamento.files[i]);
+  const novoVersionamentoSchema = z.object({
+    files: z
+      .instanceof(FileList)
+      .refine(
+        (files) => files?.length >= 1,
+        "Você deve selecionar ao menos um arquivo"
+      )
+      .refine(
+        (files) => files?.[0]?.size <= 15 * 1024 * 1024,
+        "Arquivo deve ter até 50MB"
+      )
+      .refine(
+        (files) =>
+          ["application/pdf"].includes(
+            files?.[0]?.type
+          ),
+        "Tipo de arquivo inválido"
+      )
+  })
+  const formNovoVersionamento = useForm<z.infer<typeof novoVersionamentoSchema>>({
+    resolver: zodResolver(novoVersionamentoSchema),
+    defaultValues: {
+      files: undefined
     }
+  })
 
-    const response = await fetch(`${url}/proposta/${id}/versao`, {
-      method: "POST",
-      credentials: "include",
-      body: form,
-    });
+  const onSubmitNovoVersionamento = async (data: z.infer<typeof novoVersionamentoSchema>) => {
+    try {
+      setIsLoadingRefetch(true);
+      const form = new FormData();
 
-    const body = await response.json();
-    console.log(body);
-    refetchVersionamentos();
-  }
+      for (let i = 0; i < data.files.length; i++) {
+        form.append("files", data.files[i]);
+      }
 
-  const [openDialog, setOpenDialog] = useState(false);
+      const response = await fetch(`${url}/proposta/${id}/versao`, {
+        method: "POST",
+        credentials: "include",
+        body: form,
+      });
+      if (!response.ok) {
+        // Aqui você lida com o erro de forma clara
+        const errorText = await response.text();
+        throw new Error(`Erro ${response.status}: ${errorText}`);
+      }
+      // const body = await response.json();
+      setOpenNovoVersionamento(false);
+      refetchVersionamentos();
+    } catch { } finally { setIsLoadingRefetch(false); }
+
+  };
+
+  const [openDialog] = useState(false);
   const [open, setOpen] = useState(false);
+  const [openNovoVersionamento, setOpenNovoVersionamento] = useState(false)
 
   //FORM DA QUATITATIVA
 
@@ -321,7 +309,7 @@ function VersionamentoPage() {
     idVersionamento: z.number(),
     descricao: z.string().min(2, "Nome obrigatório"),
     unidadeDeMedida: z.string().min(1, "Unidade obrigatória"),
-    quantidade: z.string(),
+    quantidade: z.string().refine((val) => val.replace(',', '.')),
     valorUnitario: z.string(),
   });
 
@@ -350,10 +338,10 @@ function VersionamentoPage() {
     name: "itens",
   });
 
-  console.log(form.formState.errors);
+  // console.log(form.formState.errors);
 
   const onSubmit = async (data: Quantitativas) => {
-    console.log(data);
+    // console.log(data);
 
     try {
       setIsLoadingRefetch(true);
@@ -384,9 +372,9 @@ function VersionamentoPage() {
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col p-3 gap-4">
+    <div className="h-max bg-gray-50 flex flex-col p-3 gap-4">
       <Link to="/propostas">
-        <Button variant="ghost" className="cursor-pointer">
+        <Button className="cursor-pointer">
           <CircleArrowLeftIcon />
           Retornar
         </Button>
@@ -405,7 +393,7 @@ function VersionamentoPage() {
             <TableRow>
               <TableHead>Versão</TableHead>
               <TableHead>Data</TableHead>
-              <TableHead className="text-center">Status</TableHead>
+              <TableHead className="">Status</TableHead>
               <TableHead className="text-center">Ação</TableHead>
             </TableRow>
           </TableHeader>
@@ -431,23 +419,26 @@ function VersionamentoPage() {
                     <DialogTrigger
                       onClick={() => (
                         setidVersao(itemVersionamento.id),
-                        setIdVersionamento(itemVersionamento.id)
+                        setIdVersionamento(itemVersionamento.id),
+                        setCurrentImageIndex(0)
                       )}
                       className="cursor-pointer"
                     >
-                      <Eye />
+                      <Button className="rounded-2xl bg-blue-100 text-blue-600 border-blue-600 border-1 hover:bg-blue-600 hover:text-white cursor-pointer h-8 w-21">
+                        Visualizar
+                      </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[70%] h-[90%] overflow-auto">
                       <DialogHeader className="p-0 m-0">
                         <DialogTitle>Visualização da proposta</DialogTitle>
                       </DialogHeader>
                       <DialogDescription className="flex flex-col gap-4 text-black">
-                          Situação da proposta
-                          <StatusDeAprovacao status={itemVersionamento.status} />
+                        Situação da proposta
+                        <StatusDeAprovacao status={itemVersionamento.status} />
                         {/* <DialogDescription className=" flex flex-col w-full items-center justify-start gap-3">
                         </DialogDescription> */}
                         <div className="flex gap-3 flex-wrap">
-                          
+
                           {(() => {
                             const pdfAnexos = (fetchAnexoVersionamento || []).filter((anexo) => {
                               // const extFromPath = anexo?.path?.split(".").pop()?.toLowerCase();
@@ -471,7 +462,7 @@ function VersionamentoPage() {
 
                                   <div className="flex flex-col items-center gap-3 flex-1 mx-4">
                                     <div className="w-full h-[500px] bg-white rounded overflow-hidden shadow-sm">
-                                      <PdfView url={pdfAnexos[currentImageIndex]?.url} />
+                                      <PdfView url={fetchAnexoVersionamento[currentImageIndex]?.url} />
                                     </div>
 
                                     <span className="text-sm font-semibold text-gray-600">
@@ -521,29 +512,28 @@ function VersionamentoPage() {
                                     A proposta foi recusada?
                                   </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    DEPOIS EU PENSO NO QUE ESCREVER
+                                    Uma vez recusada não será possível aprovar novamente
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                   <AlertDialogCancel className="cursor-pointer">
                                     Cancelar
                                   </AlertDialogCancel>
-                                  <DialogClose asChild>
-                                    <AlertDialogAction
-                                      className="cursor-pointer"
-                                      onClick={async () => {
-                                        await updateVersionamento({
-                                          id: itemVersionamento.id,
-                                          status: "REPROVADA",
-                                        });
-                                        setOpenDialog(false);
-                                        refetchVersionamentos();
-                                        refetchAll();
-                                      }}
-                                    >
-                                      Continue
-                                    </AlertDialogAction>
-                                  </DialogClose>
+                                  <AlertDialogAction
+                                    className="cursor-pointer"
+                                    onClick={async () => {
+                                      await updateVersionamento({
+                                        id: itemVersionamento.id,
+                                        status: "REPROVADA",
+                                      });
+                                      // setOpenDialog(false);
+                                      await refetchVersionamentos();
+                                      await refetchAll();
+                                    }}
+                                    disabled={isLoadingRefetch}
+                                  >
+                                    {isLoadingRefetch ? <> <Spinner /> Continuar</> : <>Continuar</>}
+                                  </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
                             </AlertDialog>
@@ -604,29 +594,41 @@ function VersionamentoPage() {
                                           onSubmit={form.handleSubmit(onSubmit)}
                                           className="flex flex-col gap-3"
                                         >
-                                          <div className="flex gap-3 items-center border-1 border-gray-500 rounded-2xl p-4 scroll-auto">
-                                            <div className="space-y-4">
-                                              <div className="flex flex-col gap-4 justify-center items-center">
+                                          <div className="flex gap-3 items-center border-b-1 border-gray-300 p-2">
+                                            <div className="flex flex-col gap-3 w-full">
+                                              <div className="w-full flex flex-col gap-4 justify-start items-center h-[250px] overflow-auto p-4">
                                                 {fields.map((field, index) => (
                                                   <div
                                                     key={field.id}
                                                     className="flex items-start gap-1"
                                                   >
+                                                    {/* <div className="flex h-full w-5 items-center justify-center"><Label>{index++}</Label></div> */}
                                                     <FormField
                                                       control={form.control}
                                                       name={`itens.${index}.descricao`}
                                                       render={({ field }) => (
                                                         <FormItem>
-                                                          <FormLabel>
-                                                            Nome
-                                                          </FormLabel>
-                                                          <FormControl>
-                                                            <Input
-                                                              placeholder="Nome do item"
-                                                              {...field}
-                                                            />
-                                                          </FormControl>
-                                                          <FormMessage />
+                                                          <FormLabel>Item</FormLabel>
+                                                          <Select
+                                                            value={field.value}
+                                                            onValueChange={field.onChange}
+                                                          >
+                                                            <FormControl>
+                                                              <SelectTrigger className="w-[180px] cursor-pointer" >
+                                                                <SelectValue placeholder="Selecione o Item" />
+                                                              </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent>
+                                                              <SelectGroup>
+                                                                <SelectLabel>Itens</SelectLabel>
+                                                                <SelectItem className="cursor-pointer" value="Retroescavadeira">Retroescavadeira</SelectItem>
+                                                                <SelectItem className="cursor-pointer" value="Rolocompactador">Rolocompactador</SelectItem>
+                                                                <SelectItem className="cursor-pointer" value="Calçamento">Calçamento</SelectItem>
+                                                                <SelectItem className="cursor-pointer" value="Homem Hora">Homem Hora</SelectItem>
+                                                              </SelectGroup>
+                                                            </SelectContent>
+                                                            <FormMessage />
+                                                          </Select>
                                                         </FormItem>
                                                       )}
                                                     />
@@ -635,16 +637,28 @@ function VersionamentoPage() {
                                                       name={`itens.${index}.unidadeDeMedida`}
                                                       render={({ field }) => (
                                                         <FormItem>
-                                                          <FormLabel>
-                                                            Unidade
-                                                          </FormLabel>
-                                                          <FormControl>
-                                                            <Input
-                                                              placeholder="Unidade de medida"
-                                                              {...field}
-                                                            />
-                                                          </FormControl>
-                                                          <FormMessage />
+                                                          <FormLabel>Unidade</FormLabel>
+                                                          <Select
+                                                            value={field.value}
+                                                            onValueChange={field.onChange}
+                                                          >
+                                                            <FormControl>
+                                                              <SelectTrigger className="w-[180px] cursor-pointer" >
+                                                                <SelectValue placeholder="Selecione o Item" />
+                                                              </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent>
+                                                              <SelectGroup>
+                                                                <SelectLabel>Itens</SelectLabel>
+                                                                <SelectItem className="cursor-pointer" value="M²">M²</SelectItem>
+                                                                <SelectItem className="cursor-pointer" value="M³">M³</SelectItem>
+                                                                <SelectItem className="cursor-pointer" value="Hora">Hora</SelectItem>
+                                                                <SelectItem className="cursor-pointer" value="Diária">Diária</SelectItem>
+                                                                <SelectItem className="cursor-pointer" value="Kg">Kg</SelectItem>
+                                                              </SelectGroup>
+                                                            </SelectContent>
+                                                            <FormMessage />
+                                                          </Select>
                                                         </FormItem>
                                                       )}
                                                     />
@@ -658,6 +672,10 @@ function VersionamentoPage() {
                                                           </FormLabel>
                                                           <FormControl>
                                                             <Input
+                                                              className="bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                              type="number"
+                                                              inputMode="numeric"
+                                                              pattern="[0-9]*"
                                                               placeholder="Quantidade"
                                                               {...field}
                                                             />
@@ -676,6 +694,10 @@ function VersionamentoPage() {
                                                           </FormLabel>
                                                           <FormControl>
                                                             <Input
+                                                              className="bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                              type="number"
+                                                              inputMode="numeric"
+                                                              pattern="[0-9]*"
                                                               placeholder="R$ -"
                                                               {...field}
                                                             />
@@ -685,6 +707,7 @@ function VersionamentoPage() {
                                                       )}
                                                     />
                                                     <Button
+                                                      className="cursor-pointer"
                                                       type="button"
                                                       variant="ghost"
                                                       size="icon"
@@ -697,21 +720,26 @@ function VersionamentoPage() {
                                                   </div>
                                                 ))}
                                               </div>
-                                              <Button
-                                                type="button"
-                                                onClick={() =>
-                                                  append({
-                                                    idVersionamento:
-                                                      itemVersionamento.id,
-                                                    descricao: "",
-                                                    unidadeDeMedida: "",
-                                                    quantidade: "",
-                                                    valorUnitario: "",
-                                                  })
-                                                }
-                                              >
-                                                Adicionar item
-                                              </Button>
+                                              <div className="flex gap-3">
+                                                <Button
+                                                  className="cursor-pointer"
+                                                  type="button"
+                                                  disabled={isLoadingRefetch}
+                                                  onClick={() =>
+                                                    append({
+                                                      idVersionamento:
+                                                        itemVersionamento.id,
+                                                      descricao: "",
+                                                      unidadeDeMedida: "",
+                                                      quantidade: "",
+                                                      valorUnitario: "",
+                                                    })
+                                                  }
+                                                >
+                                                  {isLoadingRefetch ? <><Spinner className="size-3" /> Adicionar item</> : <>Adicionar item</>}
+
+                                                </Button>
+                                              </div>
                                             </div>
                                           </div>
                                           <DialogFooter className="flex gap-3">
@@ -761,7 +789,7 @@ function VersionamentoPage() {
                 <div className="flex items-center justify-between">
                   Ações
                   <div>
-                    <Dialog>
+                    <Dialog open={openNovoVersionamento} onOpenChange={setOpenNovoVersionamento}>
                       <DialogTrigger asChild>
                         <Button
                           variant="outline"
@@ -769,6 +797,7 @@ function VersionamentoPage() {
                           disabled={versionamentos?.some(
                             (item) => item.status === "APROVADA"
                           )}
+
                         >
                           <CirclePlus />
                           Criar Novo Versionamento
@@ -780,49 +809,50 @@ function VersionamentoPage() {
                             Adicionar um novo versionamento
                           </DialogTitle>
                           <DialogDescription className="">
-                            <form
-                              onSubmit={criarNovoVersionamento}
-                              className="flex flex-col gap-4"
-                            >
-                              <Empty className="border border-dashed">
-                                <EmptyHeader>
-                                  <EmptyMedia variant="icon">
-                                    <Paperclip />
-                                  </EmptyMedia>
-                                  <EmptyTitle>Selecione um Arquivo</EmptyTitle>
-                                  <EmptyDescription>
-                                    Escolha um aruivo de seu dispositivo para
-                                    realizar o Upload
-                                    <Input
-                                      className="cursor-pointer"
-                                      type="file"
-                                      multiple
-                                      onChange={(event) => {
-                                        const files = event.target.files;
-                                        if (!files) return;
-                                        const filesArray = Array.from(files);
-                                        setNovoVersionamento({
-                                          ...novoVersionamento,
-                                          files: filesArray,
-                                        });
-                                      }}
-                                    />
-                                  </EmptyDescription>
-                                </EmptyHeader>
-                                <EmptyContent>
-                                  <DialogClose asChild>
-                                    <Button
-                                      variant="outline"
-                                      type="submit"
-                                      className="cursor-pointer"
-                                      onClick={() => refetchAll()}
-                                    >
-                                      Criar
-                                    </Button>
-                                  </DialogClose>
-                                </EmptyContent>
-                              </Empty>
-                            </form>
+                            <Form {...formNovoVersionamento}>
+
+                              <form
+                                onSubmit={formNovoVersionamento.handleSubmit(onSubmitNovoVersionamento)}
+                                className="flex flex-col gap-4"
+                              >
+                                <FormField
+                                  control={formNovoVersionamento.control}
+                                  name="files"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>Escolha um arquivo</FormLabel>
+                                      <FormControl>
+                                        <Empty className="border border-dashed">
+                                          <EmptyHeader>
+                                            <EmptyMedia variant="icon">
+                                              <Paperclip />
+                                            </EmptyMedia>
+                                            <EmptyTitle>Selecione um Arquivo</EmptyTitle>
+                                            <EmptyDescription>
+                                              Escolha um aruivo de seu dispositivo para realizar o
+                                              Upload
+                                              <Input
+                                                className="cursor-pointer"
+                                                type="file"
+                                                multiple
+                                                accept=".pdf"
+                                                onChange={(e) => field.onChange(e.target.files)}
+                                              />
+                                            </EmptyDescription>
+                                          </EmptyHeader>
+                                          <Button
+                                            className="cursor-pointer"
+                                            type="submit"
+                                            disabled={isLoadingRefetch}
+                                          >{isLoadingRefetch ? <><Spinner className="size-3" />Criando... </> : <>Criar</>}</Button>
+                                        </Empty>
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                              </form>
+                            </Form>
                           </DialogDescription>
                         </DialogHeader>
                       </DialogContent>
@@ -840,7 +870,7 @@ function VersionamentoPage() {
         ) : (
           <>
             <h1 className="font-bold">Quantitativa</h1>
-            <Table className="rounded-2xl">
+            <Table className="rounded-2xl bg-white">
               <TableHeader className="bg-gray-300">
                 <TableRow>
                   <TableHead>item:</TableHead>

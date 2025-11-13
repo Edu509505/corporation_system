@@ -31,6 +31,8 @@ function PdfView(url: PdfProp) {
     const printPluginInstance = printPlugin();
     const { Print } = printPluginInstance;
     
+    console.log("OI, MEU LINK É ESSE: ", url.url)
+
     return (
         <>
             <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">

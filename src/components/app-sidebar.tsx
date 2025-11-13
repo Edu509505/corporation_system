@@ -13,6 +13,7 @@ import {
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -26,7 +27,7 @@ import {
 
 import { Link } from "react-router-dom";
 import { useUser } from "@/use.store";
-import { useLogout } from "@/pages/hooks/hooksLogout";
+import { NavUser } from "./NavUser";
 
 // Menu items.
 const items = [
@@ -37,7 +38,7 @@ const items = [
   },
   {
     title: "Comercial",
-    url: "/#",
+    url: "/clientes",
     icon: Inbox,
     subMenu: [
       { title: "Clientes", url: "/clientes", icon: Building2Icon },
@@ -47,7 +48,7 @@ const items = [
   },
   {
     title: "Obra",
-    url: "/#",
+    url: "/diarioDeObra",
     icon: PencilRuler,
     subMenu: [
       { title: "Diário De Obra", url: "/diarioDeObra", icon: NotebookPenIcon },
@@ -56,7 +57,7 @@ const items = [
   },
   {
     title: "Financeiro",
-    url: "/#",
+    url: "/notasFiscais",
     icon: CircleDollarSignIcon,
     subMenu: [
       { title: "Faturamento", url: "/notasFiscais", icon: FilePlus2Icon },
@@ -66,10 +67,12 @@ const items = [
 
 export function AppSidebar() {
   const user = useUser((s) => s.user);
-  const logout = useLogout();
 
   return (
-    <Sidebar>
+    <Sidebar
+      variant="sidebar"
+      collapsible="icon"
+    >
       <SidebarContent className="flex flex-col justify-between h-full">
         <div>
           <SidebarGroup>
@@ -107,14 +110,19 @@ export function AppSidebar() {
         </div>
 
         {user && (
-          <div className="p-4 border-t text-sm text-muted-foreground">
-            <p className="mb-2">
-              Logado como: <strong>{user.name}</strong>
-            </p>
-            <button onClick={logout} className="text-red-500 hover:underline">
-              Sair
-            </button>
-          </div>
+          <>
+            <SidebarFooter>
+              <NavUser user={user} />
+            </SidebarFooter>
+          </>
+          // <div className="p-4 border-t text-sm text-muted-foreground">
+          //   <p className="mb-2">
+          //     Logado como: <strong>{user.name}</strong>
+          //   </p>
+          //   <button onClick={logout} className="text-red-500 hover:underline">
+          //     Sair
+          //   </button>
+          // </div>
         )}
       </SidebarContent>
     </Sidebar>
