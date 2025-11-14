@@ -5,11 +5,11 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Suspense } from "react";
 
 type PropostasEmAnaliseProps = {
-    statusProposta: number;
+    quantity: number;
 };
 
 function CardPropostasEmAnaliseList() {
-  const { data: propostasEmAnalise } = useSuspenseQuery<PropostasEmAnaliseProps[]>({
+  const { data: propostasEmAnalise } = useSuspenseQuery<PropostasEmAnaliseProps>({
   queryKey: ['propostasEmAnalise'],
   queryFn: async () => {
     const response = await fetch(`${url}/propostasEmAnalise`, {
@@ -18,12 +18,15 @@ function CardPropostasEmAnaliseList() {
     });
 
     const data = await response.json();
-    return data as PropostasEmAnaliseProps[];
+
+    console.log("PEGA POHA", data)
+
+    return data as PropostasEmAnaliseProps;
   }
 });
 
 
-const propostasTotalEmAnalise = propostasEmAnalise.length;
+const propostasTotalEmAnalise = propostasEmAnalise.quantity;
 
 return (
   <CardBase>
