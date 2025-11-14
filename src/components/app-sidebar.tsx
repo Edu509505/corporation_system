@@ -17,6 +17,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -28,6 +29,7 @@ import {
 import { Link } from "react-router-dom";
 import { useUser } from "@/use.store";
 import { NavUser } from "./NavUser";
+import LogoHorizon from "../assets/img/logo.svg"
 
 // Menu items.
 const items = [
@@ -73,6 +75,21 @@ export function AppSidebar() {
       variant="sidebar"
       collapsible="icon"
     >
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:!p-1.5"
+            >
+              <span>
+                <img src={LogoHorizon} className="size-8"/>
+                <h1>Horizon System</h1>
+              </span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
       <SidebarContent className="flex flex-col justify-between h-full">
         <div>
           <SidebarGroup>

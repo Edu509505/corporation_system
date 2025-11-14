@@ -80,7 +80,9 @@ function Quantitativa({ itemVersionamento }: funcoesQuantitativa) {
         },
         body: JSON.stringify(data),
       });
-    } catch {}
+    } catch {
+      
+    }
   };
 
   // const { mutateAsync: updateVersionamento } = useMutation({

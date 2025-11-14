@@ -10,6 +10,7 @@ import { url } from "@/url";
 import { useUser } from "@/use.store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ImagemLogin from "../assets/img/IMG-20240823-WA0208.jpg";
+import LogoHorizon from "../assets/img/logo.svg"
 
 // ------------------------------
 // Formulário de Login
@@ -81,11 +82,12 @@ function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
 
   return (
     <form
-      className={cn("flex flex-col gap-6", className)}
+      className={cn("flex flex-col gap-6 items-center", className)}
       onSubmit={handleSubmit}
       aria-busy={mutation.isPending}
       {...props}
     >
+      <div className="flex-col lg:hidden"> <img src={LogoHorizon} className="size-20"/> </div>
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Bem-Vindo</h1>
@@ -116,9 +118,6 @@ function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
         <Field>
           <div className="flex items-center">
             <FieldLabel htmlFor="password">Senha</FieldLabel>
-            <a href="#" className="ml-auto text-sm underline-offset-4 hover:underline">
-              Esqueceu a senha?
-            </a>
           </div>
           <Input
             id="password"
@@ -209,8 +208,14 @@ export function LoginFormEnviar() {
         <img
           src={ImagemLogin}
           alt="Imagem"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] blur-[4px] dark:grayscale"
         />
+        <div className="absolute size-96 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white p-2 text-5xl flex flex-col items-center justify-center">
+          <img src={LogoHorizon} />
+          <div className="backdrop-blur-[6px] rounded-2xl p-3">
+            <h1 >Horizon System</h1>
+          </div>
+        </div>
       </div>
     </div>
   );
