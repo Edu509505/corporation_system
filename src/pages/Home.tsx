@@ -1,7 +1,6 @@
 import { CardFaturamento } from "@/components/cardsHome/CardFaturamento";
 import { CardComparacaoPropostas } from "@/components/cardsHome/ComparacaoProposta";
 import { CardPropostasEmAnalise } from "@/components/cardsHome/PropostasEmAnalise";
-import { CardPropostaEmAndamento } from "@/components/cardsHome/PropostasFechadas";
 import Grafico from "@/components/graficos/GraficoM2";
 
 function Home() {
@@ -11,7 +10,7 @@ function Home() {
 
       <div className="flex flex-wrap gap-x-4 gap-y-6">
         <CardComparacaoPropostas />
-        <CardPropostaEmAndamento />
+        {/* <CardPropostaEmAndamento /> */}
         <CardPropostasEmAnalise/>
         <CardFaturamento/>
         {/* Adicione mais cards aqui */}

@@ -7,6 +7,7 @@ import React, { Suspense } from "react";
 import dayjs from "dayjs";
 import { Skeleton } from "../ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
+import { url } from "@/url";
 
 interface TodosOsItensDoDia {
     dataDia: string;
@@ -22,8 +23,6 @@ function GraficoDados() {
     // Calcula datas com dayjs
     const dataFinal = dayjs().format("YYYY-MM-DD");
     const dataInicial = dayjs().subtract(dias, "day").format("YYYY-MM-DD");
-
-    const url = import.meta.env.VITE_API_URL;
 
     const { data: chartData } = useSuspenseQuery({
         queryKey: ["itensDoDia", timeRange],
@@ -50,9 +49,6 @@ function GraficoDados() {
             <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
                 <div className="grid flex-1 gap-1">
                     <CardTitle>Gráfico do M²</CardTitle>
-                    <CardDescription>
-                        periodo de quanto está sendo feito o M²
-                    </CardDescription>
                 </div>
                 <Select value={timeRange} onValueChange={setTimeRange}>
                     <SelectTrigger
