@@ -177,7 +177,7 @@ function AdicionarContrato() {
     } catch {}
   };
   return (
-    <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
+    <div className="flex flex-col bg-background w-full gap-3 p-4">
       <header>
         <Link to="/contratos">
           <Button>
@@ -188,7 +188,7 @@ function AdicionarContrato() {
         <p className="text-gray-600">
           Preencha os detalhes do novo contrato abaixo.
         </p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-background0">
           <strong>Atenção:</strong> O preenchimento do contrato deve ser
           realizado em comum acordo entre ambas as partes envolvidas, garantindo
           que todas as informações estejam corretas, completas e devidamente

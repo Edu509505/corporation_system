@@ -165,7 +165,7 @@ function AdicionarContrato() {
     } catch {}
   };
   return (
-    <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
+    <div className="flex flex-col bg-background w-full gap-3 p-4">
       <header>
         <Link to="/medicao">
           <Button>
@@ -177,7 +177,7 @@ function AdicionarContrato() {
           Selecoine o período para preencher os itens que pertencem a esse
           fechamento.
         </p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-background0">
           <strong>Observação:</strong> Para iniciar o fechamento da medição,
           selecione o cliente e a proposta. Em seguida, defina o período
           desejado.

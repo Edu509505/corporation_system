@@ -73,7 +73,7 @@ function VisualMedicao() {
   console.log(medicao)
 
   return (
-    <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
+    <div className="flex flex-col bg-background w-full gap-3 p-4">
       <header>
         <Link to="/medicao">
           <Button>
@@ -84,7 +84,7 @@ function VisualMedicao() {
         <p className="text-gray-600">
           Visualização da Medição
         </p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-background0">
           <strong>Observação:</strong> Página dedicada para visualizar medição
         </p>
       </header>

@@ -99,7 +99,7 @@ function CardListFaturamento() {
 
 function SkeletonCardFaturamento() {
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 max-w-md mx-auto mt-10 animate-pulse">
+    <div className="bg-card shadow-md rounded-lg p-6 max-w-md mx-auto mt-10 animate-pulse">
       <div className="h-6 bg-gray-300 rounded w-2/3 mb-4"></div>
       <div className="space-y-2">
         {[...Array(4)].map((_, i) => (

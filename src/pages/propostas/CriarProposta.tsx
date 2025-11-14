@@ -149,7 +149,7 @@ function AddProposta() {
 
   };
   return (
-    <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
+    <div className="flex flex-col bg-background w-full gap-3 p-4">
       <header>
         <Link to="/propostas">
           <Button>

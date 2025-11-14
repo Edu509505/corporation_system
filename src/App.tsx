@@ -13,7 +13,6 @@ import AddContrato from "./pages/contratos/AddContrato";
 import VisualizarContrato from "./pages/contratos/VisualizarContrato";
 import DiarioDeObra from "./pages/DiarioDeObra";
 import CriarDiarioDeObra from "./components/diarioDeObra/Create";
-import MostrarDiarioDeObraPorProposta from "./pages/DiarioPorProposta";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import LoginPage from "./pages/Login";
@@ -89,10 +88,6 @@ function App() {
         {
           path: "diarioDeObra",
           element: <OnlyPlebes page={<DiarioDeObra />} />,
-        },
-        {
-          path: "diarioPorProposta/:idProposta",
-          element: <OnlyPlebes page={<MostrarDiarioDeObraPorProposta />} />,
         },
         {
           path: "criarDiarioDeObra",

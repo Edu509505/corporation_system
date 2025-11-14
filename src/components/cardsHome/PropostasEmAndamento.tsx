@@ -51,7 +51,7 @@ function CardPropostaEmAndamentoList() {
 
 function CardPropostaEmAndamentoLoading() {
   return (
-    <div className="p-4 w-full h-screen gap-4 flex flex-col bg-gray-50">
+    <div className="p-4 w-full h-screen gap-4 flex flex-col bg-background">
       {/* Título da página */}
       <Skeleton className="h-10 w-1/3 rounded-md" />
 

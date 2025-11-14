@@ -139,7 +139,7 @@ function UpdateCliente() {
   };
 
   return (
-    <div className="w-full h-screen flex flex-col p-4 gap-3 bg-gray-50">
+    <div className="w-full h-screen flex flex-col p-4 gap-3 bg-backgroundund">
       <div className="flex gap-3 items-center">
         <Edit className="size-10" />
         <h1 className="text-2xl font-bold">Editar Cliente</h1>
@@ -224,7 +224,7 @@ function UpdateCliente() {
                 <FormControl>
                   <Input placeholder="Domínio" {...field} />
                 </FormControl>
-                <FormLabel className="text-gray-500">
+                <FormLabel className="text-background0">
                   O cliente possui algum domínio? Exemplo: cliente.com.br
                 </FormLabel>
                 <FormMessage />

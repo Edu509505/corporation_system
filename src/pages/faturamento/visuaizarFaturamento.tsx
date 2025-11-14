@@ -149,7 +149,7 @@ function VisualizarNotaFiscal() {
   }
 
   return (
-    <div className="flex flex-col h-auto gap-3 bg-gray-50 p-4">
+    <div className="flex flex-col h-auto gap-3 bg-background p-4">
       <header>
         <Link to="/notasFiscais">
           <Button className="cursor-pointer">

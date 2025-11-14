@@ -9,7 +9,7 @@ import { ClientList } from "@/components/clientes/ClientList";
 
 export default function VerClientes() {
   return (
-    <div className="w-full p-2 flex flex-col bg-gray-50">
+    <div className="w-full p-2 flex flex-col bg-background">
       <div className="flex items-center gap-3">
         <Building />
         <h1 className="text-2xl font-bold">Clientes cadastrados</h1>

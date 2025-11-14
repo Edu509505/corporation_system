@@ -366,7 +366,7 @@ function VersionamentoPage() {
   };
 
   return (
-    <div className="h-max bg-gray-50 flex flex-col p-3 gap-4">
+    <div className="h-max bg-background flex flex-col p-3 gap-4">
       <Link to="/propostas">
         <Button className="cursor-pointer">
           <CircleArrowLeftIcon />

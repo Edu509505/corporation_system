@@ -210,7 +210,7 @@ export function LoginFormEnviar() {
           alt="Imagem"
           className="absolute inset-0 h-full w-full opacity-10  object-cover dark:brightness-[0.2] dark:grayscale"
         />
-        <div className="absolute size-96 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white p-2 text-5xl flex flex-col items-center justify-center">
+        <div className="absolute size-96 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-card p-2 text-5xl flex flex-col items-center justify-center">
           <img src={LogoHorizon} />
 
           <h1 >Horizon System</h1>

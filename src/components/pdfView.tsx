@@ -37,7 +37,7 @@ function PdfView(url: PdfProp) {
         <>
             <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
                 {/* Desktop - toolbar normal */}
-                <div className="hidden md:flex w-full justify-start items-center gap-3 rounded-t-2xl bg-white p-2 flex-wrap">
+                <div className="hidden md:flex w-full justify-start items-center gap-3 rounded-t-2xl bg-card p-2 flex-wrap">
                     <Print>
                         {(props) => (
                             <Button
@@ -58,7 +58,7 @@ function PdfView(url: PdfProp) {
                 </div>
 
                 {/* Mobile - menu sanduíche */}
-                <div className="md:hidden flex justify-between items-center bg-white p-3 rounded-t-2xl">
+                <div className="md:hidden flex justify-between items-center bg-card p-3 rounded-t-2xl">
                     <span className="text-sm font-semibold">Ferramentas PDF</span>
                     <button
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -70,7 +70,7 @@ function PdfView(url: PdfProp) {
 
                 {/* Mobile - menu aberto */}
                 {isMenuOpen && (
-                    <div className="md:hidden flex flex-col gap-2 bg-gray-50 p-3 border-b border-gray-200">
+                    <div className="md:hidden flex flex-col gap-2 bg-background p-3 border-b border-gray-200">
                         <Print>
                             {(props) => (
                                 <Button

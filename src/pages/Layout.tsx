@@ -16,7 +16,7 @@ export default function Layout() {
       {!hideSidebar && <AppSidebar />}
       <main className="flex flex-col h-screen w-screen">
         {!hideSidebar && (
-          <div className="flex items-center justify-start bg-gray-50">
+          <div className="flex items-center justify-start bg-background">
             <SidebarTrigger />
           </div>
         )}

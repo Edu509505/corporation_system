@@ -255,7 +255,7 @@ export default function CriarDiarioDeObra() {
               />
             </PopoverContent>
           </Popover>
-          <div className="flex gap-3 items-center border-1 border-gray-500 rounded-2xl p-4 scroll-auto">
+          <div className="flex gap-3 items-center border-1 border-background0 rounded-2xl p-4 scroll-auto">
             <div className="space-y-4">
               <div className="flex flex-col gap-4 justify-center items-center">
                 {fields.map((field, index) => (

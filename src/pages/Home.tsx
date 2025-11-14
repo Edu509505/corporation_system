@@ -5,7 +5,7 @@ import Grafico from "@/components/graficos/GraficoM2";
 
 function Home() {
   return (
-    <main className="min-h-screen bg-gray-50 p-4">
+    <main className="min-h-screen bg-background p-4">
       <h1 className="text-xl font-semibold text-gray-800 mb-4">Painel de Propostas</h1>
 
       <div className="flex flex-wrap gap-x-4 gap-y-6">

@@ -115,7 +115,7 @@ export default function CriarCliente() {
 
 
   return (
-    <div className="w-full h-screen flex flex-col p-4 gap-3 bg-gray-50">
+    <div className="w-full h-screen flex flex-col p-4 gap-3 bg-background">
       <div className="flex gap-3 items-center">
         <CircleFadingPlusIcon className="size-10" />
         <h1 className="text-2xl font-bold">Cadastrar novo Cliente</h1>
@@ -200,7 +200,7 @@ export default function CriarCliente() {
                 <FormControl>
                   <Input placeholder="Domínio" {...field} />
                 </FormControl>
-                <FormLabel className="text-gray-500">
+                <FormLabel className="text-background0">
                   O cliente possui algum domínio? Exemplo: cliente.com.br
                 </FormLabel>
                 <FormMessage />

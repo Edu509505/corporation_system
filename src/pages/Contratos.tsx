@@ -47,7 +47,7 @@ function Contratos() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br bg-gray-50 flex flex-col p-8 gap-3">
+    <div className="min-h-screen bg-gradient-to-br bg-background flex flex-col p-8 gap-3">
       <h1 className="text-3xl font-bold">Contratos</h1>
       <p className="text-gray-600">
         Visualize e gerencie os contratos cadastrados no sistema.

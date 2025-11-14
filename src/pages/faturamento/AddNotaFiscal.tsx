@@ -225,7 +225,7 @@ function AdicionarNotaFiscal() {
     } catch { }
   };
   return (
-    <div className="flex flex-col bg-gray-50 w-full gap-3 p-4">
+    <div className="flex flex-col bg-background w-full gap-3 p-4">
       <header>
         <Link to="/notasFiscais">
           <Button>
@@ -234,7 +234,7 @@ function AdicionarNotaFiscal() {
         </Link>
         <h1 className="text-2xl font-bold">Adicionar Nota Fiscal</h1>
         <p className="text-gray-600">Preencha os detalhe abaixo.</p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-background0">
           <strong>Atenção:</strong> Ao cadastrar uma nova Nota Fiscal é
           necessário selecionar o cliente a qual essa nota pertence e a qual
           mediçõa ela estará referenciando

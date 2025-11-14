@@ -104,7 +104,7 @@ function Quantitativa({ itemVersionamento }: funcoesQuantitativa) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-3">
-          <div className="flex gap-3 items-center border-1 border-gray-500 rounded-2xl p-4 scroll-auto">
+          <div className="flex gap-3 items-center border-1 border-background0 rounded-2xl p-4 scroll-auto">
             <div className="space-y-4">
               <div className="flex flex-col gap-4">
                 {fields.map((field, index) => (

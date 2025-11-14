@@ -8,7 +8,7 @@ import PageTableMedicao from "@/components/medicao/tabelaMedicao/page";
 function Medicao() {
   return (
     <>
-      <main className="flex flex-col items-center justify-start h-screen p-4 gap-3 bg-gray-50">
+      <main className="flex flex-col items-center justify-start h-screen p-4 gap-3 bg-background">
         <article className="items-start w-full ">
           <h1 className="font-bold text-3xl">Medição</h1>
           <h2>Metragem de contratos e trabalhos avulso</h2>

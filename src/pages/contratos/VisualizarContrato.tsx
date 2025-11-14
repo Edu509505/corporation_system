@@ -130,7 +130,7 @@ function GetInfoContratos() {
 
 
   return (
-    <div className="w-full flex flex-col flex-wrap gap-3 p-4 bg-gray-50">
+    <div className="w-full flex flex-col flex-wrap gap-3 p-4 bg-background">
       <Link to={'/contratos'}>
         <Button className="cursor-pointer"><ArrowLeftCircleIcon />Retornar</Button>
       </Link>
