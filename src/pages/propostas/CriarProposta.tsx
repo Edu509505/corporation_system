@@ -119,6 +119,7 @@ function AddProposta() {
 
   const onSubmit = async (data: z.infer<typeof propostaSchema>) => {
     try {
+      
       setIsLoading(true)
 
       const form = new FormData();
@@ -295,6 +296,7 @@ function AddProposta() {
                   className="mt-4 cursor-pointer"
                   variant="default"
                   disabled={isLoading}
+                  
                 >
                   {isLoading ? <><Spinner /> Criar Proposta</> : <>Criar Proposta</>}
 
