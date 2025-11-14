@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner"
 import {
   CircleArrowLeftIcon,
@@ -41,6 +40,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const url = import.meta.env.VITE_API_URL;
 //Qualquer Link relacionado ao Back-End sempre importar o .env como boa prática
@@ -52,7 +53,7 @@ const criarClienteSchema = z.object({
     .nonempty("Campo Obrigatório"),
   cnpj: z
     .string()
-    .refine((val) => val.length >= 14 ? cnpj.format(val) : !cnpj.format(val) ? { error: "Cnpj invélido" }:"")
+    .refine((val) => val.length >= 14 ? cnpj.format(val) : !cnpj.format(val) ? { error: "Cnpj invélido" } : "")
     .refine((val) => cnpj.isValid(val), { error: "Cnpj Inválido" })
     .min(18, "Escreva um cnpj válido")
     .nonempty("Campo Obrigatório"),
@@ -78,48 +79,40 @@ export default function CriarCliente() {
     },
   });
 
-  const [ isLoading, setIsLoading ] = useState<boolean>(false)
-  const [ alertDialog, setAlertDialog ] = useState<boolean>(false)
+  const criarUsuario = useMutation({
+  mutationKey: ['criarUsuario'],
+  mutationFn: async (data: z.infer<typeof criarClienteSchema>) => {
+    const response = await fetch(`${url}/clientes`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Erro ${response.status}: ${errorText}`)
+    }
+
+    return response.json()
+  },
+})
+
 
   const onSubmit = async (data: z.infer<typeof criarClienteSchema>) => {
-    console.log(data);
-
-    try {
-      setIsLoading(true)
-      const response = await fetch(`${url}/clientes`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      console.log("parei aqui");
-
-      if (!response.ok) {
-        // Aqui você lida com o erro de forma clara
-        setResponseOk(false);
-        const errorText = await response.text();
-        throw new Error(`Erro ${response.status}: ${errorText}`);
-      }
-      console.log("estou aqui");
-      const body = await response.json();
-      console.log("Cliente criado com sucesso:", body);
-      setResponseOk(true);
-      setIsLoading(false);
-      setAlertDialog(true);
-    } catch (error) {
-      console.error("Falha ao criar cliente:", error);
-      setResponseOk(false);
-      setIsLoading(false);
-      setAlertDialog(true)
+  toast.promise(
+    criarUsuario.mutateAsync(data),
+    {
+      loading: 'Cadastrando cliente...',
+      success: () => 'Cliente cadastrado com sucesso!',
+      error: (err) => `Erro: ${(err as Error).message}`,
     }
-  };
+  )
+  formCliente.reset()
+}
 
-  const [responseOk, setResponseOk] = useState(false);
-
-  // console.log("handleSubmit", handleSubmit);
 
   return (
     <div className="w-full h-screen flex flex-col p-4 gap-3 bg-gray-50">
@@ -224,19 +217,13 @@ export default function CriarCliente() {
                 <CircleArrowLeftIcon /> Voltar
               </Button>
             </Link>
-            <AlertDialog open={alertDialog} defaultOpen={alertDialog}>
+            <AlertDialog open={criarUsuario.isSuccess || criarUsuario.isError}>
               <AlertDialogTrigger asChild>
-                <Button
-                  type="submit"
-                  variant="default"
-                  className="cursor-pointer"
-                  disabled={isLoading}
-                >
-                  {isLoading? <><Spinner /> Cadastrar</> : <><CircleCheck /> Cadastrar</>}
-                  
+                <Button type="submit" disabled={criarUsuario.isPending} className="cursor-pointer">
+                  {criarUsuario.isPending ? <><Spinner /> Cadastrar</> : <><CircleCheck /> Cadastrar</>}
                 </Button>
               </AlertDialogTrigger>
-              {!responseOk ? (
+              {criarUsuario.isError ? (
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-3 text-destructive">
@@ -247,10 +234,7 @@ export default function CriarCliente() {
                       Tente novamente mais tarde
                     </AlertDialogDescription>
                     <AlertDialogFooter>
-                      <AlertDialogCancel 
-                      className="cursor-pointer"
-                      onClick={() => setAlertDialog(false)}
-                      >
+                      <AlertDialogCancel className="cursor-pointer">
                         Voltar
                       </AlertDialogCancel>
                     </AlertDialogFooter>

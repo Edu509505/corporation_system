@@ -28,6 +28,7 @@ import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  useMutation,
   useQueryErrorResetBoundary,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -42,6 +43,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 
 interface Cliente {
   name: string;
@@ -75,10 +77,7 @@ const editarClienteSchema = z.object({
 function UpdateCliente() {
   const { id } = useParams<{ id: string }>(); // Pega o ID da URL
 
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [alertDialog, setAlertDialog] = useState<boolean>(false)
-
-  const { data: cliente, refetch: clienteRefetch} = useSuspenseQuery({
+  const { data: cliente, refetch: clienteRefetch } = useSuspenseQuery({
     queryKey: ["cliente", id],
     queryFn: async () => {
       const response = await fetch(`${url}/cliente/${id}`, {
@@ -106,38 +105,38 @@ function UpdateCliente() {
     },
   });
 
+  const criarUsuario = useMutation({
+    mutationKey: ['criarUsuario'],
+    mutationFn: async (data: z.infer<typeof editarClienteSchema>) => {
+      const response = await fetch(`${url}/cliente/${id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`Erro ${response.status}: ${errorText}`)
+      }
+
+      return response.json()
+    },
+  })
+
   const onSubmit = async (data: z.infer<typeof editarClienteSchema>) => {
-    console.log(data);
-    try {
-      setIsLoading(true)
-  
-          const response = await fetch(`${url}/cliente/${id}`, {
-            method: "PUT", // ou PATCH, dependendo da sua API
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          });
-          console.log("parei aqui", response);
-          if (!response.ok) {
-            setResponseOk(false);
-            throw new Error("Erro ao atualizar cliente");
-          }
-          setResponseOk(true);
-          setIsLoading(false);
-          setAlertDialog(true);
-
-          console.log("cheguei aqui");
-    } catch (error){
-      console.error("Falha ao criar cliente:", error);
-      setResponseOk(false);
-      setIsLoading(false);
-      setAlertDialog(true)
-    }finally{setIsLoading(false)}
+    toast.promise(
+      criarUsuario.mutateAsync(data),
+      {
+        loading: 'Cadastrando cliente...',
+        success: () => 'Cliente cadastrado com sucesso!',
+        error: (err) => `Erro: ${(err as Error).message}`,
+      }
+    )
+    formCliente.reset()
   };
-
-  const [responseOk, setResponseOk] = useState(false);
 
   return (
     <div className="w-full h-screen flex flex-col p-4 gap-3 bg-gray-50">
@@ -242,34 +241,28 @@ function UpdateCliente() {
                 <CircleArrowLeftIcon /> Voltar
               </Button>
             </Link>
-            <AlertDialog open={alertDialog} defaultOpen={alertDialog}>
+            <AlertDialog open={criarUsuario.isSuccess || criarUsuario.isError}>
               <AlertDialogTrigger asChild>
-                <Button
-                  type="submit"
-                  variant="default"
-                  className="cursor-pointer"
-                  disabled={isLoading}
-                >
-                  {isLoading? <><Spinner /> Cadastrar</> : <><CircleCheck /> Cadastrar</>}
+                <Button type="submit" disabled={criarUsuario.isPending} className="cursor-pointer">
+                  {criarUsuario.isPending ? <><Spinner /> Cadastrar</> : <><CircleCheck /> Cadastrar</>}
                 </Button>
               </AlertDialogTrigger>
-              {!responseOk ? (
+              {criarUsuario.isError ? (
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-3 text-destructive">
                       <CircleX />
-                      Não foi possível cadastrar o usuário
+                      Não foi possível atualizar o cliente
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       Tente novamente mais tarde
                     </AlertDialogDescription>
                     <AlertDialogFooter>
-                      <AlertDialogCancel 
-                      className="cursor-pointer"
-                      onClick={() => setAlertDialog(false)}
-                      >
-                        Continuar
-                      </AlertDialogCancel>
+                      <Link to={"/clientes"}>
+                        <AlertDialogCancel className="cursor-pointer">
+                          Voltar
+                        </AlertDialogCancel>
+                      </Link>
                     </AlertDialogFooter>
                   </AlertDialogHeader>
                 </AlertDialogContent>
@@ -278,11 +271,10 @@ function UpdateCliente() {
                   <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-3 text-ring">
                       <CircleCheck />
-                      Cadastro de Usuario atualizado com sucesso
+                      Cliente atualizado com sucesso
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                      As informações do usario foram atualizados e inserido no
-                      sistema
+                      Cliente atualizado e inserido no sistema
                     </AlertDialogDescription>
                     <AlertDialogFooter>
                       <Link to={"/clientes"}>

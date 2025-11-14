@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { CirclePlus } from "lucide-react";
 import { Link } from "react-router-dom";
-import TabelaPropostas from "@/components/componentsVersionamento/page";
-
+import PageTablePropostas from "@/components/propostas/page";
 
 export default function VerPropostas() {
+
   return (
     <>
       <main className="flex flex-col items-center justify-start h-screen p-2 pt-5 pb-10 gap-3 bg-gray-50">
@@ -21,7 +21,7 @@ export default function VerPropostas() {
             </Button>
            </Link>
           </div>
-          <TabelaPropostas />
+          <PageTablePropostas />
         </article>
       </main>
     </>

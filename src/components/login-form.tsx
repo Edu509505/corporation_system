@@ -87,7 +87,7 @@ function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
       aria-busy={mutation.isPending}
       {...props}
     >
-      <div className="flex-col lg:hidden"> <img src={LogoHorizon} className="size-20"/> </div>
+      <div className="flex-col lg:hidden"> <img src={LogoHorizon} className="size-20" /> </div>
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Bem-Vindo</h1>
@@ -204,17 +204,17 @@ export function LoginFormEnviar() {
           </div>
         </div>
       </div>
-      <div className="bg-muted relative hidden lg:block">
+      <div className=" relative hidden bg-gray-800 bg-opacity-30 lg:block">
         <img
           src={ImagemLogin}
           alt="Imagem"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] blur-[4px] dark:grayscale"
+          className="absolute inset-0 h-full w-full opacity-10  object-cover dark:brightness-[0.2] dark:grayscale"
         />
         <div className="absolute size-96 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white p-2 text-5xl flex flex-col items-center justify-center">
           <img src={LogoHorizon} />
-          <div className="backdrop-blur-[6px] rounded-2xl p-3">
-            <h1 >Horizon System</h1>
-          </div>
+
+          <h1 >Horizon System</h1>
+
         </div>
       </div>
     </div>
