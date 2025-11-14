@@ -1,5 +1,5 @@
 import PageTableFaturamento from "@/components/faturamento/page";
-import  GraficoFaturamento  from "@/components/graficos/GraficoFaturamento";
+// import  GraficoFaturamento  from "@/components/graficos/GraficoFaturamento";
 import { Button } from "@/components/ui/button";
 import { CirclePlus } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -19,7 +19,7 @@ function NotasFiscais() {
         </Link>
       </section>
       <section> 
-        <GraficoFaturamento />
+        {/* <GraficoFaturamento /> */}
       </section>
       <section>
         <PageTableFaturamento />
