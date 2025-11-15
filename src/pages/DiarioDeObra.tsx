@@ -1,31 +1,10 @@
-// import { useQuery } from '@tanstack/react-query';
-// import { fetchDiarioDeObraPorProposta } from '../services/diarioDeObraService';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { CirclePlus } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-// import TabelaDiariosDeObras from '@/components/diarioDeObra/TabelaDiarioDeObra'
-const url = import.meta.env.VITE_API_URL;
+import PageTableDiarioDeObras from '@/components/diarioDeObra/page';
 
 export default function ListaDeDiarios() {
-   const { data: getMedicoes } = useQuery({
-    queryKey: ["medicoes",],
-    queryFn: async () => {
-      const response = await fetch(
-        `${url}/getMedicoes`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-      if (!response.ok) return;
-      const data = await response.json();
-      return data 
-    },
-  });
-
-  console.log(getMedicoes)
-
+   
   const navigate = useNavigate();
   const handleClick = () => {
     navigate("/criarDiarioDeObra"); // Navigates to the /dashboard route
@@ -45,7 +24,7 @@ export default function ListaDeDiarios() {
               Criar Proposta
             </Button>
           </div>
-          {/* <TabelaDiariosDeObras /> */}
+          <PageTableDiarioDeObras />
         </article>
       </main>
     </>

@@ -3,6 +3,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Link } from "react-router-dom";
 import { Badge } from "../ui/badge";
 import { CircleCheck, CircleX, Timer } from "lucide-react";
+import { format } from "date-fns/format";
 
 export interface DiarioDeObra {
   createdAt: string
@@ -39,6 +40,15 @@ export interface DiarioDeObra {
 }
 
 export const columns: ColumnDef<DiarioDeObra>[] = [
+  {
+    id: "createdAt",
+    accessorKey: "createdAt",
+    header:() => <>Data</>,
+    cell: ({ row }) => {
+      const data = row.getValue("createdAt")
+      return format(new Date(data as string), "dd/MM/yyyy")
+    }
+  },
   {
     id: "cliente.name",
     accessorKey: "cliente.name",

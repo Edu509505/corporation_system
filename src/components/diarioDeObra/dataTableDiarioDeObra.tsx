@@ -57,7 +57,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
-export function DataTableProposta<TData, TValue>({
+export function DataTableDiarioDeObra<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {

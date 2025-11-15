@@ -1,5 +1,6 @@
 
-import logo from "../../assets/img/logo.png"
+import logo from "../../assets/img/logo.svg"
+import { Spinner } from "./spinner";
 
 export function GlobalLoader() {
   return (
@@ -7,10 +8,9 @@ export function GlobalLoader() {
       <img
         src={logo}
         alt="Logo da empresa"
-        className="h-16 w-auto animate-pulse"
+        className="size-50"
       />
-      <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-green-500 border-solid" />
-      <p className="text-sm text-muted-foreground">Verificando sessão...</p>
+      <Spinner className="text-green-800"/>
     </div>
   );
 }

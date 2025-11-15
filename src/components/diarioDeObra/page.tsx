@@ -7,7 +7,7 @@ export default function PageTableDiarioDeObras() {
   const { data: DiarioDeObras } = useQuery({
     queryKey: ["DiarioDeObras"],
     queryFn: async () => {
-      const response = await fetch(`${url}/DiarioDeObras`, {
+      const response = await fetch(`${url}/diarioDeObras`, {
         method: "GET",
         credentials: "include",
       });
@@ -16,6 +16,8 @@ export default function PageTableDiarioDeObras() {
       return data as DiarioDeObra[];
     },
   });
+
+  console.log("Page", DiarioDeObras)
 
   return (
     <div className="container mx-auto">
