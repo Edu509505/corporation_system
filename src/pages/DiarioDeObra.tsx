@@ -1,10 +1,9 @@
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { CirclePlus } from 'lucide-react';
-import PageTableDiarioDeObras from '@/components/diarioDeObra/page';
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { CirclePlus } from "lucide-react";
+import PageTableDiarioDeObras from "@/components/diarioDeObra/page";
 
 export default function ListaDeDiarios() {
-   
   const navigate = useNavigate();
   const handleClick = () => {
     navigate("/criarDiarioDeObra"); // Navigates to the /dashboard route

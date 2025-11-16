@@ -42,14 +42,14 @@ interface Cliente {
 }
 
 interface Propostas {
-  createdAt: string
-  descricao: string
-  id: number
-  idCliente: number
-  nomeDaProposta: string
-  statusProposta: string
-  updatedAt: string
-  valorProposta: number
+  createdAt: string;
+  descricao: string;
+  id: number;
+  idCliente: number;
+  nomeDaProposta: string;
+  statusProposta: string;
+  updatedAt: string;
+  valorProposta: number;
 }
 
 interface DataTableProps<TData, TValue> {
@@ -79,7 +79,6 @@ export function DataTableDiarioDeObra<TData, TValue>({
     },
   });
 
-
   const { data: clientes } = useQuery({
     queryKey: ["clientes"],
     queryFn: async () => {
@@ -102,7 +101,7 @@ export function DataTableDiarioDeObra<TData, TValue>({
       });
       if (!response.ok) throw new Error("Propostas");
       const data = await response.json();
-      return data as Propostas[]
+      return data as Propostas[];
     },
   });
 
@@ -114,30 +113,18 @@ export function DataTableDiarioDeObra<TData, TValue>({
           <h1 className="font-bold">Filtros</h1>
         </div>
         <div className="flex flex-wrap gap-3 py-3">
-          {/* <div className="flex flex-col gap-3">
-            <Label>Número da Nota</Label>
-            <Input
-              placeholder="Número da Nota"
-              type="number"
-              value={(table.getColumn("numeroDaNota")?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn("numeroDaNota")?.setFilterValue(event.target.value)
-              }
-              className="w-[150px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            />
-          </div> */}
           <div className="flex flex-col gap-3">
             <Label>Empresa</Label>
 
             <Select
               onValueChange={(event) =>
                 table
-                  .getColumn("cliente.name")
+                  .getColumn("propostaDiario.cliente.name")
                   ?.setFilterValue(event)
               }
               defaultValue={
                 (table
-                  .getColumn("cliente.name")
+                  .getColumn("propostaDiario.cliente.name")
                   ?.getFilterValue() as string) ?? ""
               }
             >
@@ -157,17 +144,17 @@ export function DataTableDiarioDeObra<TData, TValue>({
             </Select>
           </div>
           <div className="flex flex-col gap-3">
-            <Label>Empresa</Label>
+            <Label>Obra</Label>
 
             <Select
               onValueChange={(event) =>
                 table
-                  .getColumn("nomeDaProposta")
+                  .getColumn("propostaDiario.nomeDaProposta")
                   ?.setFilterValue(event)
               }
               defaultValue={
                 (table
-                  .getColumn("nomeDaProposta")
+                  .getColumn("propostaDiario.nomeDaProposta")
                   ?.getFilterValue() as string) ?? ""
               }
             >
@@ -186,106 +173,6 @@ export function DataTableDiarioDeObra<TData, TValue>({
               </SelectContent>
             </Select>
           </div>
-          {/* <div className="flex flex-col gap-3">
-            <Label>Tipo</Label>
-            <Select
-              onValueChange={(event) =>
-                table.getColumn("tipo")?.setFilterValue(event)
-              }
-              // value={
-              //   (table.getColumn("tipo")?.getFilterValue() as string) ?? ""
-              // }
-              defaultValue={
-                (table.getColumn("tipo")?.getFilterValue() as string) ?? ""
-              }
-            >
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Selecionar tipo" />
-              </SelectTrigger>
-
-              <SelectContent className="w-[150px]">
-                <SelectGroup>
-                  <SelectLabel>Proposta</SelectLabel>
-                  <SelectItem value="LOCACAO">Locação</SelectItem>
-                  <SelectItem value="SERVICO">Serviço</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div> */}
-          <div className="flex flex-col gap-3">
-            {/* <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-[200px] justify-start text-left font-normal"
-                >
-                  {selectedDate ? format(selectedDate, "dd/MM/yyyy") : "Selecionar Data"}
-                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  captionLayout="dropdown"
-                />
-              </PopoverContent>
-            </Popover> */}
-
-          </div>
-          <div className="flex flex-col gap-3">
-            <Label>Situação</Label>
-            <Select
-              onValueChange={(event) =>
-                table.getColumn("statusProposta")?.setFilterValue(event)
-              }
-              // value={
-              //   (table.getColumn("tipo")?.getFilterValue() as string) ?? ""
-              // }
-              defaultValue={
-                (table.getColumn("statusProposta")?.getFilterValue() as string) ?? ""
-              }
-            >
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Selecionar tipo" />
-              </SelectTrigger>
-
-              <SelectContent className="w-[150px]">
-                <SelectGroup>
-                  <SelectLabel>Situação</SelectLabel>
-                  <SelectItem value="EM_ANALISE">Em Análise</SelectItem>
-                  <SelectItem value="APROVADA">Aprovada</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          {/* <div className="flex flex-col gap-3">
-            <Label>Emissão</Label>
-            <Input
-              placeholder="Emissão"
-              type="date"
-              value={(table.getColumn("createdAt")?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn("createdAt")?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm no-calendar border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-
-          </div>
-          <div className="flex flex-col gap-3">
-            <Label>Vencimento</Label>
-            <Input
-              placeholder="Vencimento"
-              type="date"
-              value={(table.getColumn("vencimento")?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn("vencimento")?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm no-calendar"
-            />
-
-          </div> */}
         </div>
       </section>
       <div className="overflow-hidden rounded-md border">
@@ -299,9 +186,9 @@ export function DataTableDiarioDeObra<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   );
                 })}

@@ -17,8 +17,6 @@ export default function PageTableDiarioDeObras() {
     },
   });
 
-  console.log("Page", DiarioDeObras)
-
   return (
     <div className="container mx-auto">
       <DataTableDiarioDeObra columns={columns} data={DiarioDeObras ?? []} />

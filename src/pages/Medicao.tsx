@@ -13,7 +13,7 @@ function Medicao() {
           <h1 className="font-bold text-3xl">Medição</h1>
           <h2>Metragem de contratos e trabalhos avulso</h2>
         </article>
-        <div className="w-full">
+        <div className="w-full flex flex-col gap-3">
           <Link to="/adicionarMedicao">
             <Button className="cursor-pointer">
               {" "}

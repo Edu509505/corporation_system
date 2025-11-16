@@ -105,7 +105,7 @@ export default function CriarDiarioDeObra() {
   const dataDia = form.watch("dataDia");
   const idPropostaSelecionada = form.watch("idProposta");
 
-  console.log(idPropostaSelecionada)
+  console.log(idPropostaSelecionada);
 
   const { data: quantitativasForProposta } = useQuery({
     queryKey: ["quantitativas", idPropostaSelecionada],
@@ -146,7 +146,7 @@ export default function CriarDiarioDeObra() {
     try {
       const payload = {
         idProposta: Number(values.idProposta),
-        dataDia: dayjs(values.dataDia).format("YYYY-MM-DD"), // ✅ formato puro, sem horário
+        dataDia: dayjs(values.dataDia).format("YYYY-MM-DD"),
         itensDoDia: values.itensDoDia.map((it) => ({
           descricao: it.descricao,
           idQuantitativa: Number(it.idQuantitativa),
