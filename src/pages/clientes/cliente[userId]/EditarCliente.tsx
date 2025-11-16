@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CircleArrowLeftIcon, CircleCheck, CircleX, Edit } from "lucide-react";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import { Link, useParams } from "react-router-dom";
 import { cnpj } from "cpf-cnpj-validator";
 import {
@@ -82,7 +82,7 @@ function UpdateCliente() {
     queryFn: async () => {
       const response = await fetch(`${url}/cliente/${id}`, {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
       });
       if (!response.ok) throw new Error("Cliente não encontrado");
       const data = await response.json();
@@ -90,9 +90,9 @@ function UpdateCliente() {
     },
   });
 
-  console.log(cliente)
+  console.log(cliente);
 
-  clienteRefetch()
+  clienteRefetch();
 
   const formCliente = useForm<z.infer<typeof editarClienteSchema>>({
     resolver: zodResolver(editarClienteSchema),
@@ -106,36 +106,33 @@ function UpdateCliente() {
   });
 
   const criarUsuario = useMutation({
-    mutationKey: ['criarUsuario'],
+    mutationKey: ["criarUsuario"],
     mutationFn: async (data: z.infer<typeof editarClienteSchema>) => {
       const response = await fetch(`${url}/cliente/${id}`, {
-        method: 'PUT',
-        credentials: 'include',
+        method: "PUT",
+        credentials: "include",
         headers: {
-          'Content-type': 'application/json',
+          "Content-type": "application/json",
         },
         body: JSON.stringify(data),
-      })
+      });
 
       if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Erro ${response.status}: ${errorText}`)
+        const errorText = await response.text();
+        throw new Error(`Erro ${response.status}: ${errorText}`);
       }
 
-      return response.json()
+      return response.json();
     },
-  })
+  });
 
   const onSubmit = async (data: z.infer<typeof editarClienteSchema>) => {
-    toast.promise(
-      criarUsuario.mutateAsync(data),
-      {
-        loading: 'Cadastrando cliente...',
-        success: () => 'Cliente cadastrado com sucesso!',
-        error: (err) => `Erro: ${(err as Error).message}`,
-      }
-    )
-    formCliente.reset()
+    toast.promise(criarUsuario.mutateAsync(data), {
+      loading: "Cadastrando cliente...",
+      success: () => "Cliente cadastrado com sucesso!",
+      error: (err) => `Erro: ${(err as Error).message}`,
+    });
+    formCliente.reset();
   };
 
   return (
@@ -243,8 +240,20 @@ function UpdateCliente() {
             </Link>
             <AlertDialog open={criarUsuario.isSuccess || criarUsuario.isError}>
               <AlertDialogTrigger asChild>
-                <Button type="submit" disabled={criarUsuario.isPending} className="cursor-pointer">
-                  {criarUsuario.isPending ? <><Spinner /> Cadastrar</> : <><CircleCheck /> Cadastrar</>}
+                <Button
+                  type="submit"
+                  disabled={criarUsuario.isPending}
+                  className="cursor-pointer"
+                >
+                  {criarUsuario.isPending ? (
+                    <>
+                      <Spinner /> Cadastrar
+                    </>
+                  ) : (
+                    <>
+                      <CircleCheck /> Cadastrar
+                    </>
+                  )}
                 </Button>
               </AlertDialogTrigger>
               {criarUsuario.isError ? (

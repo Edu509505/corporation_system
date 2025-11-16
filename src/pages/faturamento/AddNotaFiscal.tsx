@@ -175,7 +175,7 @@ function AdicionarNotaFiscal() {
       idProposta: "",
       tipo: "",
       valor: "",
-      numeroDaNota: ""
+      numeroDaNota: "",
     },
   });
 
@@ -192,10 +192,10 @@ function AdicionarNotaFiscal() {
       form.set("idCliente", data.idCliente);
       form.set("idProposta", data.idProposta);
       form.set("idMedicao", data.idMedicao);
-      form.set("valor", data.valor.replace(',', '.'));
+      form.set("valor", data.valor.replace(",", "."));
       form.set("vencimento", data.vencimento.toString());
       form.set("tipo", data.tipo);
-      form.set("numeroDaNota", data.numeroDaNota)
+      form.set("numeroDaNota", data.numeroDaNota);
       form.append("anexo", data.anexo);
 
       for (let [key, value] of form.entries()) {
@@ -222,7 +222,7 @@ function AdicionarNotaFiscal() {
       setResponseOk(true);
       setResponseNotOk(false);
       console.log("Cliente criado com sucesso:", body);
-    } catch { }
+    } catch {}
   };
   return (
     <div className="flex flex-col bg-background w-full gap-3 p-4">
@@ -237,7 +237,7 @@ function AdicionarNotaFiscal() {
         <p className="text-sm text-background0">
           <strong>Atenção:</strong> Ao cadastrar uma nova Nota Fiscal é
           necessário selecionar o cliente a qual essa nota pertence e a qual
-          mediçõa ela estará referenciando
+          medição ela estará referenciando
         </p>
       </header>
       <main className="">
@@ -254,14 +254,12 @@ function AdicionarNotaFiscal() {
                   <FormItem>
                     <FormLabel>Cliente</FormLabel>
                     <Select
-
                       onValueChange={(value) => {
                         setIdCliente(value.toString());
                         field.onChange(value);
                         propostasAprovadas;
                       }}
                       defaultValue={field.value}
-
                     >
                       <FormControl>
                         <SelectTrigger className="w-[300px] bg-white">
@@ -293,7 +291,6 @@ function AdicionarNotaFiscal() {
                   <FormItem>
                     <FormLabel>Proposta</FormLabel>
                     <Select
-
                       onValueChange={(value) => {
                         field.onChange(value);
                         setIdProposta(value.toString());
@@ -308,7 +305,7 @@ function AdicionarNotaFiscal() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="w-[300px]">
-                        <SelectGroup >
+                        <SelectGroup>
                           <SelectLabel>Proposta</SelectLabel>
                           {propostasAprovadas?.map((proposta) => (
                             <SelectItem
@@ -330,7 +327,7 @@ function AdicionarNotaFiscal() {
                 name="idMedicao"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Medicao</FormLabel>
+                    <FormLabel>Medicão</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -376,7 +373,8 @@ function AdicionarNotaFiscal() {
                         pattern="[0-9]*"
                         // onInputCapture={(value) => value.replace(/[^0-9]/g, '')}
                         placeholder="N° - "
-                        {...field} />
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -462,7 +460,8 @@ function AdicionarNotaFiscal() {
                         pattern="[0-9]*"
                         // onInputCapture={(value) => value.replace(/[^0-9]/g, '')}
                         placeholder="R$ - "
-                        {...field} />
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

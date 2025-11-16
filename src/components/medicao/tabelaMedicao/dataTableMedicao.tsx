@@ -52,53 +52,61 @@ export function DataTableMedicao<TData, TValue>({
 
   return (
     <>
-    <section className="flex flex-col">
-      <div className="flex gap-3">
-      <Filter />
-      <h1 className="font-bold">Filtros</h1>
+      <section className="flex flex-col">
+        <div className="flex gap-3">
+          <Filter />
+          <h1 className="font-bold">Filtros</h1>
         </div>
-      <div className="flex gap-3">
-      <div className="flex flex-col gap-3 py-4">
-        <Label>Empresa</Label>
-        <Input
-          placeholder="filtrar"
-          value={
-            (table.getColumn("clienteMedicao.name")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("clienteMedicao.name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-      </div>
-      <div className="flex flex-col gap-3 py-4">
-        <Label>Cliente</Label>
-        <Input
-          placeholder="filtrar"
-          value={
-            (table.getColumn("propostaMedicao.nomeDaProposta")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("propostaMedicao.nomeDaProposta")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-      </div>
-      <div className="flex flex-col gap-3 py-4">
-        <Label>Situaão</Label>
-        <Input
-          placeholder="filtrar"
-          value={
-            (table.getColumn("faturado")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("faturado")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-      </div>
-      </div>
-    </section>
+        <div className="flex gap-3">
+          <div className="flex flex-col gap-3 py-4">
+            <Label>Empresa</Label>
+            <Input
+              placeholder="filtrar"
+              value={
+                (table
+                  .getColumn("clienteMedicao.name")
+                  ?.getFilterValue() as string) ?? ""
+              }
+              onChange={(event) =>
+                table
+                  .getColumn("clienteMedicao.name")
+                  ?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
+          </div>
+          <div className="flex flex-col gap-3 py-4">
+            <Label>Cliente</Label>
+            <Input
+              placeholder="filtrar"
+              value={
+                (table
+                  .getColumn("propostaMedicao.nomeDaProposta")
+                  ?.getFilterValue() as string) ?? ""
+              }
+              onChange={(event) =>
+                table
+                  .getColumn("propostaMedicao.nomeDaProposta")
+                  ?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
+          </div>
+          <div className="flex flex-col gap-3 py-4">
+            <Label>Situação</Label>
+            <Input
+              placeholder="filtrar"
+              value={
+                (table.getColumn("faturado")?.getFilterValue() as string) ?? ""
+              }
+              onChange={(event) =>
+                table.getColumn("faturado")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
+          </div>
+        </div>
+      </section>
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
