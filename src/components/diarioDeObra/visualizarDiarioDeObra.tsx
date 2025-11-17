@@ -59,21 +59,21 @@ function VisualizarDiarioDeObra(id: PropDiario) {
   console.log(itensDiaDiario);
 
   return (
-    <div className="w-full ">
+    <div className="w-full overflow-auto">
       <Table className="bg-white">
         <TableHeader className="bg-gray-300">
           <TableRow>
             <TableHead>Descrição</TableHead>
             <TableHead>Item</TableHead>
-            <TableHead>Unidade de Medida:</TableHead>
+            <TableHead>Medida</TableHead>
             <TableHead>Quantidade</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {itensDiaDiario?.map((item) => (
             <TableRow>
-              <TableCell> {item.descricao}</TableCell>
-              <TableCell> {item.quantitativaItensDia.descricao}</TableCell>
+              <TableCell>{item.descricao}</TableCell>
+              <TableCell>{item.quantitativaItensDia.descricao}</TableCell>
               <TableCell>{item.quantitativaItensDia.unidadeDeMedida}</TableCell>
               <TableCell>{item.quantidade}</TableCell>
             </TableRow>
