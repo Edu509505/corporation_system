@@ -17,18 +17,16 @@ export default function ListaDeDiarios() {
           <div className="flex items-center justify-end w-full">
             <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="default"><CirclePlus/>Criar Diário</Button>
+                  <Button variant="default" className="cursor-pointer"><CirclePlus/>Criar Diário</Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[500px] overflow-auto">
+                <DialogContent className="sm:max-w-[500px]">
                   <DialogHeader>
-                    <DialogTitle>Edit profile</DialogTitle>
+                    <DialogTitle className="flex gap-3 items-center"><CirclePlus /> Adicionar Diário de Obra</DialogTitle>
                     <DialogDescription>
                       Preencha os itens abaixo para criar um novo diário
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="overflow-auto">
                     <Create />
-                  </div>
                 </DialogContent>
             </Dialog>
           </div>

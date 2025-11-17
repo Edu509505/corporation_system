@@ -86,7 +86,7 @@ export const columns: ColumnDef<DiarioDeObra>[] = [
             <VisualizarDiarioDeObra id={row.original.id} />
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline">Fechar</Button>
+                <Button variant="outline" className="cursor-pointer">Fechar</Button>
               </DialogClose>
             </DialogFooter>
           </DialogContent>

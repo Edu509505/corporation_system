@@ -125,7 +125,7 @@ function PeriodoFechamento({
 
   return (
     <main className="h-full flex flex-col gap-3">
-      <section className="rounded-md border overflow-auto h-[450px]">
+      <section className="rounded-md border max-h-[450px] overflow-auto">
         <Table>
           <TableHeader>
             <TableRow>

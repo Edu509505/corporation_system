@@ -159,6 +159,7 @@ export default function CriarDiarioDeObra() {
       };
 
       await criarDiarioMutation.mutateAsync(payload);
+      await query.invalidateQueries({ queryKey: ["DiarioDeObras"] })
       form.reset({ idProposta: "", dataDia: new Date(), itensDoDia: [] });
       setToast({ message: "Diário criado com sucesso", type: "success" });
       setTimeout(() => setToast(null), 3000);
@@ -180,12 +181,12 @@ export default function CriarDiarioDeObra() {
   const itensDoDia = form.watch("itensDoDia");
   const isFormValid = itensDoDia.length > 0 && form.formState.isValid;
 
-  function invalidateQueries(arg0: { queryKey: string[]; }): void {
-    throw new Error("Function not implemented.");
-  }
+  // function invalidateQueries(arg0: { queryKey: string[]; }): void {
+  //   throw new Error("Function not implemented.");
+  // }
 
   return (
-    <div className="flex flex-col p-4 gap-3 h-[350px]">
+    <div className="flex flex-col gap-3">
       {toast ? (
         <div
           className={`p-3 rounded ${toast.type === "success"
@@ -199,7 +200,7 @@ export default function CriarDiarioDeObra() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-3 overflow-auto"
+          className="flex flex-col gap-3"
         >
           <FormField
             control={form.control}
@@ -212,7 +213,7 @@ export default function CriarDiarioDeObra() {
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger className="w-auto">
+                    <SelectTrigger className="w-auto cursor-pointer">
                       <SelectValue placeholder="Selecionar proposta" />
                     </SelectTrigger>
                   </FormControl>
@@ -242,7 +243,7 @@ export default function CriarDiarioDeObra() {
               <Button
                 variant="outline"
                 id="date"
-                className="w-48 justify-between font-normal"
+                className="w-48 justify-between font-normal cursor-pointer"
               >
                 {dataDia ? dataDia.toLocaleDateString() : "Selecione a data"}
                 <ChevronDownIcon />
@@ -264,9 +265,9 @@ export default function CriarDiarioDeObra() {
               />
             </PopoverContent>
           </Popover>
-          <div className="flex gap-3 items-center border-1 border-background rounded-2xl">
+          <div className="flex gap-3 items-center">
             <div className="space-y-4">
-              <div className="flex flex-col gap-4 justify-center items-center h-[150px] overflow-auto">
+              <div className="flex flex-col gap-4 justify-start items-start md:w-full w-[250px] h-[150px] overflow-auto p-2">
                 {fields.map((field, index) => (
                   <div key={field.id} className="flex items-start gap-1">
                     <FormField
@@ -345,6 +346,7 @@ export default function CriarDiarioDeObra() {
                       type="button"
                       variant="ghost"
                       size="icon"
+                      className="cursor-pointer"
                       onClick={() => remove(index)}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -352,7 +354,9 @@ export default function CriarDiarioDeObra() {
                   </div>
                 ))}
               </div>
+              <div className="flex gap-3">
               <Button
+              className="cursor-pointer"
                 type="button"
                 onClick={() => {
                   append({
@@ -367,18 +371,18 @@ export default function CriarDiarioDeObra() {
               <DialogClose
                 type="submit"
                 disabled={!isFormValid || criarDiarioMutation.isPending}
-
+                className="cursor-pointer"
               >
                 <Button
                   type="submit"
                   disabled={!isFormValid || criarDiarioMutation.isPending}
-                  onClick={() => query.invalidateQueries({ queryKey: ['DiarioDeObras'] })}
                 >
                   {criarDiarioMutation.status === "pending"
                     ? "Criando..."
                     : "Criar"}
                 </Button>
               </DialogClose>
+              </div>
             </div>
           </div>
         </form>
