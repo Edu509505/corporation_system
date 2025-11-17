@@ -1,13 +1,10 @@
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CirclePlus } from "lucide-react";
 import PageTableDiarioDeObras from "@/components/diarioDeObra/page";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import Create from "@/components/diarioDeObra/Create";
 
 export default function ListaDeDiarios() {
-  const navigate = useNavigate();
-  const handleClick = () => {
-    navigate("/criarDiarioDeObra"); // Navigates to the /dashboard route
-  };
 
   return (
     <>
@@ -18,10 +15,22 @@ export default function ListaDeDiarios() {
         </article>
         <article className="w-full">
           <div className="flex items-center justify-end w-full">
-            <Button onClick={handleClick} className="cursor-pointer">
-              <CirclePlus />
-              Criar Proposta
-            </Button>
+            <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="default"><CirclePlus/>Criar Diário</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px] overflow-auto">
+                  <DialogHeader>
+                    <DialogTitle>Edit profile</DialogTitle>
+                    <DialogDescription>
+                      Preencha os itens abaixo para criar um novo diário
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="overflow-auto">
+                    <Create />
+                  </div>
+                </DialogContent>
+            </Dialog>
           </div>
           <PageTableDiarioDeObras />
         </article>
