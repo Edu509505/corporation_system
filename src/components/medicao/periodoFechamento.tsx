@@ -15,8 +15,6 @@ const url = import.meta.env.VITE_API_URL;
 const formatDateOnly = (date: Date | null) =>
   date ? date.toISOString().slice(0, 10) : "";
 
-
-
 interface PeriodoFechamentoProps {
   dataInicial: Date | null;
   dataFinal: Date | null;
@@ -63,7 +61,9 @@ function PeriodoFechamento({
     queryKey: ["getPeriodoDeObra", dataInicial, dataFinal, idProposta],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/diarioDeObraPeriodo/${formatDateOnly(dataInicial)}/${formatDateOnly(dataFinal)}/proposta/${idProposta}`,
+        `${url}/diarioDeObraPeriodo/${formatDateOnly(
+          dataInicial
+        )}/${formatDateOnly(dataFinal)}/proposta/${idProposta}`,
         {
           method: "GET",
           credentials: "include",
@@ -80,7 +80,7 @@ function PeriodoFechamento({
     queryFn: async () => {
       const response = await fetch(`${url}/quantitativa/${idProposta}`, {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
       });
       if (!response.ok) throw new Error("Nenhuma quantitativa encontrada");
       const data = await response.json();
@@ -125,7 +125,7 @@ function PeriodoFechamento({
 
   return (
     <main className="h-full flex flex-col gap-3">
-      <section className="overflow-hidden rounded-md border">
+      <section className="rounded-md border overflow-auto h-[450px]">
         <Table>
           <TableHeader>
             <TableRow>
@@ -142,9 +142,7 @@ function PeriodoFechamento({
             {periodo.map((value) =>
               value.itensDoDia.map((value2) => (
                 <TableRow key={value2.id}>
-                  <TableCell>
-                    {dayjs(value.dataDia).format("DD/MM")}
-                  </TableCell>
+                  <TableCell>{dayjs(value.dataDia).format("DD/MM")}</TableCell>
                   <TableCell>{value2.descricao}</TableCell>
                   <TableCell>
                     {
@@ -158,7 +156,9 @@ function PeriodoFechamento({
                         ?.unidadeDeMedida
                     }
                   </TableCell>
-                  <TableCell>{value2.quantidade}</TableCell>
+                  <TableCell>
+                    {Intl.NumberFormat("PT-BR").format(value2.quantidade)}
+                  </TableCell>
                   <TableCell>
                     {Intl.NumberFormat("PT-BR", {
                       style: "currency",
@@ -206,7 +206,9 @@ function PeriodoFechamento({
               {quantitativa.map((value) => (
                 <TableRow key={value.id}>
                   <TableCell>{value.descricao}</TableCell>
-                  <TableCell>{calculo(value.id)}</TableCell>
+                  <TableCell>
+                    {Intl.NumberFormat("PT-BR").format(calculo(value.id))}
+                  </TableCell>
                   <TableCell>{value.unidadeDeMedida}</TableCell>
                   <TableCell>
                     {Intl.NumberFormat("PT-BR", {
