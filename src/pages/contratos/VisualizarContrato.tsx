@@ -118,7 +118,7 @@ function GetInfoContratos() {
   const { data: quantitativa } = useSuspenseQuery({
     queryKey: ["quantitativa", versionamentoAprovado.map((ver) => ver.id)],
     queryFn: async () => {
-      const response = await fetch(`${url}/quantitativa/${versionamentoAprovado.map((ver) => ver.id)}`, {
+      const response = await fetch(`${url}/quantitativa/${dadosCliente?.proposta.id}`, {
         method: "GET",
         credentials: "include"
       })
