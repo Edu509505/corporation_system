@@ -823,7 +823,7 @@ function VersionamentoPage() {
                                             </EmptyMedia>
                                             <EmptyTitle>Selecione um Arquivo</EmptyTitle>
                                             <EmptyDescription>
-                                              Escolha um aruivo de seu dispositivo para realizar o
+                                              Escolha um arquivo de seu dispositivo para realizar o
                                               Upload
                                               <Input
                                                 className="cursor-pointer"

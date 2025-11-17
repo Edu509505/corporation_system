@@ -133,7 +133,7 @@ function PeriodoFechamentoIdMedicao({
 
   return (
     <main className="h-full flex flex-col gap-3">
-      <section className="overflow-hidden rounded-md border">
+      <section className="rounded-md border max-h-[450px] overflow-auto">
         <Table>
           <TableHeader>
             <TableRow>

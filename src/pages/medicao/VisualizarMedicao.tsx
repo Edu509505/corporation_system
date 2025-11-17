@@ -8,6 +8,8 @@ import { Suspense } from "react";
 import {
   Calendar,
   CircleArrowLeftIcon,
+  CircleCheck,
+  Timer,
 } from "lucide-react";
 
 import { Link, useParams } from "react-router";
@@ -16,6 +18,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import PeriodoFechamentoIdMedicao from "@/components/medicao/periodoFechamentoIdMedicao";
+import { Badge } from "@/components/ui/badge";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -104,8 +107,12 @@ function VisualMedicao() {
           </div>
           <div className="flex flex-col gap-2">
             <Label>Stuação</Label>
-            <div className="rounded-[0.5rem] border-1 border-gray-300 pl-2 pr-4 pt-1 pb-1 flex justify-start">
-              <h1>{medicao.faturado}</h1>
+            <div className=" flex justify-start items-center">
+              {
+                medicao.faturado === "NAO_FATURADO" ?
+                  <Badge className="text-blue-600 bg-blue-100 border border-blue-500"><Timer /> Não Faturado</Badge>
+                  : <Badge className="text-green-600 bg-green-100 border border-green-500"> <CircleCheck /> Faturado </Badge>
+              }
             </div>
           </div>
         </div>
@@ -116,13 +123,13 @@ function VisualMedicao() {
               <h1>{medicao.observacao}</h1>
             </div>
           </div>
-        ): (<div className="flex flex-col gap-2">
-            <Label>Observação</Label>
-            <div className="rounded-[0.5rem] border-1 border-gray-300 pl-2 pr-2 pt-1 pb-1 flex justify-start">
-              <h1>Sem Observações</h1>
-            </div>
-          </div>)}
-        
+        ) : (<div className="flex flex-col gap-2">
+          <Label>Observação</Label>
+          <div className="rounded-[0.5rem] border-1 border-gray-300 pl-2 pr-2 pt-1 pb-1 flex justify-start">
+            <h1>Sem Observações</h1>
+          </div>
+        </div>)}
+
         <h1>Período do fechamento</h1>
         <section className="flex gap-3">
           <div className="flex flex-col gap-2">

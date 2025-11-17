@@ -192,7 +192,7 @@ function AdicionarNotaFiscal() {
       form.set("idCliente", data.idCliente);
       form.set("idProposta", data.idProposta);
       form.set("idMedicao", data.idMedicao);
-      form.set("valor", data.valor.replace(",", "."));
+      form.set("valor", (parseFloat(data.valor)*100).toLocaleString().replace(",", "."));
       form.set("vencimento", data.vencimento.toString());
       form.set("tipo", data.tipo);
       form.set("numeroDaNota", data.numeroDaNota);

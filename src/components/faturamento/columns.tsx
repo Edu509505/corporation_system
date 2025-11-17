@@ -147,7 +147,7 @@ export const columns: ColumnDef<Faturamento>[] = [
       const formatted = new Intl.NumberFormat("PT-BR", {
         style: "currency",
         currency: "BRL",
-      }).format(valor);
+      }).format(valor / 100);
       return formatted;
     },
   },

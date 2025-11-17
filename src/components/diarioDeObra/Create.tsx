@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/form";
 // Select já é importado no topo do arquivo (se necessário ajuste), evitando duplicação
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Calendar } from "@/components/ui/calendar";
 import React from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -35,6 +35,7 @@ import {
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { DialogClose } from "../ui/dialog";
 dayjs.extend(utc);
 
 const url = import.meta.env.VITE_API_URL;
@@ -72,6 +73,9 @@ const validaSchemaDiarioDeObra = z.object({
   ),
 });
 export default function CriarDiarioDeObra() {
+
+  const query = useQueryClient();
+
   const navigate = useNavigate();
   const [toast, setToast] = React.useState<{
     message: string;
@@ -91,7 +95,7 @@ export default function CriarDiarioDeObra() {
     },
   });
 
-  console.log("propostasAprovadas", propostasAprovadas);
+  // console.log("propostasAprovadas", propostasAprovadas);
 
   const form = useForm<z.infer<typeof validaSchemaDiarioDeObra>>({
     resolver: zodResolver(validaSchemaDiarioDeObra),
@@ -155,6 +159,7 @@ export default function CriarDiarioDeObra() {
       };
 
       await criarDiarioMutation.mutateAsync(payload);
+      await query.invalidateQueries({ queryKey: ["DiarioDeObras"] })
       form.reset({ idProposta: "", dataDia: new Date(), itensDoDia: [] });
       setToast({ message: "Diário criado com sucesso", type: "success" });
       setTimeout(() => setToast(null), 3000);
@@ -173,16 +178,21 @@ export default function CriarDiarioDeObra() {
   });
 
   console.log("fields", fields);
+  const itensDoDia = form.watch("itensDoDia");
+  const isFormValid = itensDoDia.length > 0 && form.formState.isValid;
+
+  // function invalidateQueries(arg0: { queryKey: string[]; }): void {
+  //   throw new Error("Function not implemented.");
+  // }
 
   return (
-    <div className="flex flex-col p-4 gap-3">
+    <div className="flex flex-col gap-3">
       {toast ? (
         <div
-          className={`p-3 rounded ${
-            toast.type === "success"
-              ? "bg-green-200 text-green-800"
-              : "bg-red-200 text-red-800"
-          }`}
+          className={`p-3 rounded ${toast.type === "success"
+            ? "bg-green-200 text-green-800"
+            : "bg-red-200 text-red-800"
+            }`}
         >
           {toast.message}
         </div>
@@ -203,7 +213,7 @@ export default function CriarDiarioDeObra() {
                   defaultValue={field.value}
                 >
                   <FormControl>
-                    <SelectTrigger className="w-[300px]">
+                    <SelectTrigger className="w-auto cursor-pointer">
                       <SelectValue placeholder="Selecionar proposta" />
                     </SelectTrigger>
                   </FormControl>
@@ -233,7 +243,7 @@ export default function CriarDiarioDeObra() {
               <Button
                 variant="outline"
                 id="date"
-                className="w-48 justify-between font-normal"
+                className="w-48 justify-between font-normal cursor-pointer"
               >
                 {dataDia ? dataDia.toLocaleDateString() : "Selecione a data"}
                 <ChevronDownIcon />
@@ -255,9 +265,9 @@ export default function CriarDiarioDeObra() {
               />
             </PopoverContent>
           </Popover>
-          <div className="flex gap-3 items-center border-1 border-background0 rounded-2xl p-4 scroll-auto">
+          <div className="flex gap-3 items-center">
             <div className="space-y-4">
-              <div className="flex flex-col gap-4 justify-center items-center">
+              <div className="flex flex-col gap-4 justify-start items-start md:w-full w-[250px] h-[150px] overflow-auto p-2">
                 {fields.map((field, index) => (
                   <div key={field.id} className="flex items-start gap-1">
                     <FormField
@@ -336,6 +346,7 @@ export default function CriarDiarioDeObra() {
                       type="button"
                       variant="ghost"
                       size="icon"
+                      className="cursor-pointer"
                       onClick={() => remove(index)}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -343,7 +354,9 @@ export default function CriarDiarioDeObra() {
                   </div>
                 ))}
               </div>
+              <div className="flex gap-3">
               <Button
+              className="cursor-pointer"
                 type="button"
                 onClick={() => {
                   append({
@@ -355,17 +368,22 @@ export default function CriarDiarioDeObra() {
               >
                 Adicionar item
               </Button>
+              <DialogClose
+                type="submit"
+                disabled={!isFormValid || criarDiarioMutation.isPending}
+                className="cursor-pointer"
+              >
+                <Button
+                  type="submit"
+                  disabled={!isFormValid || criarDiarioMutation.isPending}
+                >
+                  {criarDiarioMutation.status === "pending"
+                    ? "Criando..."
+                    : "Criar"}
+                </Button>
+              </DialogClose>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              type="submit"
-              disabled={criarDiarioMutation.status === "pending"}
-            >
-              {criarDiarioMutation.status === "pending"
-                ? "Criando..."
-                : "Criar"}
-            </Button>
           </div>
         </form>
       </Form>
