@@ -5,7 +5,6 @@ import { Skeleton } from "../ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";;
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, type ChartConfig } from "../ui/chart";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-import dayjs from "dayjs";
 import { url } from "@/url";
 
 
