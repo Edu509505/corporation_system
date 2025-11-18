@@ -9,7 +9,7 @@ import {
   Paperclip,
   Trash2,
 } from "lucide-react";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 
@@ -304,7 +304,11 @@ function VersionamentoPage() {
     descricao: z.string().min(2, "Nome obrigatório"),
     unidadeDeMedida: z.string().min(1, "Unidade obrigatória"),
     quantidade: z.string().refine((val) => val.replace(',', '.')),
-    valorUnitario: z.string(),
+    valorUnitario: z.string().min(1, "Defina o valor da proposta")
+      .transform((val) => {
+        const clean = val.replace(/\D/g, '');
+        return parseFloat(clean) / 100;
+      })
   });
 
   const formSchema = z.object({
@@ -322,7 +326,7 @@ function VersionamentoPage() {
   };
 
   const form = useForm<Quantitativas>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       itens: [],
     },
@@ -335,8 +339,6 @@ function VersionamentoPage() {
   // console.log(form.formState.errors);
 
   const onSubmit = async (data: Quantitativas) => {
-    // console.log(data);
-
     try {
       setIsLoadingRefetch(true);
 
@@ -345,7 +347,14 @@ function VersionamentoPage() {
         status: "APROVADA",
       });
 
-      //await updateProposta({ id: id!, status: "APROVADA" });
+      const payload = {
+        itens: data.itens.map((item) => ({
+          ...item,
+          valorUnitario: Math.round(
+            parseFloat(item.valorUnitario.toString()) * 100
+          ).toString(),
+        })),
+      };
 
       await fetch(`${url}/quantitativa`, {
         method: "POST",
@@ -353,7 +362,7 @@ function VersionamentoPage() {
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       await refetchAll();
@@ -364,6 +373,38 @@ function VersionamentoPage() {
       setIsLoadingRefetch(false);
     }
   };
+
+  function CurrencyInput({ field }: { field: any }) {
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+      const handleInput = (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        const raw = target.value.replace(/\D/g, '');
+        const number = parseFloat(raw) / 100;
+        const formatted = number.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        });
+        target.value = formatted;
+        field.onChange(formatted); // atualiza o valor no RHF
+      };
+
+      const input = inputRef.current;
+      input?.addEventListener('input', handleInput);
+
+      return () => input?.removeEventListener('input', handleInput);
+    }, [field]);
+
+    return (
+      <Input
+        placeholder="R$ -"
+        ref={inputRef}
+        defaultValue={field.value}
+        name={field.name}
+      />
+    );
+  }
 
   return (
     <div className="h-max bg-background flex flex-col p-3 gap-4">
@@ -683,20 +724,11 @@ function VersionamentoPage() {
                                                       name={`itens.${index}.valorUnitario`}
                                                       render={({ field }) => (
                                                         <FormItem>
-                                                          <FormLabel>
-                                                            Valor
-                                                          </FormLabel>
-                                                          <FormControl>
-                                                            <Input
-                                                              className="bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                                              type="number"
-                                                              inputMode="numeric"
-                                                              pattern="[0-9]*"
-                                                              placeholder="R$ -"
-                                                              {...field}
-                                                            />
-                                                          </FormControl>
+                                                          <FormLabel>Valor</FormLabel>
                                                           <FormMessage />
+                                                          <FormControl>
+                                                            <CurrencyInput field={field} />
+                                                          </FormControl>
                                                         </FormItem>
                                                       )}
                                                     />
@@ -879,7 +911,7 @@ function VersionamentoPage() {
                     <TableCell > {item.descricao}</TableCell>
                     <TableCell > {formatToNumber(item.quantidade)}</TableCell>
                     <TableCell > {item.unidadeDeMedida}</TableCell>
-                    <TableCell >{formatToBRL(item.valorUnitario)}</TableCell>
+                    <TableCell >{formatToBRL(item.valorUnitario/100)}</TableCell>
                   </TableRow>
                 ))
                 }

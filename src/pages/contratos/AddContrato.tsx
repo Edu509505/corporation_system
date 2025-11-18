@@ -312,7 +312,7 @@ function AdicionarContrato() {
                             className="cursor-pointer"
                             type="file"
                             multiple
-                            accept=".jpg,.png,.pdf"
+                            accept=".pdf"
                             onChange={(e) => field.onChange(e.target.files)}
                           />
                         </EmptyDescription>

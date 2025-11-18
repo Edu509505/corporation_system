@@ -25,7 +25,7 @@ import {
   SelectLabel,
   SelectGroup,
 } from "@/components/ui/select";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import {
   Empty,
   EmptyDescription,
@@ -66,7 +66,7 @@ interface Cliente {
 
 function AddProposta() {
   const { data: clientes } = useSuspenseQuery({
-    queryKey: ["clientes", ""],
+    queryKey: ["clientes", ],
     queryFn: async () => {
       const response = await fetch(`${url}/clientes`, {
         method: "GET",
@@ -82,7 +82,11 @@ function AddProposta() {
     idCliente: z.string().min(1, "Selecione ao menos um cliente"),
     nomeDaProposta: z.string().min(1, "Escreva o nome da Proposta"),
     descricao: z.string().min(1, "Recomendado ter uma descrição"),
-    valorProposta: z.coerce.number(),
+    valorProposta: z.string().min(1, "Defina o valor da proposta")
+    .transform((val) => {
+      const clean = val.replace(/\D/g, '');
+      return parseFloat(clean) / 100;
+    }),
     files: z
       .instanceof(FileList)
       .refine(
@@ -108,7 +112,7 @@ function AddProposta() {
       idCliente: "",
       nomeDaProposta: "",
       descricao: "",
-      valorProposta: 0,
+      valorProposta: "" as any,
       files: undefined
     },
   });
@@ -117,9 +121,11 @@ function AddProposta() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [alertDialog, setAlertDialog] = useState<boolean>(false)
 
+
+
   const onSubmit = async (data: z.infer<typeof propostaSchema>) => {
     try {
-      
+
       setIsLoading(true)
 
       const form = new FormData();
@@ -127,7 +133,7 @@ function AddProposta() {
       form.set("idCliente", data.idCliente);
       form.set("nomeDaProposta", data.nomeDaProposta);
       form.set("descricao", data.descricao);
-      form.set("valorProposta", data.valorProposta.toString());
+      form.set("valorProposta", (parseFloat(data.valorProposta.toString())*100).toString());
 
       for (let i = 0; i < data.files.length; i++) {
         form.append("files", data.files[i]);
@@ -148,6 +154,40 @@ function AddProposta() {
     } catch { } finally { setIsLoading(false), setAlertDialog(true) }
 
   };
+
+  function CurrencyInput({ field }: { field: any }) {
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+      const handleInput = (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        const raw = target.value.replace(/\D/g, '');
+        const number = parseFloat(raw) / 100;
+        const formatted = number.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        });
+        target.value = formatted;
+        field.onChange(formatted); // atualiza o valor no RHF
+      };
+
+      const input = inputRef.current;
+      input?.addEventListener('input', handleInput);
+
+      return () => input?.removeEventListener('input', handleInput);
+    }, [field]);
+
+    return (
+      <Input
+        placeholder="R$ -"
+        ref={inputRef}
+        defaultValue={field.value}
+        name={field.name}
+      />
+    );
+  }
+
+
   return (
     <div className="flex flex-col bg-background w-full gap-3 p-4">
       <header>
@@ -245,7 +285,7 @@ function AddProposta() {
                   <FormLabel>Valor Da Proposta</FormLabel>
                   <FormMessage />
                   <FormControl>
-                    <Input placeholder="R$ - " type="number" {...field} />
+                    <CurrencyInput field={field} />
                   </FormControl>
                   <FormDescription>
                     Escreva um valor
@@ -253,6 +293,7 @@ function AddProposta() {
                 </FormItem>
               )}
             />
+
 
             <FormField
               control={form.control}
@@ -296,51 +337,51 @@ function AddProposta() {
                   className="mt-4 cursor-pointer"
                   variant="default"
                   disabled={isLoading}
-                  
+
                 >
                   {isLoading ? <><Spinner /> Criar Proposta</> : <>Criar Proposta</>}
 
                 </Button>
               </AlertDialogTrigger>
               {responseOk ?
-              (
+                (
 
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="text-ring flex items-center gap-3">
-                      <CircleCheckBigIcon /> Contrato cadastrado com sucesso
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Seu contrato foi cadastrado e inserido no sistema
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <Link to="/propostas">
-                      <AlertDialogAction 
-                      className="cursor-pointer">Continuar</AlertDialogAction>
-                    </Link>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-ring flex items-center gap-3">
+                        <CircleCheckBigIcon /> Contrato cadastrado com sucesso
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Seu contrato foi cadastrado e inserido no sistema
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <Link to="/propostas">
+                        <AlertDialogAction
+                          className="cursor-pointer">Continuar</AlertDialogAction>
+                      </Link>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
 
-              ):(
+                ) : (
 
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="text-destructive flex items-center gap-3">
-                      <CircleX /> Erro ao cadastrar proposta
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      A ação de cadastrar o proposta foi mal-sucedida
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel
-                    className="cursor-pointer"
-                    onClick={() => setAlertDialog(false)}
-                    >Voltar</AlertDialogCancel>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              )}
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-destructive flex items-center gap-3">
+                        <CircleX /> Erro ao cadastrar proposta
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        A ação de cadastrar o proposta foi mal-sucedida
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel
+                        className="cursor-pointer"
+                        onClick={() => setAlertDialog(false)}
+                      >Voltar</AlertDialogCancel>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                )}
             </AlertDialog>
           </form>
         </Form>

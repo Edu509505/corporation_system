@@ -73,7 +73,7 @@ export const columns: ColumnDef<DiarioDeObra>[] = [
               Visualizar
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[600px] overflow-auto">
             <DialogHeader>
               <DialogTitle>
                 Diário de Obra -{" "}
@@ -85,6 +85,11 @@ export const columns: ColumnDef<DiarioDeObra>[] = [
             </DialogHeader>
             <VisualizarDiarioDeObra id={row.original.id} />
             <DialogFooter>
+              {/* {
+                new Date(row.original.dataDia) < new Date(new Date().setDate(new Date().getDate() - 3)) ? 
+                <><Label><CircleAlert />Só é possível editar dentro de 3 dias após o registro</Label></> 
+                : <><Button className="cursor-pointer">Editar</Button></>
+              } */}
               <DialogClose asChild>
                 <Button variant="outline" className="cursor-pointer">Fechar</Button>
               </DialogClose>

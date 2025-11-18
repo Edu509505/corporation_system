@@ -7,6 +7,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
 import { Suspense } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { CarroucelPdf } from "@/components/carroucelPdf";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -74,10 +76,10 @@ function GetInfoContratos() {
     queryKey: ["versionamento", dadosCliente?.proposta.id],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/proposta/${dadosCliente?.proposta.id.toString()}/verAprovado`,{
-          method: "GET",
-          credentials: "include"
-        }
+        `${url}/proposta/${dadosCliente?.proposta.id.toString()}/verAprovado`, {
+        method: "GET",
+        credentials: "include"
+      }
       );
       if (!response.ok) throw new Error("Versionamento não encontrada");
       const data = await response.json();
@@ -90,10 +92,10 @@ function GetInfoContratos() {
     queryKey: ["anexoVersionamento", versionamentoAprovado],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/versionamento/${versionamentoAprovado.map((ver) => ver.id)}/anexos/urls`,{
-          method: "GET",
-          credentials: "include"
-        }
+        `${url}/versionamento/${versionamentoAprovado.map((ver) => ver.id)}/anexos/urls`, {
+        method: "GET",
+        credentials: "include"
+      }
       )
       if (!response.ok) throw new Error("Anexo não encontrada");
       const data = await response.json();
@@ -128,6 +130,7 @@ function GetInfoContratos() {
     }
   })
 
+  console.log("Anexo", anexoVersionamento)
 
   return (
     <div className="w-full flex flex-col flex-wrap gap-3 p-4 bg-background">
@@ -195,19 +198,30 @@ function GetInfoContratos() {
           {anexoVersionamento === undefined ? (
             <span>Nenhum anexo encontrado.</span>
           ) : (
-            anexoVersionamento.map((anexo, idx) => (
-              <a
-                key={idx}
-                href={anexo.toString()}
-                download="olha_aqui_nome_novo"
-              >
-                <div className="w-[65px] flex justify-center bg-green-200 rounded-2xl p-2 transition-all hover:scale-110">
-                  <h1 className="flex font-bold">
-                    {idx + 1} - <FileImage />
-                  </h1>
-                </div>
-              </a>
-            ))
+            <>
+            <h1>{anexoVersionamento.length} Anexos registrados</h1>
+              <Dialog >
+                <DialogTrigger asChild>
+                  <Button variant="outline">Visualizar Arquivos</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[70%] h-[90%] overflow-auto">
+                  <DialogHeader>
+                    <DialogTitle>Visualizalção dos anexos</DialogTitle>
+                    <DialogDescription>
+                      Anexos
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="h-full">
+                    <CarroucelPdf anexos={anexoVersionamento as any} />
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">Fechar</Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </>
           )}
         </div>
         <div className="gap-3 flex flex-col bg-white border-1 border-ring p-4 rounded-2xl">
@@ -215,18 +229,31 @@ function GetInfoContratos() {
           {anexoContrato === undefined ? (
             <span>Nenhum anexo encontrado.</span>
           ) : (
-            anexoContrato?.map((anexo, idx) => (
-              <a
-                key={idx}
-                href={anexo.toString()}
-                className="w-[65px] flex justify-center bg-green-200 rounded-2xl p-2 transition-all hover:scale-110"
-                download="porqueNaoTaRenomeando"
-              >
-                <h1 className="flex font-bold">
-                  {idx + 1} - <FileImage />
-                </h1>
-              </a>
-            ))
+            
+            <>
+            <h1>{anexoContrato.length} Anexos registrados</h1>
+              <Dialog >
+                <DialogTrigger asChild>
+                  <Button variant="outline">Visualizar Arquivos</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[70%] h-[90%] overflow-auto">
+                  <DialogHeader>
+                    <DialogTitle>Visualizalção dos anexos</DialogTitle>
+                    <DialogDescription>
+                      Anexos
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="h-full">
+                    <CarroucelPdf anexos={anexoContrato as any} />
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">Fechar</Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </>
           )}
         </div>
       </div>
@@ -254,7 +281,7 @@ function GetInfoContratos() {
                     <TableCell >{Intl.NumberFormat("pt-BR", {
                       style: "currency",
                       currency: "BRL"
-                    }).format(item.valorUnitario)}</TableCell>
+                    }).format(item.valorUnitario / 100)}</TableCell>
                   </TableRow>
                 ))
                 }

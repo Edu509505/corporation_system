@@ -1,7 +1,7 @@
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Form } from "@/components/ui/form";
+import { Form, FormDescription } from "@/components/ui/form";
 import {
   FormControl,
   FormField,
@@ -25,7 +25,7 @@ import {
   SelectLabel,
   SelectGroup,
 } from "@/components/ui/select";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import {
   Empty,
   EmptyDescription,
@@ -148,10 +148,14 @@ function AdicionarNotaFiscal() {
     idCliente: z.string().min(1, "Selecione ao menos um cliente"),
     idProposta: z.string().min(1, "Selecione ao menos uma proposta"),
     idMedicao: z.string().min(1, "Selecione a Medição"),
-    valor: z.string().min(1, "Deina um valor"),
+    valor: z.string().min(1, "Defina o valor da proposta")
+        .transform((val) => {
+          const clean = val.replace(/\D/g, '');
+          return parseFloat(clean) / 100;
+        }),
     vencimento: z.date("Defina a data para o vencimento"),
     tipo: z.string().min(1, "Selecione o tipo"),
-    numeroDaNota: z.string().min(1, "Precisa conter um número"),
+    numeroDaNota: z.string().min(2 , "Precisa conter um número"),
     anexo: z
       .instanceof(File)
       .refine((file) => !!file, "Você deve selecionar ao menos um arquivo")
@@ -167,14 +171,14 @@ function AdicionarNotaFiscal() {
   });
 
   const form = useForm<z.infer<typeof contratoSchema>>({
-    resolver: zodResolver(contratoSchema),
+    resolver: zodResolver(contratoSchema) as any,
     defaultValues: {
       idCliente: "",
       idMedicao: "",
       anexo: undefined,
       idProposta: "",
       tipo: "",
-      valor: "",
+      valor: "0" as any,
       numeroDaNota: "",
     },
   });
@@ -192,7 +196,7 @@ function AdicionarNotaFiscal() {
       form.set("idCliente", data.idCliente);
       form.set("idProposta", data.idProposta);
       form.set("idMedicao", data.idMedicao);
-      form.set("valor", (parseFloat(data.valor)*100).toLocaleString().replace(",", "."));
+      form.set("valor", (parseFloat(data.valor.toString())*100).toString());
       form.set("vencimento", data.vencimento.toString());
       form.set("tipo", data.tipo);
       form.set("numeroDaNota", data.numeroDaNota);
@@ -224,6 +228,39 @@ function AdicionarNotaFiscal() {
       console.log("Cliente criado com sucesso:", body);
     } catch {}
   };
+
+  function CurrencyInput({ field }: { field: any }) {
+      const inputRef = useRef<HTMLInputElement>(null);
+  
+      useEffect(() => {
+        const handleInput = (e: Event) => {
+          const target = e.target as HTMLInputElement;
+          const raw = target.value.replace(/\D/g, '');
+          const number = parseFloat(raw) / 100;
+          const formatted = number.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+          });
+          target.value = formatted;
+          field.onChange(formatted); // atualiza o valor no RHF
+        };
+  
+        const input = inputRef.current;
+        input?.addEventListener('input', handleInput);
+  
+        return () => input?.removeEventListener('input', handleInput);
+      }, [field]);
+  
+      return (
+        <Input
+          placeholder="R$ -"
+          ref={inputRef}
+          defaultValue={field.value}
+          name={field.name}
+        />
+      );
+    }
+
   return (
     <div className="flex flex-col bg-background w-full gap-3 p-4">
       <header>
@@ -312,7 +349,7 @@ function AdicionarNotaFiscal() {
                               key={proposta.id}
                               value={proposta.id.toString()}
                             >
-                              {proposta.nomeDaProposta}
+                             {proposta.nomeDaProposta}
                             </SelectItem>
                           ))}
                         </SelectGroup>
@@ -346,6 +383,7 @@ function AdicionarNotaFiscal() {
                               key={medicao.id}
                               value={medicao.id.toString()}
                             >
+                              {medicao.id} - 
                               {format(
                                 new Date(medicao.createdAt),
                                 "dd/MM/yyyy"
@@ -447,26 +485,18 @@ function AdicionarNotaFiscal() {
                 )}
               />
               <FormField
-                control={form.control}
-                name="valor"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Valor</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        type="number"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        // onInputCapture={(value) => value.replace(/[^0-9]/g, '')}
-                        placeholder="R$ - "
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              control={form.control}
+              name="valor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Valor Da Nota</FormLabel>
+                  <FormMessage />
+                  <FormControl>
+                    <CurrencyInput field={field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
             </div>
             <FormField
               control={form.control}
@@ -487,7 +517,7 @@ function AdicionarNotaFiscal() {
                           <Input
                             className="cursor-pointer"
                             type="file"
-                            accept=".jpg,.png,.pdf"
+                            accept=".pdf"
                             onChange={(e) =>
                               field.onChange(e.target.files?.[0])
                             }

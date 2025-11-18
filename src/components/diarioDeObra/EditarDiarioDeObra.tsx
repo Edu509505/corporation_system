@@ -47,19 +47,6 @@ interface Propostas {
   descricao: string;
 }
 
-// interface formularioDiarioDeObra {
-//     idProposta: number;
-//     dataDia: string;
-// }
-
-// interface ItensDoDia {
-//     itens: {
-//         idDiarioDeObra: number;
-//         descricao: string;
-//         itemQuantitativa: string;
-//         quantidade: number;
-//     }[]
-// }
 
 const validaSchemaDiarioDeObra = z.object({
   idProposta: z.string().min(1, "Selecione pelo menos 1"),
@@ -129,8 +116,6 @@ export default function CriarDiarioDeObra() {
     enabled: !!idPropostaSelecionada,
   });
 
-
-
   const criarDiarioMutation = useMutation({
     mutationKey: ["criarDiario"],
     mutationFn: async (payload: any) => {
@@ -159,8 +144,7 @@ export default function CriarDiarioDeObra() {
           quantidade: Number(it.quantidade),
         })),
       };
-      console.log("Data enviada:", dayjs(values.dataDia).format("YYYY-MM-DD"));
-      
+
       await criarDiarioMutation.mutateAsync(payload);
       await query.invalidateQueries({ queryKey: ["DiarioDeObras"] })
       form.reset({ idProposta: "", dataDia: new Date(), itensDoDia: [] });
@@ -358,33 +342,33 @@ export default function CriarDiarioDeObra() {
                 ))}
               </div>
               <div className="flex gap-3">
+              <Button
+              className="cursor-pointer"
+                type="button"
+                onClick={() => {
+                  append({
+                    descricao: "",
+                    idQuantitativa: "",
+                    quantidade: 0,
+                  });
+                }}
+              >
+                Adicionar item
+              </Button>
+              <DialogClose
+                type="submit"
+                disabled={!isFormValid || criarDiarioMutation.isPending}
+                className="cursor-pointer"
+              >
                 <Button
-                  className="cursor-pointer"
-                  type="button"
-                  onClick={() => {
-                    append({
-                      descricao: "",
-                      idQuantitativa: "",
-                      quantidade: 0,
-                    });
-                  }}
-                >
-                  Adicionar item
-                </Button>
-                <DialogClose
                   type="submit"
                   disabled={!isFormValid || criarDiarioMutation.isPending}
-                  className="cursor-pointer"
                 >
-                  <Button
-                    type="submit"
-                    disabled={!isFormValid || criarDiarioMutation.isPending}
-                  >
-                    {criarDiarioMutation.status === "pending"
-                      ? "Criando..."
-                      : "Criar"}
-                  </Button>
-                </DialogClose>
+                  {criarDiarioMutation.status === "pending"
+                    ? "Criando..."
+                    : "Criar"}
+                </Button>
+              </DialogClose>
               </div>
             </div>
           </div>
