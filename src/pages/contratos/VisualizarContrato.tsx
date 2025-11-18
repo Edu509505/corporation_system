@@ -1,7 +1,7 @@
 import { useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { cnpj } from "cpf-cnpj-validator";
-import { ArrowLeftCircleIcon, FileImage } from "lucide-react";
+import { ArrowLeftCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
