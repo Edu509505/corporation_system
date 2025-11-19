@@ -94,8 +94,7 @@ function GraficoFaturamentoDados() {
                     const valorFormatado = new Intl.NumberFormat("pt-BR", {
                       style: "currency",
                       currency: "BRL",
-                      maximumFractionDigits: 0,
-                    }).format(numericValue);
+                    }).format(numericValue/100);
 
                     const nameStr = name == null ? "" : String(name);
                     const nomeFormatado = nameStr

@@ -143,6 +143,7 @@ export const columns: ColumnDef<Faturamento>[] = [
     accessorKey: "valor",
     header: () => <>Valor</>,
     cell: ({ row }) => {
+      console.log(row.getValue('valor'));
       const valor = parseFloat(row.getValue("valor"));
       const formatted = new Intl.NumberFormat("PT-BR", {
         style: "currency",

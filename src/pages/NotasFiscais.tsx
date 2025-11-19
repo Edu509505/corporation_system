@@ -1,3 +1,4 @@
+import { CardFaturamentoAberto } from "@/components/cardsFaturamento/CardFaturamentoAberto";
 import PageTableFaturamento from "@/components/faturamento/page";
 import GraficoFaturamento from "@/components/graficos/GraficoFaturamento";
 // import  GraficoFaturamento  from "@/components/graficos/GraficoFaturamento";
@@ -20,6 +21,9 @@ function NotasFiscais() {
         </Link>
       </section>
       <section> 
+        <CardFaturamentoAberto/>
+      </section>
+      <section>
         <GraficoFaturamento />
       </section>
       <section>
