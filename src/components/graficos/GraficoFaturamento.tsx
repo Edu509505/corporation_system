@@ -8,10 +8,10 @@ import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { url } from "@/url";
 
 
-interface FaturamentoPropos {
-    quantity: number;
+interface FaturamentoMesProps{
+  mesReferencia: string; // Ex: "Nov/2025"
+  totalPago: number;     // Ex: 15000
 }
-
 
 function GraficoFaturamentoDados() {
   const { data } = useSuspenseQuery({
@@ -21,17 +21,21 @@ function GraficoFaturamentoDados() {
         method: "GET",
         credentials: "include",
       });
-      if (!response.ok) throw new Error("erro ao encontrar faturamentos");
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Erro na resposta:", response.status, errorText);
+        throw new Error("erro ao encontrar faturamentos");
+      }
       const data = await response.json();
-      return data as FaturamentoPropos[]; // array com vários meses
+      return data as FaturamentoMesProps[];
     },
   });
 
   const chartData = data ?? [];
 
   const chartConfig = {
-    quantity: {
-      label: "faturamento",
+    totalPago: {
+      label: "Faturamento",
       color: "var(--chart-2)",
     },
   } satisfies ChartConfig;
@@ -50,29 +54,9 @@ function GraficoFaturamentoDados() {
         >
           <AreaChart data={chartData}>
             <defs>
-              <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-desktop)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-desktop)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
               <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-mobile)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-mobile)"
-                  stopOpacity={0.1}
-                />
+                <stop offset="5%" stopColor="var(--color-mobile)" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="var(--color-mobile)" stopOpacity={0.1} />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} />
@@ -89,19 +73,11 @@ function GraficoFaturamentoDados() {
                 <ChartTooltipContent
                   labelFormatter={(value) => value}
                   formatter={(value, name) => {
-                    const numericValue =
-                      typeof value === "number" ? value : Number(value ?? 0);
                     const valorFormatado = new Intl.NumberFormat("pt-BR", {
                       style: "currency",
                       currency: "BRL",
-                    }).format(numericValue/100);
-
-                    const nameStr = name == null ? "" : String(name);
-                    const nomeFormatado = nameStr
-                      .replace(/([A-Z])/g, " $1")
-                      .replace(/^./, (str: string) => str.toUpperCase());
-
-                    return `${nomeFormatado}: ${valorFormatado}`;
+                    }).format(Number(value ?? 0));
+                    return `${name}: ${valorFormatado}`;
                   }}
                   indicator="dot"
                 />
@@ -121,7 +97,6 @@ function GraficoFaturamentoDados() {
     </Card>
   );
 }
-
 
 
 function LoadingGrafico() {
