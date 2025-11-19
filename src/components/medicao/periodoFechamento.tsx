@@ -163,9 +163,9 @@ function PeriodoFechamento({
                     {Intl.NumberFormat("PT-BR", {
                       style: "currency",
                       currency: "BRL",
-                    }).format(
+                    }).format((
                       quantitativa.find((q) => q.id === value2.idQuantitativa)
-                        ?.valorUnitario as number
+                        ?.valorUnitario as number)/100
                     )}
                   </TableCell>
                   <TableCell>
@@ -174,7 +174,7 @@ function PeriodoFechamento({
                       currency: "BRL",
                     }).format(
                       (quantitativa.find((q) => q.id === value2.idQuantitativa)
-                        ?.valorUnitario as number) * value2.quantidade
+                        ?.valorUnitario as number)/100 * value2.quantidade
                     )}
                   </TableCell>
                 </TableRow>
@@ -214,7 +214,7 @@ function PeriodoFechamento({
                     {Intl.NumberFormat("PT-BR", {
                       style: "currency",
                       currency: "BRL",
-                    }).format(calculo(value.id) * value.valorUnitario)}
+                    }).format((calculo(value.id) * value.valorUnitario)/100)}
                   </TableCell>
                 </TableRow>
               ))}
@@ -226,7 +226,7 @@ function PeriodoFechamento({
                   {Intl.NumberFormat("PT-BR", {
                     style: "currency",
                     currency: "BRL",
-                  }).format(resultadosSomados() as number)}
+                  }).format(resultadosSomados()/100 as number)}
                 </TableCell>
               </TableRow>
             </TableFooter>

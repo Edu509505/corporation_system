@@ -144,6 +144,8 @@ function AdicionarNotaFiscal() {
     },
   });
 
+  console.log("Medicoes ",medicao)
+
   const contratoSchema = z.object({
     idCliente: z.string().min(1, "Selecione ao menos um cliente"),
     idProposta: z.string().min(1, "Selecione ao menos uma proposta"),
