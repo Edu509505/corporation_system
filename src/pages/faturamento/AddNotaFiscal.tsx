@@ -157,7 +157,9 @@ function AdicionarNotaFiscal() {
     tipo: z.string().min(1, "Selecione o tipo"),
     numeroDaNota: z.string().min(2 , "Precisa conter um número"),
     anexo: z
-      .instanceof(File)
+      .instanceof(File, {
+        error: "Arquivo Obrigatório"
+      })
       .refine((file) => !!file, "Você deve selecionar ao menos um arquivo")
       .refine(
         (file) => file.size <= 50 * 1024 * 1024,
@@ -165,7 +167,7 @@ function AdicionarNotaFiscal() {
       )
       .refine(
         (file) =>
-          ["image/jpeg", "image/png", "application/pdf"].includes(file.type),
+          ["application/pdf"].includes(file.type),
         "Tipo de arquivo inválido"
       ),
   });

@@ -109,7 +109,9 @@ function AdicionarContrato() {
     idCliente: z.string().min(1, "Selecione ao menos um cliente"),
     idProposta: z.string().min(1, "Selecione ao menos uma proposta"),
     anexo: z
-      .instanceof(FileList)
+      .instanceof(FileList, {
+        error: "Arquivo Obrigatório"
+      })
       .refine(
         (files) => files?.length >= 1,
         "Você deve selecionar ao menos um arquivo"
@@ -120,7 +122,7 @@ function AdicionarContrato() {
       )
       .refine(
         (files) =>
-          ["image/jpeg", "image/png", "application/pdf"].includes(
+          ["application/pdf"].includes(
             files?.[0]?.type
           ),
         "Tipo de arquivo inválido"

@@ -88,7 +88,9 @@ function AddProposta() {
       return parseFloat(clean) / 100;
     }),
     files: z
-      .instanceof(FileList)
+      .instanceof(FileList, {
+        error: "Arquivo Obrigatório"
+      })
       .refine(
         (files) => files?.length >= 1,
         "Você deve selecionar ao menos um arquivo"
