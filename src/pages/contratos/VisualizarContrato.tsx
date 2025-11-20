@@ -1,4 +1,7 @@
-import { useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useQueryErrorResetBoundary,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { cnpj } from "cpf-cnpj-validator";
 import { ArrowLeftCircleIcon } from "lucide-react";
@@ -6,9 +9,25 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
 import { Suspense } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { CarroucelPdf } from "@/components/carroucelPdf";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -64,7 +83,7 @@ function GetInfoContratos() {
     queryFn: async () => {
       const response = await fetch(`${url}/contrato/${id}`, {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
       });
       if (!response.ok) throw new Error("Cliente não encontrato");
       const data = await response.json();
@@ -76,10 +95,11 @@ function GetInfoContratos() {
     queryKey: ["versionamento", dadosCliente?.proposta.id],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/proposta/${dadosCliente?.proposta.id.toString()}/verAprovado`, {
-        method: "GET",
-        credentials: "include"
-      }
+        `${url}/proposta/${dadosCliente?.proposta.id.toString()}/verAprovado`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
       );
       if (!response.ok) throw new Error("Versionamento não encontrada");
       const data = await response.json();
@@ -87,55 +107,64 @@ function GetInfoContratos() {
     },
   });
 
-
   const { data: anexoVersionamento } = useSuspenseQuery({
     queryKey: ["anexoVersionamento", versionamentoAprovado],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/versionamento/${versionamentoAprovado.map((ver) => ver.id)}/anexos/urls`, {
-        method: "GET",
-        credentials: "include"
-      }
-      )
+        `${url}/versionamento/${versionamentoAprovado.map(
+          (ver) => ver.id
+        )}/anexos/urls`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
       if (!response.ok) throw new Error("Anexo não encontrada");
       const data = await response.json();
-      return (data.url || []) as AnexoVersionamento[]
-    }
-  })
+      return (data.url || []) as AnexoVersionamento[];
+    },
+  });
 
   const { data: anexoContrato } = useSuspenseQuery({
     queryKey: ["anexoContrato", versionamentoAprovado],
     queryFn: async () => {
       const response = await fetch(`${url}/contrato/${id}/anexoContrato/url`, {
         method: "GET",
-        credentials: "include"
-      })
-      if (!response.ok) throw new Error("Não foi encontrado o Anexo do contrato")
-      const data = await response.json()
-      return (data.url || []) as AnexoContrato[]
-    }
-  })
-
+        credentials: "include",
+      });
+      if (!response.ok)
+        throw new Error("Não foi encontrado o Anexo do contrato");
+      const data = await response.json();
+      return (data.url || []) as AnexoContrato[];
+    },
+  });
 
   const { data: quantitativa } = useSuspenseQuery({
     queryKey: ["quantitativa", versionamentoAprovado.map((ver) => ver.id)],
     queryFn: async () => {
-      const response = await fetch(`${url}/quantitativa/${dadosCliente?.proposta.id}`, {
-        method: "GET",
-        credentials: "include"
-      })
-      if (!response.ok) throw new Error("Não foi encontrato nenhuma quantitativa")
-      const data = await response.json()
-      return data as Quantitativa[]
-    }
-  })
+      const response = await fetch(
+        `${url}/quantitativa/${dadosCliente?.proposta.id}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      if (!response.ok)
+        throw new Error("Não foi encontrato nenhuma quantitativa");
+      const data = await response.json();
+      return data as Quantitativa[];
+    },
+  });
 
-  console.log("Anexo", anexoVersionamento)
+  console.log("Anexo", anexoVersionamento);
 
   return (
     <div className="w-full flex flex-col flex-wrap gap-3 p-4 bg-background">
-      <Link to={'/contratos'}>
-        <Button className="cursor-pointer"><ArrowLeftCircleIcon />Retornar</Button>
+      <Link to={"/contratos"}>
+        <Button className="cursor-pointer">
+          <ArrowLeftCircleIcon />
+          Retornar
+        </Button>
       </Link>
       <h1 className="text-2xl font-bold">Visualização do contrato</h1>
       <div className="flex gap-3 flex-wrap">
@@ -185,10 +214,11 @@ function GetInfoContratos() {
               .join("/")}
           </h1>
           <h1>
-            <strong>Valor: </strong> {Intl.NumberFormat('PT-BR', {
+            <strong>Valor: </strong>{" "}
+            {Intl.NumberFormat("PT-BR", {
               style: "currency",
-              currency: "BRL"
-            }).format(dadosCliente?.proposta.valorProposta)}
+              currency: "BRL",
+            }).format(dadosCliente?.proposta.valorProposta / 100)}
           </h1>
         </section>
       </div>
@@ -199,17 +229,15 @@ function GetInfoContratos() {
             <span>Nenhum anexo encontrado.</span>
           ) : (
             <>
-            <h1>{anexoVersionamento.length} Anexos registrados</h1>
-              <Dialog >
+              <h1>{anexoVersionamento.length} Anexos registrados</h1>
+              <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="outline">Visualizar Arquivos</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[70%] h-[90%] overflow-auto">
                   <DialogHeader>
                     <DialogTitle>Visualizalção dos anexos</DialogTitle>
-                    <DialogDescription>
-                      Anexos
-                    </DialogDescription>
+                    <DialogDescription>Anexos</DialogDescription>
                   </DialogHeader>
                   <div className="h-full">
                     <CarroucelPdf anexos={anexoVersionamento as any} />
@@ -229,19 +257,16 @@ function GetInfoContratos() {
           {anexoContrato === undefined ? (
             <span>Nenhum anexo encontrado.</span>
           ) : (
-            
             <>
-            <h1>{anexoContrato.length} Anexos registrados</h1>
-              <Dialog >
+              <h1>{anexoContrato.length} Anexos registrados</h1>
+              <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="outline">Visualizar Arquivos</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[70%] h-[90%] overflow-auto">
                   <DialogHeader>
                     <DialogTitle>Visualizalção dos anexos</DialogTitle>
-                    <DialogDescription>
-                      Anexos
-                    </DialogDescription>
+                    <DialogDescription>Anexos</DialogDescription>
                   </DialogHeader>
                   <div className="h-full">
                     <CarroucelPdf anexos={anexoContrato as any} />
@@ -258,7 +283,9 @@ function GetInfoContratos() {
         </div>
       </div>
       <div className="flex flex-col gap-3">
-        <h1 className="font-bold text-2xl">Quantitativas imposta na Proposta</h1>
+        <h1 className="font-bold text-2xl">
+          Quantitativas imposta na Proposta
+        </h1>
         {quantitativa === undefined ? (
           <span>Nenhuma quantitativa foi encontrada</span>
         ) : (
@@ -275,16 +302,20 @@ function GetInfoContratos() {
               <TableBody>
                 {quantitativa.map((item) => (
                   <TableRow>
-                    <TableCell > {item.descricao}</TableCell>
-                    <TableCell > {Intl.NumberFormat("pt-BR").format(item.quantidade)}</TableCell>
-                    <TableCell > {item.unidadeDeMedida}</TableCell>
-                    <TableCell >{Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL"
-                    }).format(item.valorUnitario / 100)}</TableCell>
+                    <TableCell> {item.descricao}</TableCell>
+                    <TableCell>
+                      {" "}
+                      {Intl.NumberFormat("pt-BR").format(item.quantidade)}
+                    </TableCell>
+                    <TableCell> {item.unidadeDeMedida}</TableCell>
+                    <TableCell>
+                      {Intl.NumberFormat("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      }).format(item.valorUnitario / 100)}
+                    </TableCell>
                   </TableRow>
-                ))
-                }
+                ))}
               </TableBody>
             </Table>
           </>
@@ -296,11 +327,10 @@ function GetInfoContratos() {
           //     <h1 ><strong>Valor Unitário:</strong> {formatToBRL(item.valorUnitario)}</h1>
           //   </div>
           // ))
-
         )}
       </div>
     </div>
-  )
+  );
 }
 
 function VisualizarContratoLoading() {
@@ -324,7 +354,7 @@ function VisualizarContratoLoading() {
         <Skeleton className="h-11 w-full" />
       </div>
     </div>
-  )
+  );
 }
 
 function ErrorFallback({

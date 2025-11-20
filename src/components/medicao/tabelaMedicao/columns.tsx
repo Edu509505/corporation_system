@@ -34,15 +34,24 @@ export const columns: ColumnDef<Medicao>[] = [
     id: "faturado",
     accessorKey: "faturado",
     header: () => "Situação",
-    cell: ({row}) => {
-      const situacao = row.getValue("faturado") as string ;
+    cell: ({ row }) => {
+      const situacao = row.getValue("faturado") as string;
       const formatacao = situacao.toUpperCase();
       if (formatacao === "NAO_FATURADO") {
-        return <Badge className="text-blue-600 bg-blue-100 border border-blue-500"><Timer /> Não Faturado</Badge>
+        return (
+          <Badge className="text-blue-600 bg-blue-100 border border-blue-500">
+            <Timer /> Não Faturado
+          </Badge>
+        );
       } else if (formatacao === "FATURADO") {
-        return <Badge className="text-green-600 bg-green-100 border border-green-500"> <CircleCheck /> Faturado </Badge>
+        return (
+          <Badge className="text-green-600 bg-green-100 border border-green-500">
+            {" "}
+            <CircleCheck /> Faturado{" "}
+          </Badge>
+        );
       }
-    }
+    },
   },
   {
     accessorKey: "valorTotal",
@@ -52,7 +61,7 @@ export const columns: ColumnDef<Medicao>[] = [
       const formatted = new Intl.NumberFormat("PT-BR", {
         style: "currency",
         currency: "BRL",
-      }).format(valor / 100);
+      }).format(valor / 10000);
       return formatted;
     },
   },
@@ -66,8 +75,7 @@ export const columns: ColumnDef<Medicao>[] = [
             Visualizar
           </Button>
         </Link>
-
-      )
-    }
-  }
+      );
+    },
+  },
 ];

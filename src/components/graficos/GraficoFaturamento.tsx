@@ -1,16 +1,25 @@
-import { useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useQueryErrorResetBoundary,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Skeleton } from "../ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";;
-import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, type ChartConfig } from "../ui/chart";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "../ui/chart";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { url } from "@/url";
 
-
-interface FaturamentoMesProps{
+interface FaturamentoMesProps {
   mesReferencia: string; // Ex: "Nov/2025"
-  totalPago: number;     // Ex: 15000
+  totalPago: number; // Ex: 15000
 }
 
 function GraficoFaturamentoDados() {
@@ -55,8 +64,16 @@ function GraficoFaturamentoDados() {
           <AreaChart data={chartData}>
             <defs>
               <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-mobile)" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="var(--color-mobile)" stopOpacity={0.1} />
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-mobile)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-mobile)"
+                  stopOpacity={0.1}
+                />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} />
@@ -76,7 +93,7 @@ function GraficoFaturamentoDados() {
                     const valorFormatado = new Intl.NumberFormat("pt-BR", {
                       style: "currency",
                       currency: "BRL",
-                    }).format(Number(value ?? 0));
+                    }).format(Number(value ?? 0) / 100);
                     return `${name}: ${valorFormatado}`;
                   }}
                   indicator="dot"
@@ -98,34 +115,34 @@ function GraficoFaturamentoDados() {
   );
 }
 
-
 function LoadingGrafico() {
-    return (
-        <Skeleton></Skeleton>
-    )
+  return <Skeleton></Skeleton>;
 }
 
 function ErrorFallback({
-    error,
+  error,
 }: {
-    error: Error;
-    resetErrorBoundary: () => void;
+  error: Error;
+  resetErrorBoundary: () => void;
 }) {
-    return <div className="p-5 text-destructive">Erro: {error.message}</div>;
+  return <div className="p-5 text-destructive">Erro: {error.message}</div>;
 }
 
 export function GraficoFaturamento() {
-    const { reset } = useQueryErrorResetBoundary();
+  const { reset } = useQueryErrorResetBoundary();
 
-    return (
-        <ErrorBoundary onReset={reset} fallbackRender={({ error,
-            resetErrorBoundary }) => <ErrorFallback error={error}
-                resetErrorBoundary={resetErrorBoundary} />} >
-            <Suspense fallback={<LoadingGrafico />} >
-                <GraficoFaturamentoDados />
-            </Suspense>
-        </ErrorBoundary>
-    )
+  return (
+    <ErrorBoundary
+      onReset={reset}
+      fallbackRender={({ error, resetErrorBoundary }) => (
+        <ErrorFallback error={error} resetErrorBoundary={resetErrorBoundary} />
+      )}
+    >
+      <Suspense fallback={<LoadingGrafico />}>
+        <GraficoFaturamentoDados />
+      </Suspense>
+    </ErrorBoundary>
+  );
 }
 
 export default GraficoFaturamento;
