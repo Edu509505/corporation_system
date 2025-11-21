@@ -1,6 +1,6 @@
 import { useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query"
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import React, { Suspense } from "react";
@@ -36,6 +36,15 @@ function GraficoDados() {
             return data as TodosOsItensDoDia[];
         }
     });
+    const filteredData = chartData.filter((item) => {
+        const date = dayjs(item.dataDia);
+        const today = dayjs();
+        if (timeRange === "7d") return date.isAfter(today.subtract(7, "day"));
+        if (timeRange === "30d") return date.isAfter(today.subtract(30, "day"));
+        if (timeRange === "90d") return date.isAfter(today.subtract(90, "day"));
+        return true;
+    });
+
 
     const chartConfig = {
         total_m2: {
@@ -75,11 +84,11 @@ function GraficoDados() {
                     config={chartConfig}
                     className="aspect-auto h-[250px] w-full"
                 >
-                    <AreaChart data={chartData}>
+                    <AreaChart data={filteredData}>
                         <defs>
                             <linearGradient id="fillM2" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="var(--chart-2)" stopOpacity={0.8} />
-                                <stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0.1} />
+                                <stop offset="5%" stopColor="var(--ring)" stopOpacity={0.8} />
+                                <stop offset="95%" stopColor="var(--ring)" stopOpacity={0.1} />
                             </linearGradient>
                         </defs>
                         <CartesianGrid vertical={false} />
@@ -89,10 +98,15 @@ function GraficoDados() {
                             axisLine={false}
                             tickMargin={8}
                             minTickGap={8}
-                            interval={0}
-                            padding={{ left: 20, right: 20 }} // 👈 aqui está o ajuste!
+                            interval="preserveStartEnd"
+                            padding={{ left: 20, right: 20 }}
                             tickFormatter={(value) => dayjs(value).format("DD/MM")}
                         />
+                        <YAxis
+                            domain={[5, 700]} // ou [0, 600] se quiser fixo
+                            allowDataOverflow={true}
+                        />
+
                         <ChartTooltip
                             cursor={false}
                             content={
@@ -104,10 +118,11 @@ function GraficoDados() {
                         />
                         <Area
                             dataKey="total_m2"
-                            type="natural"
+                            type="monotone"
                             fill="url(#fillM2)"
-                            stroke="var(--chart-2)"
+                            stroke="var(--ring)"
                         />
+
                         <ChartLegend content={<ChartLegendContent />} />
                     </AreaChart>
                 </ChartContainer>
@@ -116,8 +131,8 @@ function GraficoDados() {
     );
 }
 
-function LoadingGrafico(){
-    return(
+function LoadingGrafico() {
+    return (
         <Skeleton></Skeleton>
     )
 }
