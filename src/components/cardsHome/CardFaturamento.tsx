@@ -1,5 +1,8 @@
 import { url } from "@/url";
-import { useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useQueryErrorResetBoundary,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import CardBase from "./CardsHome";
@@ -14,65 +17,76 @@ type CardFaturamentoPropos = {
 
 function CardListFaturamento() {
   const { data: faturamentoData } = useSuspenseQuery<CardFaturamentoPropos>({
-    queryKey: ['cardFaturamento'],
+    queryKey: ["cardFaturamento"],
     queryFn: async () => {
       const response = await fetch(`${url}/cardFaturamento`, {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
       });
       if (!response.ok) throw new Error("Erro ao buscar faturamento");
 
       const data = await response.json();
       console.log("data Faturamento", data);
       return data;
-    }
+    },
   });
 
   const valorFormatado = Intl.NumberFormat("pt-BR", {
     style: "currency",
-    currency: "BRL"
-  }).format(Number(faturamentoData.totalAtual) || 0);
+    currency: "BRL",
+  }).format((Number(faturamentoData.totalAtual) || 0) / 100);
 
   const variacaoRaw = faturamentoData.variacaoPercentual;
-  const variacao = typeof variacaoRaw === "string" && variacaoRaw === "N/A"
-    ? null
-    : Number(variacaoRaw);
+  const variacao =
+    typeof variacaoRaw === "string" && variacaoRaw === "N/A"
+      ? null
+      : Number(variacaoRaw);
 
-  const variacaoFormatada = variacao !== null && isFinite(variacao)
-    ? `${variacao.toFixed(2)}%`
-    : "N/A";
+  const variacaoFormatada =
+    variacao !== null && isFinite(variacao) ? `${variacao.toFixed(2)}%` : "N/A";
 
   const badgeClass =
-    variacao === null ? "text-muted-foreground border-muted-foreground" :
-      variacao > 0 ? "text-green-600 border-green-600" :
-        variacao < 0 ? "text-red-600 border-red-600" :
-          "text-black border-black";
+    variacao === null
+      ? "text-muted-foreground border-muted-foreground"
+      : variacao > 0
+      ? "text-green-600 border-green-600"
+      : variacao < 0
+      ? "text-red-600 border-red-600"
+      : "text-black border-black";
 
   const badgeIcon =
-    variacao === null ? <Minus /> :
-      variacao > 0 ? <TrendingUp /> :
-        variacao < 0 ? <TrendingDown /> :
-          <Minus />;
+    variacao === null ? (
+      <Minus />
+    ) : variacao > 0 ? (
+      <TrendingUp />
+    ) : variacao < 0 ? (
+      <TrendingDown />
+    ) : (
+      <Minus />
+    );
 
-  console.log({ variacao, variacaoPercentual: faturamentoData.variacaoPercentual });
-
+  console.log({
+    variacao,
+    variacaoPercentual: faturamentoData.variacaoPercentual,
+  });
 
   return (
     <CardBase>
-      <h2 className="font-bold">Faturamento Mensal</h2>
+      <div className="flex justify-between">
+        <h2 className="font-bold">Faturamento Mensal</h2>
 
-      <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-        {valorFormatado}
-      </CardTitle>
-
-      <CardAction>
         <Badge variant="outline" className={badgeClass}>
           <span className="flex items-center gap-1">
             {badgeIcon}
             {variacaoFormatada}
           </span>
         </Badge>
-      </CardAction>
+      </div>
+
+      <CardAction></CardAction>
+      <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+        {valorFormatado}
+      </CardTitle>
 
       <div className="mt-2 text-sm text-muted-foreground">
         {variacao === null && (
@@ -80,22 +94,25 @@ function CardListFaturamento() {
         )}
         {typeof variacao === "number" && variacao > 0 && (
           <span className="text-green-600">
-            O faturamento aumentou em {variacao.toFixed(2)}% em relação ao mês anterior.
+            O faturamento aumentou em {variacao.toFixed(2)}% em relação ao mês
+            anterior.
           </span>
         )}
         {typeof variacao === "number" && variacao < 0 && (
           <span className="text-red-600">
-            O faturamento caiu {Math.abs(variacao).toFixed(2)}% em relação ao mês anterior.
+            O faturamento caiu {Math.abs(variacao).toFixed(2)}% em relação ao
+            mês anterior.
           </span>
         )}
         {variacao === 0 && (
-          <span>O faturamento se manteve estável em relação ao mês anterior.</span>
+          <span>
+            O faturamento se manteve estável em relação ao mês anterior.
+          </span>
         )}
       </div>
     </CardBase>
   );
 }
-
 
 function SkeletonCardFaturamento() {
   return (
@@ -119,20 +136,19 @@ function ErrorFallback({
   return <div className="p-5 text-destructive">Erro: {error.message}</div>;
 }
 
-
-
-
-
 export function CardFaturamento() {
   const { reset } = useQueryErrorResetBoundary();
 
   return (
-    <ErrorBoundary onReset={reset} fallbackRender={({ error,
-      resetErrorBoundary }) => <ErrorFallback error={error}
-        resetErrorBoundary={resetErrorBoundary} />} >
-      <Suspense fallback={<SkeletonCardFaturamento />} >
+    <ErrorBoundary
+      onReset={reset}
+      fallbackRender={({ error, resetErrorBoundary }) => (
+        <ErrorFallback error={error} resetErrorBoundary={resetErrorBoundary} />
+      )}
+    >
+      <Suspense fallback={<SkeletonCardFaturamento />}>
         <CardListFaturamento />
       </Suspense>
     </ErrorBoundary>
-  )
+  );
 }
