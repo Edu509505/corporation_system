@@ -149,8 +149,8 @@ function VisualMedicao() {
 
         </section>
         <PeriodoFechamentoIdMedicao
-          dataInicial={new Date(medicao.periodoInicial)}
-          dataFinal={new Date(medicao.periodoFinal)}
+          dataInicial={format(new Date(medicao.periodoInicial), "yyyy-MM-dd")}
+          dataFinal={format(new Date(medicao.periodoFinal), "yyyy-MM-dd")}
           idProposta={medicao.idProposta}
           idMedicao={medicao.id}
         />

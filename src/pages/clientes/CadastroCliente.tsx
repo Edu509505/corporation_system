@@ -80,38 +80,38 @@ export default function CriarCliente() {
   });
 
   const criarUsuario = useMutation({
-  mutationKey: ['criarUsuario'],
-  mutationFn: async (data: z.infer<typeof criarClienteSchema>) => {
-    const response = await fetch(`${url}/clientes`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
+    mutationKey: ['criarUsuario'],
+    mutationFn: async (data: z.infer<typeof criarClienteSchema>) => {
+      const response = await fetch(`${url}/clientes`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`Erro ${response.status}: ${errorText}`)
-    }
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`Erro ${response.status}: ${errorText}`)
+      }
 
-    return response.json()
-  },
-})
+      return response.json()
+    },
+  })
 
 
   const onSubmit = async (data: z.infer<typeof criarClienteSchema>) => {
-  toast.promise(
-    criarUsuario.mutateAsync(data),
-    {
-      loading: 'Cadastrando cliente...',
-      success: () => 'Cliente cadastrado com sucesso!',
-      error: (err) => `Erro: ${(err as Error).message}`,
-    }
-  )
-  formCliente.reset()
-}
+    toast.promise(
+      criarUsuario.mutateAsync(data),
+      {
+        loading: 'Cadastrando cliente...',
+        success: () => 'Cliente cadastrado com sucesso!',
+        error: (err) => `Erro: ${(err as Error).message}`,
+      }
+    )
+    formCliente.reset()
+  }
 
 
   return (

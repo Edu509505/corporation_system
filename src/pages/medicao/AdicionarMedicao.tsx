@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
+  useMutation,
   useQueryErrorResetBoundary,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -29,6 +30,7 @@ import { Suspense, useState } from "react";
 import {
   CalendarIcon,
   CircleArrowLeftIcon,
+  CircleCheck,
   CircleCheckBigIcon,
   CircleX,
 } from "lucide-react";
@@ -41,6 +43,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Link } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -54,6 +57,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns/format";
 import PeriodoFechamento from "@/components/medicao/periodoFechamento";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -109,7 +114,7 @@ function AdicionarContrato() {
 
   const [idProposta, setIdProposta] = useState<string | undefined>(undefined);
 
-  const contratoSchema = z.object({
+  const medicaoSchema = z.object({
     idCliente: z.string().min(1, "Selecione ao menos um cliente"),
     idProposta: z.string().min(1, "Selecione ao menos uma proposta"),
     observacao: z.string(),
@@ -117,8 +122,8 @@ function AdicionarContrato() {
     periodoFinal: z.date("Data Final Obrigatória"),
   });
 
-  const form = useForm<z.infer<typeof contratoSchema>>({
-    resolver: zodResolver(contratoSchema),
+  const form = useForm<z.infer<typeof medicaoSchema>>({
+    resolver: zodResolver(medicaoSchema),
     defaultValues: {
       idCliente: "",
       idProposta: "",
@@ -132,16 +137,13 @@ function AdicionarContrato() {
   const [dataInicial, setDataInicial] = useState<Date | null>(null);
   const [dataFinal, setDataFinal] = useState<Date | null>(null);
 
-  const [desableSelectProposta, setDesableSelectProposta] =
-    useState<boolean>(true);
+  const [desableSelectProposta, setDesableSelectProposta] = useState<boolean>(true);
   const [periodoInicial, setPeriodoInicial] = useState<boolean>(true);
   const [periodoFinal, setPeriodoFinal] = useState<boolean>(true);
 
-  //AQUI É FEITO O REGISTRO
-  const onSubmit = async (data: z.infer<typeof contratoSchema>) => {
-    try {
-      console.log(data);
-
+  const criarMedicao = useMutation({
+    mutationKey: ["criarMedicao"],
+    mutationFn: async (data: z.infer<typeof medicaoSchema>) => {
       const response = await fetch(`${url}/criarMedicao`, {
         method: "POST",
         headers: {
@@ -150,19 +152,30 @@ function AdicionarContrato() {
         body: JSON.stringify(data),
         credentials: "include",
       });
-      console.log("response", response);
+      
       if (!response.ok) {
-        // Aqui você lida com o erro de forma clara
-        setResponseNotOk(true);
-        setResponseOk(false);
-        const errorText = await response.text();
-        throw new Error(`Erro ${response.status}: ${errorText}`);
+        const errorText = await response.text()
+        throw new Error(`Erro ${response.status}: ${errorText}`)
       }
-      const body = await response.json();
-      setResponseOk(true);
-      setResponseNotOk(false);
-      console.log("Cliente criado com sucesso:", body);
-    } catch {}
+
+      return response.json()
+    }
+  })
+
+  //AQUI É FEITO O REGISTRO
+  const onSubmit = async (data: z.infer<typeof medicaoSchema>) => {
+      console.log(data);
+
+      toast.promise(
+      criarMedicao.mutateAsync(data),
+      {
+        loading: 'Cadastrando cliente...',
+        success: () => 'Cliente cadastrado com sucesso!',
+        error: (err) => `Erro: ${(err as Error).message}`,
+      }
+    )
+    form.reset()
+
   };
   return (
     <div className="flex flex-col bg-background w-full gap-3 p-4">
@@ -389,54 +402,49 @@ function AdicionarContrato() {
             ) : (
               <h1>Nenhum Periodo Selecionado</h1>
             )}
-            <Button
-              type="submit"
-              className="mt-4 cursor-pointer"
-              variant="default"
-            >
-              Cadastrar Medição
-            </Button>
-            <AlertDialog
-              open={responseOk}
-              onOpenChange={(open) => {
-                setResponseOk(open);
-              }}
-            >
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="text-ring flex items-center gap-3">
-                    <CircleCheckBigIcon /> Contrato cadastrado com sucesso
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Seu contrato foi cadastrado e inserido no sistema
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <Link to="/medicao">
-                    <AlertDialogAction>Continuar</AlertDialogAction>
-                  </Link>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-            <AlertDialog
-              open={responseNotOk}
-              onOpenChange={(open) => {
-                setResponseNotOk(open);
-              }}
-            >
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="text-destructive flex items-center gap-3">
-                    <CircleX /> Erro ao cadastrar contrato
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    A ação de cadastrar o contrato foi mal-sucedida
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Voltar</AlertDialogCancel>
-                </AlertDialogFooter>
-              </AlertDialogContent>
+            <AlertDialog open={criarMedicao.isSuccess || criarMedicao.isError}>
+              <AlertDialogTrigger asChild>
+                <Button type="submit" disabled={criarMedicao.isPending} className="cursor-pointer">
+                  {criarMedicao.isPending ? <><Spinner /> Cadastrar</> : <><CircleCheck /> Cadastrar</>}
+                </Button>
+              </AlertDialogTrigger>
+              {criarMedicao.isError ? (
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-3 text-destructive">
+                      <CircleX />
+                      Não foi possível cadastrar o Medição
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Tente novamente mais tarde
+                    </AlertDialogDescription>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="cursor-pointer">
+                        Voltar
+                      </AlertDialogCancel>
+                    </AlertDialogFooter>
+                  </AlertDialogHeader>
+                </AlertDialogContent>
+              ) : (
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="flex items-center gap-3 text-ring">
+                      <CircleCheck />
+                      Medição cadastrada com sucesso
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Medição cadastrada e inserido no sistema
+                    </AlertDialogDescription>
+                    <AlertDialogFooter>
+                      <Link to={"/medicao"}>
+                        <AlertDialogAction className="cursor-pointer">
+                          Continuar
+                        </AlertDialogAction>
+                      </Link>
+                    </AlertDialogFooter>
+                  </AlertDialogHeader>
+                </AlertDialogContent>
+              )}
             </AlertDialog>
           </form>
         </Form>

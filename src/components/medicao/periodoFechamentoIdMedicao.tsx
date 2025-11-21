@@ -16,8 +16,8 @@ const formatDateOnly = (date: Date | null) =>
   date ? date.toISOString().slice(0, 10) : "";
 
 interface PeriodoFechamentoProps {
-  dataInicial: Date | null;
-  dataFinal: Date | null;
+  dataInicial: string | null;
+  dataFinal: string | null;
   idProposta: string | undefined;
   idMedicao: string | undefined;
 }
@@ -69,19 +69,19 @@ function PeriodoFechamentoIdMedicao({
     ],
     queryFn: async () => {
       const response = await fetch(
-        `${url}/diarioDeObra/${formatDateOnly(dataInicial)}/${formatDateOnly(
-          dataFinal
-        )}/proposta/${idProposta}/medicao/${idMedicao}`,
+        `${url}/diarioDeObra/${dataInicial}/${dataFinal}/proposta/${idProposta}/medicao/${idMedicao}`,
         {
           method: "GET",
           credentials: "include",
         }
       );
-      if (!response.ok) throw new Error("Propostas não encontradas");
+      if (!response.ok) throw new Error("Mediçoes não encontradas");
       const data = await response.json();
       return data as DiarioDeObra[];
     },
   });
+
+  console.log(periodo)
 
   const { data: quantitativa } = useSuspenseQuery({
     queryKey: ["quantitativa", dataInicial, dataFinal, idProposta],

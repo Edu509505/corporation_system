@@ -12,7 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
+  useMutation,
   useQuery,
+  useQueryClient,
   useQueryErrorResetBoundary,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -61,6 +63,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns/format";
+import { Spinner } from "@/components/ui/spinner";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -144,20 +147,20 @@ function AdicionarNotaFiscal() {
     },
   });
 
-  console.log("Medicoes ",medicao)
+  console.log("Medicoes ", medicao)
 
   const contratoSchema = z.object({
     idCliente: z.string().min(1, "Selecione ao menos um cliente"),
     idProposta: z.string().min(1, "Selecione ao menos uma proposta"),
     idMedicao: z.string().min(1, "Selecione a Medição"),
     valor: z.string().min(1, "Defina o valor da proposta")
-        .transform((val) => {
-          const clean = val.replace(/\D/g, '');
-          return parseFloat(clean) / 100;
-        }),
+      .transform((val) => {
+        const clean = val.replace(/\D/g, '');
+        return parseFloat(clean) / 100;
+      }),
     vencimento: z.date("Defina a data para o vencimento"),
     tipo: z.string().min(1, "Selecione o tipo"),
-    numeroDaNota: z.string().min(2 , "Precisa conter um número"),
+    numeroDaNota: z.string().min(2, "Precisa conter um número"),
     anexo: z
       .instanceof(File, {
         error: "Arquivo Obrigatório"
@@ -187,83 +190,81 @@ function AdicionarNotaFiscal() {
     },
   });
 
-  const [responseOk, setResponseOk] = useState<boolean>(false);
-  const [responseNotOk, setResponseNotOk] = useState<boolean>(false);
+  // const [responseOk, setResponseOk] = useState<boolean>(false);
+  // const [responseNotOk, setResponseNotOk] = useState<boolean>(false);
 
-  const onSubmit = async (data: z.infer<typeof contratoSchema>) => {
-    console.log("data ", data);
-    console.log("files: ", data.anexo);
+  const queryClient = useQueryClient();
 
-    try {
-      const form = new FormData();
-
-      form.set("idCliente", data.idCliente);
-      form.set("idProposta", data.idProposta);
-      form.set("idMedicao", data.idMedicao);
-      form.set("valor", (parseFloat(data.valor.toString())*100).toString());
-      form.set("vencimento", data.vencimento.toString());
-      form.set("tipo", data.tipo);
-      form.set("numeroDaNota", data.numeroDaNota);
-      form.append("anexo", data.anexo);
-
-      for (let [key, value] of form.entries()) {
-        console.log(`${key}:`, value);
-      }
-
-      console.log("FORM ", form);
-
+  const criarNotaMutation = useMutation({
+    mutationKey: ["createFaturamento"],
+    mutationFn: async (formData: FormData) => {
       const response = await fetch(`${url}/createFaturamento`, {
         method: "POST",
         credentials: "include",
-        body: form,
+        body: formData,
       });
-      console.log("response", response);
       if (!response.ok) {
-        // Aqui você lida com o erro de forma clara
-        setResponseNotOk(true);
-        setResponseOk(false);
-        const errorText = await response.text();
-        throw new Error(`Erro ${response.status}: ${errorText}`);
+        const txt = await response.text();
+        throw new Error(txt || `Erro ${response.status}`);
       }
-      console.log("estou aqui");
-      const body = await response.json();
-      setResponseOk(true);
-      setResponseNotOk(false);
-      console.log("Cliente criado com sucesso:", body);
-    } catch {}
+      return response.json();
+    },
+    onSuccess: (data) => {
+      form.reset();
+      // optional: invalidate queries
+      queryClient.invalidateQueries();
+      queryClient.invalidateQueries();
+    },
+    onError: (error) => {
+      console.error("Erro ao criar nota fiscal:", error);
+    },
+  });
+
+  const onSubmit = (data: z.infer<typeof contratoSchema>) => {
+    const formData = new FormData();
+    formData.set("idCliente", data.idCliente);
+    formData.set("idProposta", data.idProposta);
+    formData.set("idMedicao", data.idMedicao);
+    formData.set("valor", (parseFloat(data.valor.toString()) * 100).toString());
+    formData.set("vencimento", data.vencimento.toString());
+    formData.set("tipo", data.tipo);
+    formData.set("numeroDaNota", data.numeroDaNota);
+    if (data.anexo) formData.append("anexo", data.anexo);
+
+    criarNotaMutation.mutate(formData);
   };
 
   function CurrencyInput({ field }: { field: any }) {
-      const inputRef = useRef<HTMLInputElement>(null);
-  
-      useEffect(() => {
-        const handleInput = (e: Event) => {
-          const target = e.target as HTMLInputElement;
-          const raw = target.value.replace(/\D/g, '');
-          const number = parseFloat(raw) / 100;
-          const formatted = number.toLocaleString('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-          });
-          target.value = formatted;
-          field.onChange(formatted); // atualiza o valor no RHF
-        };
-  
-        const input = inputRef.current;
-        input?.addEventListener('input', handleInput);
-  
-        return () => input?.removeEventListener('input', handleInput);
-      }, [field]);
-  
-      return (
-        <Input
-          placeholder="R$ -"
-          ref={inputRef}
-          defaultValue={field.value}
-          name={field.name}
-        />
-      );
-    }
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+      const handleInput = (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        const raw = target.value.replace(/\D/g, '');
+        const number = parseFloat(raw) / 100;
+        const formatted = number.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        });
+        target.value = formatted;
+        field.onChange(formatted); // atualiza o valor no RHF
+      };
+
+      const input = inputRef.current;
+      input?.addEventListener('input', handleInput);
+
+      return () => input?.removeEventListener('input', handleInput);
+    }, [field]);
+
+    return (
+      <Input
+        placeholder="R$ -"
+        ref={inputRef}
+        defaultValue={field.value}
+        name={field.name}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col bg-background w-full gap-3 p-4">
@@ -353,7 +354,7 @@ function AdicionarNotaFiscal() {
                               key={proposta.id}
                               value={proposta.id.toString()}
                             >
-                             {proposta.nomeDaProposta}
+                              {proposta.nomeDaProposta}
                             </SelectItem>
                           ))}
                         </SelectGroup>
@@ -387,7 +388,7 @@ function AdicionarNotaFiscal() {
                               key={medicao.id}
                               value={medicao.id.toString()}
                             >
-                              {medicao.id} - 
+                              {medicao.id} -
                               {format(
                                 new Date(medicao.createdAt),
                                 "dd/MM/yyyy"
@@ -489,18 +490,18 @@ function AdicionarNotaFiscal() {
                 )}
               />
               <FormField
-              control={form.control}
-              name="valor"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Valor Da Nota</FormLabel>
-                  <FormMessage />
-                  <FormControl>
-                    <CurrencyInput field={field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+                control={form.control}
+                name="valor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Valor Da Nota</FormLabel>
+                    <FormMessage />
+                    <FormControl>
+                      <CurrencyInput field={field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             </div>
             <FormField
               control={form.control}
@@ -538,22 +539,25 @@ function AdicionarNotaFiscal() {
               type="submit"
               className="mt-4 cursor-pointer"
               variant="default"
+              disabled={criarNotaMutation.isPending}
             >
-              Cadastrar Nota Fiscal
+              {criarNotaMutation.isPending ? <><Spinner/> Enviando...</> : "Cadastrar Nota Fiscal"}
             </Button>
+
+            {/* sucesso */}
             <AlertDialog
-              open={responseOk}
+              open={criarNotaMutation.isSuccess}
               onOpenChange={(open) => {
-                setResponseOk(open);
+                if (!open) criarNotaMutation.reset();
               }}
             >
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle className="text-ring flex items-center gap-3">
-                    <CircleCheckBigIcon /> Contrato cadastrado com sucesso
+                    <CircleCheckBigIcon /> Nota cadastrada com sucesso
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    Seu contrato foi cadastrado e inserido no sistema
+                    Sua nota foi cadastrada e inserida no sistema
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -563,23 +567,25 @@ function AdicionarNotaFiscal() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+
+            {/* erro */}
             <AlertDialog
-              open={responseNotOk}
+              open={criarNotaMutation.isError}
               onOpenChange={(open) => {
-                setResponseNotOk(open);
+                if (!open) criarNotaMutation.reset();
               }}
             >
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle className="text-destructive flex items-center gap-3">
-                    <CircleX /> Erro ao cadastrar contrato
+                    <CircleX /> Erro ao cadastrar nota
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    A ação de cadastrar o contrato foi mal-sucedida
+                    A ação de cadastrar a nota fiscal falhou. Tente novamente.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Voltar</AlertDialogCancel>
+                  <AlertDialogCancel>Fechar</AlertDialogCancel>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
