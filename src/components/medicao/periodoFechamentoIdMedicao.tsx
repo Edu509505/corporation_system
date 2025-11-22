@@ -12,8 +12,8 @@ import {
 import { MessageCircleWarningIcon } from "lucide-react";
 const url = import.meta.env.VITE_API_URL;
 
-const formatDateOnly = (date: Date | null) =>
-  date ? date.toISOString().slice(0, 10) : "";
+// const formatDateOnly = (date: Date | null) =>
+//   date ? date.toISOString().slice(0, 10) : "";
 
 interface PeriodoFechamentoProps {
   dataInicial: string | null;

@@ -64,7 +64,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns/format";
 import { Spinner } from "@/components/ui/spinner";
-import { Label } from "@/components/ui/label";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -210,7 +209,7 @@ function AdicionarNotaFiscal() {
       }
       return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       form.reset();
       // optional: invalidate queries
       queryClient.invalidateQueries();

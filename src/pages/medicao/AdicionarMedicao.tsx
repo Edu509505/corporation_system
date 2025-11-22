@@ -31,7 +31,6 @@ import {
   CalendarIcon,
   CircleArrowLeftIcon,
   CircleCheck,
-  CircleCheckBigIcon,
   CircleX,
 } from "lucide-react";
 import {
@@ -130,9 +129,6 @@ function AdicionarContrato() {
       observacao: "",
     },
   });
-
-  const [responseOk, setResponseOk] = useState<boolean>(false);
-  const [responseNotOk, setResponseNotOk] = useState<boolean>(false);
 
   const [dataInicial, setDataInicial] = useState<Date | null>(null);
   const [dataFinal, setDataFinal] = useState<Date | null>(null);
