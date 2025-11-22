@@ -17,7 +17,7 @@ type CardFaturamentoPropos = {
 
 function CardListFaturamento() {
   const { data: faturamentoData } = useSuspenseQuery<CardFaturamentoPropos>({
-    queryKey: ["cardFaturamento"],
+    queryKey: ["cardFaturamento", url],
     queryFn: async () => {
       const response = await fetch(`${url}/cardFaturamento`, {
         method: "GET",
@@ -35,11 +35,16 @@ function CardListFaturamento() {
     currency: "BRL",
   }).format((Number(faturamentoData.totalAtual) || 0) / 100);
 
-  const variacaoRaw = faturamentoData.variacaoPercentual;
+  console.log(faturamentoData.variacaoPercentual.toString().split("%")[0]);
+
+  const variacaoRaw = faturamentoData.variacaoPercentual
+    .toString()
+    .split("%")[0];
   const variacao =
     typeof variacaoRaw === "string" && variacaoRaw === "N/A"
       ? null
       : Number(variacaoRaw);
+  console.log(variacao);
 
   const variacaoFormatada =
     variacao !== null && isFinite(variacao) ? `${variacao.toFixed(2)}%` : "N/A";
@@ -66,7 +71,7 @@ function CardListFaturamento() {
 
   return (
     <CardBase>
-      <div className="flex justify-between">
+      <div className="flex justify-between gap-3">
         <h2 className="font-bold">Faturamento Mensal</h2>
 
         <Badge variant="outline" className={badgeClass}>
