@@ -1,4 +1,7 @@
-import { useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query"
+import {
+  useQueryErrorResetBoundary,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { Skeleton } from "../ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
 import { Suspense } from "react";
@@ -16,20 +19,19 @@ interface Proposta {
 }
 
 function CardPropostaEmAndamentoList() {
-
   const { data: propostasAprovadas } = useSuspenseQuery({
     queryKey: ["propostasAprovadas"],
     queryFn: async () => {
       const response = await fetch(`${url}/propostasAprovadas`, {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
       });
-      if (!response.ok) throw new Error("erro ao encontrar os versionamentos aprovados");
+      if (!response.ok)
+        throw new Error("erro ao encontrar os versionamentos aprovados");
       const data = await response.json();
       return data as Proposta[];
-    }
-  })
-  console.log(propostasAprovadas)
+    },
+  });
   return (
     <CardBase>
       <div className="flex items-center gap-6">
@@ -46,7 +48,7 @@ function CardPropostaEmAndamentoList() {
         </div>
       </div>
     </CardBase>
-  )
+  );
 }
 
 function CardPropostaEmAndamentoLoading() {
@@ -80,12 +82,12 @@ function CardPropostaEmAndamentoLoading() {
       <div className="w-full h-[300px] mt-4 rounded-2xl border border-gray-200 p-6 flex flex-col gap-4">
         <Skeleton className="h-6 w-1/4 rounded" /> {/* Título do gráfico */}
         <Skeleton className="h-9 w-1/5 rounded" /> {/* Filtro de período */}
-        <Skeleton className="h-full w-full rounded-md" /> {/* Área do gráfico */}
+        <Skeleton className="h-full w-full rounded-md" />{" "}
+        {/* Área do gráfico */}
       </div>
     </div>
   );
 }
-
 
 function ErrorFallback({
   error,
@@ -96,19 +98,19 @@ function ErrorFallback({
   return <div className="p-5 text-destructive">Erro: {error.message}</div>;
 }
 
-
-
 export function CardPropostaEmAndamento() {
   const { reset } = useQueryErrorResetBoundary();
 
   return (
-    <ErrorBoundary onReset={reset} fallbackRender={({ error,
-      resetErrorBoundary }) => <ErrorFallback error={error}
-        resetErrorBoundary={resetErrorBoundary} />} >
-      <Suspense fallback={<CardPropostaEmAndamentoLoading />} >
+    <ErrorBoundary
+      onReset={reset}
+      fallbackRender={({ error, resetErrorBoundary }) => (
+        <ErrorFallback error={error} resetErrorBoundary={resetErrorBoundary} />
+      )}
+    >
+      <Suspense fallback={<CardPropostaEmAndamentoLoading />}>
         <CardPropostaEmAndamentoList />
       </Suspense>
     </ErrorBoundary>
-  )
-
+  );
 }

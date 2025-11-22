@@ -24,37 +24,36 @@ const url = import.meta.env.VITE_API_URL;
 
 interface Medicao {
   clienteMedicao: {
-    cnpj: string
-    createdAt: string
-    id: number
-    local: string
-    name: string | undefined
-    path: string
-    status: string
-    updatedAt: string
-  }
-  createdAt: string
-  faturado: string
-  id: string
-  idCliente: number
-  idContrato: number
-  idProposta: string
-  observacao: string
-  periodoFinal: string
-  periodoInicial: string
+    cnpj: string;
+    createdAt: string;
+    id: number;
+    local: string;
+    name: string | undefined;
+    path: string;
+    status: string;
+    updatedAt: string;
+  };
+  createdAt: string;
+  faturado: string;
+  id: string;
+  idCliente: number;
+  idContrato: number;
+  idProposta: string;
+  observacao: string;
+  periodoFinal: string;
+  periodoInicial: string;
   propostaMedicao: {
-    createdAt: string
-    descricao: string
-    id: number
-    idCliente: number
-    nomeDaProposta: string
-    statusProposta: string
-    updatedAt: string
-    valorProposta: number
-  }
-  updatedAt: string
-  valorTotal: number
-
+    createdAt: string;
+    descricao: string;
+    id: number;
+    idCliente: number;
+    nomeDaProposta: string;
+    statusProposta: string;
+    updatedAt: string;
+    valorProposta: number;
+  };
+  updatedAt: string;
+  valorTotal: number;
 }
 
 function VisualMedicao() {
@@ -73,8 +72,6 @@ function VisualMedicao() {
     },
   });
 
-  console.log(medicao)
-
   return (
     <div className="flex flex-col bg-background w-full gap-3 p-4">
       <header>
@@ -84,9 +81,7 @@ function VisualMedicao() {
           </Button>
         </Link>
         <h1 className="text-2xl font-bold">Medição</h1>
-        <p className="text-gray-600">
-          Visualização da Medição
-        </p>
+        <p className="text-gray-600">Visualização da Medição</p>
         <p className="text-sm text-background0">
           <strong>Observação:</strong> Página dedicada para visualizar medição
         </p>
@@ -108,11 +103,16 @@ function VisualMedicao() {
           <div className="flex flex-col gap-2">
             <Label>Stuação</Label>
             <div className=" flex justify-start items-center">
-              {
-                medicao.faturado === "NAO_FATURADO" ?
-                  <Badge className="text-blue-600 bg-blue-100 border border-blue-500"><Timer /> Não Faturado</Badge>
-                  : <Badge className="text-green-600 bg-green-100 border border-green-500"> <CircleCheck /> Faturado </Badge>
-              }
+              {medicao.faturado === "NAO_FATURADO" ? (
+                <Badge className="text-blue-600 bg-blue-100 border border-blue-500">
+                  <Timer /> Não Faturado
+                </Badge>
+              ) : (
+                <Badge className="text-green-600 bg-green-100 border border-green-500">
+                  {" "}
+                  <CircleCheck /> Faturado{" "}
+                </Badge>
+              )}
             </div>
           </div>
         </div>
@@ -123,12 +123,14 @@ function VisualMedicao() {
               <h1>{medicao.observacao}</h1>
             </div>
           </div>
-        ) : (<div className="flex flex-col gap-2">
-          <Label>Observação</Label>
-          <div className="rounded-[0.5rem] border-1 border-gray-300 pl-2 pr-2 pt-1 pb-1 flex justify-start">
-            <h1>Sem Observações</h1>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <Label>Observação</Label>
+            <div className="rounded-[0.5rem] border-1 border-gray-300 pl-2 pr-2 pt-1 pb-1 flex justify-start">
+              <h1>Sem Observações</h1>
+            </div>
           </div>
-        </div>)}
+        )}
 
         <h1>Período do fechamento</h1>
         <section className="flex gap-3">
@@ -146,7 +148,6 @@ function VisualMedicao() {
               <Calendar className="size-4" />
             </div>
           </div>
-
         </section>
         <PeriodoFechamentoIdMedicao
           dataInicial={format(new Date(medicao.periodoInicial), "yyyy-MM-dd")}

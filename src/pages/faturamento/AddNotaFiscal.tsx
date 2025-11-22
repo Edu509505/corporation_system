@@ -64,6 +64,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns/format";
 import { Spinner } from "@/components/ui/spinner";
+import { Label } from "@/components/ui/label";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -90,6 +91,7 @@ interface Medicao {
   periodoFinal: string;
   faturado: string;
   createdAt: string;
+  valorTotal: number;
 }
 
 function AdicionarNotaFiscal() {
@@ -147,15 +149,15 @@ function AdicionarNotaFiscal() {
     },
   });
 
-  console.log("Medicoes ", medicao)
-
   const contratoSchema = z.object({
     idCliente: z.string().min(1, "Selecione ao menos um cliente"),
     idProposta: z.string().min(1, "Selecione ao menos uma proposta"),
     idMedicao: z.string().min(1, "Selecione a Medição"),
-    valor: z.string().min(1, "Defina o valor da proposta")
+    valor: z
+      .string()
+      .min(1, "Defina o valor da proposta")
       .transform((val) => {
-        const clean = val.replace(/\D/g, '');
+        const clean = val.replace(/\D/g, "");
         return parseFloat(clean) / 100;
       }),
     vencimento: z.date("Defina a data para o vencimento"),
@@ -163,7 +165,7 @@ function AdicionarNotaFiscal() {
     numeroDaNota: z.string().min(2, "Precisa conter um número"),
     anexo: z
       .instanceof(File, {
-        error: "Arquivo Obrigatório"
+        error: "Arquivo Obrigatório",
       })
       .refine((file) => !!file, "Você deve selecionar ao menos um arquivo")
       .refine(
@@ -171,8 +173,7 @@ function AdicionarNotaFiscal() {
         "Arquivo deve ter até 50MB"
       )
       .refine(
-        (file) =>
-          ["application/pdf"].includes(file.type),
+        (file) => ["application/pdf"].includes(file.type),
         "Tipo de arquivo inválido"
       ),
   });
@@ -240,20 +241,20 @@ function AdicionarNotaFiscal() {
     useEffect(() => {
       const handleInput = (e: Event) => {
         const target = e.target as HTMLInputElement;
-        const raw = target.value.replace(/\D/g, '');
+        const raw = target.value.replace(/\D/g, "");
         const number = parseFloat(raw) / 100;
-        const formatted = number.toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL',
+        const formatted = number.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
         });
         target.value = formatted;
         field.onChange(formatted); // atualiza o valor no RHF
       };
 
       const input = inputRef.current;
-      input?.addEventListener('input', handleInput);
+      input?.addEventListener("input", handleInput);
 
-      return () => input?.removeEventListener('input', handleInput);
+      return () => input?.removeEventListener("input", handleInput);
     }, [field]);
 
     return (
@@ -388,11 +389,13 @@ function AdicionarNotaFiscal() {
                               key={medicao.id}
                               value={medicao.id.toString()}
                             >
-                              {medicao.id} -
-                              {format(
+                              {`${medicao.id} - ${format(
                                 new Date(medicao.createdAt),
                                 "dd/MM/yyyy"
-                              )}
+                              )} - ${Intl.NumberFormat("PT-BR", {
+                                style: "currency",
+                                currency: "BRL",
+                              }).format(medicao.valorTotal / 10000)}`}
                             </SelectItem>
                           ))}
                         </SelectGroup>
@@ -517,7 +520,7 @@ function AdicionarNotaFiscal() {
                         </EmptyMedia>
                         <EmptyTitle>Selecione um Arquivo</EmptyTitle>
                         <EmptyDescription>
-                          Escolha um aruivo de seu dispositivo para realizar o
+                          Escolha um arquivo de seu dispositivo para realizar o
                           Upload
                           <Input
                             className="cursor-pointer"
@@ -541,7 +544,13 @@ function AdicionarNotaFiscal() {
               variant="default"
               disabled={criarNotaMutation.isPending}
             >
-              {criarNotaMutation.isPending ? <><Spinner/> Enviando...</> : "Cadastrar Nota Fiscal"}
+              {criarNotaMutation.isPending ? (
+                <>
+                  <Spinner /> Enviando...
+                </>
+              ) : (
+                "Cadastrar Nota Fiscal"
+              )}
             </Button>
 
             {/* sucesso */}

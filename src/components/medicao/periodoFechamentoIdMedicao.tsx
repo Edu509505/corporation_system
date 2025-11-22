@@ -81,8 +81,6 @@ function PeriodoFechamentoIdMedicao({
     },
   });
 
-  console.log(periodo)
-
   const { data: quantitativa } = useSuspenseQuery({
     queryKey: ["quantitativa", dataInicial, dataFinal, idProposta],
     queryFn: async () => {
@@ -171,7 +169,7 @@ function PeriodoFechamentoIdMedicao({
                       currency: "BRL",
                     }).format(
                       (quantitativa.find((q) => q.id === value2.idQuantitativa)
-                        ?.valorUnitario as number) /100
+                        ?.valorUnitario as number) / 100
                     )}
                   </TableCell>
                   <TableCell>
@@ -179,8 +177,10 @@ function PeriodoFechamentoIdMedicao({
                       style: "currency",
                       currency: "BRL",
                     }).format(
-                      (quantitativa.find((q) => q.id === value2.idQuantitativa)
-                        ?.valorUnitario as number) * value2.quantidade /100
+                      ((quantitativa.find((q) => q.id === value2.idQuantitativa)
+                        ?.valorUnitario as number) *
+                        value2.quantidade) /
+                        100
                     )}
                   </TableCell>
                 </TableRow>
@@ -218,7 +218,7 @@ function PeriodoFechamentoIdMedicao({
                     {Intl.NumberFormat("PT-BR", {
                       style: "currency",
                       currency: "BRL",
-                    }).format((calculo(value.id) * value.valorUnitario)/100)}
+                    }).format((calculo(value.id) * value.valorUnitario) / 100)}
                   </TableCell>
                 </TableRow>
               ))}
@@ -230,7 +230,7 @@ function PeriodoFechamentoIdMedicao({
                   {Intl.NumberFormat("PT-BR", {
                     style: "currency",
                     currency: "BRL",
-                  }).format(resultadosSomados()/100 as number)}
+                  }).format((resultadosSomados() / 100) as number)}
                 </TableCell>
               </TableRow>
             </TableFooter>

@@ -90,8 +90,6 @@ function UpdateCliente() {
     },
   });
 
-  console.log(cliente);
-
   clienteRefetch();
 
   const formCliente = useForm<z.infer<typeof editarClienteSchema>>({

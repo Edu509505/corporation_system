@@ -26,7 +26,6 @@ function CardListFaturamento() {
       if (!response.ok) throw new Error("Erro ao buscar faturamento");
 
       const data = await response.json();
-      console.log("data Faturamento", data);
       return data;
     },
   });
@@ -64,11 +63,6 @@ function CardListFaturamento() {
     ) : (
       <Minus />
     );
-
-  console.log({
-    variacao,
-    variacaoPercentual: faturamentoData.variacaoPercentual,
-  });
 
   return (
     <CardBase>

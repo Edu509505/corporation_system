@@ -156,8 +156,6 @@ function GetInfoContratos() {
     },
   });
 
-  console.log("Anexo", anexoVersionamento);
-
   return (
     <div className="w-full flex flex-col flex-wrap gap-3 p-4 bg-background">
       <Link to={"/contratos"}>

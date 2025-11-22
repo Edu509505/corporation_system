@@ -73,7 +73,6 @@ const validaSchemaDiarioDeObra = z.object({
   ),
 });
 export default function CriarDiarioDeObra() {
-
   const query = useQueryClient();
 
   const navigate = useNavigate();
@@ -109,8 +108,6 @@ export default function CriarDiarioDeObra() {
   const dataDia = form.watch("dataDia");
   const idPropostaSelecionada = form.watch("idProposta");
 
-  console.log(idPropostaSelecionada);
-
   const { data: quantitativasForProposta } = useQuery({
     queryKey: ["quantitativas", idPropostaSelecionada],
     queryFn: async () => {
@@ -128,8 +125,6 @@ export default function CriarDiarioDeObra() {
     },
     enabled: !!idPropostaSelecionada,
   });
-
-
 
   const criarDiarioMutation = useMutation({
     mutationKey: ["criarDiario"],
@@ -159,10 +154,9 @@ export default function CriarDiarioDeObra() {
           quantidade: Number(it.quantidade),
         })),
       };
-      console.log("Data enviada:", dayjs(values.dataDia).format("YYYY-MM-DD"));
-      
+
       await criarDiarioMutation.mutateAsync(payload);
-      await query.invalidateQueries({ queryKey: ["DiarioDeObras"] })
+      await query.invalidateQueries({ queryKey: ["DiarioDeObras"] });
       form.reset({ idProposta: "", dataDia: new Date(), itensDoDia: [] });
       setToast({ message: "Diário criado com sucesso", type: "success" });
       setTimeout(() => setToast(null), 3000);
@@ -179,8 +173,6 @@ export default function CriarDiarioDeObra() {
     control: form.control,
     name: "itensDoDia",
   });
-
-  console.log("fields", fields);
   const itensDoDia = form.watch("itensDoDia");
   const isFormValid = itensDoDia.length > 0 && form.formState.isValid;
 
@@ -192,10 +184,11 @@ export default function CriarDiarioDeObra() {
     <div className="flex flex-col gap-3">
       {toast ? (
         <div
-          className={`p-3 rounded ${toast.type === "success"
-            ? "bg-green-200 text-green-800"
-            : "bg-red-200 text-red-800"
-            }`}
+          className={`p-3 rounded ${
+            toast.type === "success"
+              ? "bg-green-200 text-green-800"
+              : "bg-red-200 text-red-800"
+          }`}
         >
           {toast.message}
         </div>

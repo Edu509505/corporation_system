@@ -137,7 +137,8 @@ function AdicionarContrato() {
   const [dataInicial, setDataInicial] = useState<Date | null>(null);
   const [dataFinal, setDataFinal] = useState<Date | null>(null);
 
-  const [desableSelectProposta, setDesableSelectProposta] = useState<boolean>(true);
+  const [desableSelectProposta, setDesableSelectProposta] =
+    useState<boolean>(true);
   const [periodoInicial, setPeriodoInicial] = useState<boolean>(true);
   const [periodoFinal, setPeriodoFinal] = useState<boolean>(true);
 
@@ -152,30 +153,24 @@ function AdicionarContrato() {
         body: JSON.stringify(data),
         credentials: "include",
       });
-      
+
       if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Erro ${response.status}: ${errorText}`)
+        const errorText = await response.text();
+        throw new Error(`Erro ${response.status}: ${errorText}`);
       }
 
-      return response.json()
-    }
-  })
+      return response.json();
+    },
+  });
 
   //AQUI É FEITO O REGISTRO
   const onSubmit = async (data: z.infer<typeof medicaoSchema>) => {
-      console.log(data);
-
-      toast.promise(
-      criarMedicao.mutateAsync(data),
-      {
-        loading: 'Cadastrando cliente...',
-        success: () => 'Cliente cadastrado com sucesso!',
-        error: (err) => `Erro: ${(err as Error).message}`,
-      }
-    )
-    form.reset()
-
+    toast.promise(criarMedicao.mutateAsync(data), {
+      loading: "Cadastrando cliente...",
+      success: () => "Cliente cadastrado com sucesso!",
+      error: (err) => `Erro: ${(err as Error).message}`,
+    });
+    form.reset();
   };
   return (
     <div className="flex flex-col bg-background w-full gap-3 p-4">
@@ -404,8 +399,20 @@ function AdicionarContrato() {
             )}
             <AlertDialog open={criarMedicao.isSuccess || criarMedicao.isError}>
               <AlertDialogTrigger asChild>
-                <Button type="submit" disabled={criarMedicao.isPending} className="cursor-pointer">
-                  {criarMedicao.isPending ? <><Spinner /> Cadastrar</> : <><CircleCheck /> Cadastrar</>}
+                <Button
+                  type="submit"
+                  disabled={criarMedicao.isPending}
+                  className="cursor-pointer"
+                >
+                  {criarMedicao.isPending ? (
+                    <>
+                      <Spinner /> Cadastrar
+                    </>
+                  ) : (
+                    <>
+                      <CircleCheck /> Cadastrar
+                    </>
+                  )}
                 </Button>
               </AlertDialogTrigger>
               {criarMedicao.isError ? (

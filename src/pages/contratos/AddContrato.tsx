@@ -75,7 +75,7 @@ function AdicionarContrato() {
     queryFn: async () => {
       const response = await fetch(`${url}/clientes`, {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
       });
       if (!response.ok) throw new Error("Clientes não encontrados");
       const data = await response.json();
@@ -90,9 +90,10 @@ function AdicionarContrato() {
     queryFn: async () => {
       if (idCliente !== "") {
         const response = await fetch(
-          `${url}/cliente/${idCliente}/propostasAprovadas`,{
+          `${url}/cliente/${idCliente}/propostasAprovadas`,
+          {
             method: "GET",
-            credentials: "include"
+            credentials: "include",
           }
         );
         if (!response.ok) throw new Error("Propostas não encontradas");
@@ -110,7 +111,7 @@ function AdicionarContrato() {
     idProposta: z.string().min(1, "Selecione ao menos uma proposta"),
     anexo: z
       .instanceof(FileList, {
-        error: "Arquivo Obrigatório"
+        error: "Arquivo Obrigatório",
       })
       .refine(
         (files) => files?.length >= 1,
@@ -121,10 +122,7 @@ function AdicionarContrato() {
         "Arquivo deve ter até 50MB"
       )
       .refine(
-        (files) =>
-          ["application/pdf"].includes(
-            files?.[0]?.type
-          ),
+        (files) => ["application/pdf"].includes(files?.[0]?.type),
         "Tipo de arquivo inválido"
       ),
   });
@@ -143,9 +141,6 @@ function AdicionarContrato() {
   const [responseNotOk, setResponseNotOk] = useState<boolean>(false);
 
   const onSubmit = async (data: z.infer<typeof contratoSchema>) => {
-    console.log("data ", data);
-    console.log("files: ", data.anexo.length);
-
     try {
       const form = new FormData();
 
@@ -154,7 +149,6 @@ function AdicionarContrato() {
       form.set("titulo", data.titulo);
 
       for (let i = 0; i < data.anexo.length; i++) {
-        console.log(data.anexo[i]);
         form.append("anexo", data.anexo[i]);
       }
       setResponseOk(true);
@@ -163,7 +157,6 @@ function AdicionarContrato() {
         credentials: "include",
         body: form,
       });
-      console.log("response", response);
       if (!response.ok) {
         // Aqui você lida com o erro de forma clara
         setResponseNotOk(true);
@@ -171,11 +164,9 @@ function AdicionarContrato() {
         const errorText = await response.text();
         throw new Error(`Erro ${response.status}: ${errorText}`);
       }
-      console.log("estou aqui");
-      const body = await response.json();
+      await response.json();
       setResponseOk(true);
       setResponseNotOk(false);
-      console.log("Cliente criado com sucesso:", body);
     } catch {}
   };
   return (
@@ -308,7 +299,7 @@ function AdicionarContrato() {
                         </EmptyMedia>
                         <EmptyTitle>Selecione um Arquivo</EmptyTitle>
                         <EmptyDescription>
-                          Escolha um aruivo de seu dispositivo para realizar o
+                          Escolha um arquivo de seu dispositivo para realizar o
                           Upload
                           <Input
                             className="cursor-pointer"

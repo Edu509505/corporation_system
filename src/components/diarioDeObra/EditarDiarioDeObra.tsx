@@ -47,7 +47,6 @@ interface Propostas {
   descricao: string;
 }
 
-
 const validaSchemaDiarioDeObra = z.object({
   idProposta: z.string().min(1, "Selecione pelo menos 1"),
   dataDia: z.date(),
@@ -60,7 +59,6 @@ const validaSchemaDiarioDeObra = z.object({
   ),
 });
 export default function CriarDiarioDeObra() {
-
   const query = useQueryClient();
 
   const navigate = useNavigate();
@@ -95,8 +93,6 @@ export default function CriarDiarioDeObra() {
 
   const dataDia = form.watch("dataDia");
   const idPropostaSelecionada = form.watch("idProposta");
-
-  console.log(idPropostaSelecionada);
 
   const { data: quantitativasForProposta } = useQuery({
     queryKey: ["quantitativas", idPropostaSelecionada],
@@ -146,7 +142,7 @@ export default function CriarDiarioDeObra() {
       };
 
       await criarDiarioMutation.mutateAsync(payload);
-      await query.invalidateQueries({ queryKey: ["DiarioDeObras"] })
+      await query.invalidateQueries({ queryKey: ["DiarioDeObras"] });
       form.reset({ idProposta: "", dataDia: new Date(), itensDoDia: [] });
       setToast({ message: "Diário criado com sucesso", type: "success" });
       setTimeout(() => setToast(null), 3000);
@@ -164,7 +160,6 @@ export default function CriarDiarioDeObra() {
     name: "itensDoDia",
   });
 
-  console.log("fields", fields);
   const itensDoDia = form.watch("itensDoDia");
   const isFormValid = itensDoDia.length > 0 && form.formState.isValid;
 
@@ -176,10 +171,11 @@ export default function CriarDiarioDeObra() {
     <div className="flex flex-col gap-3">
       {toast ? (
         <div
-          className={`p-3 rounded ${toast.type === "success"
-            ? "bg-green-200 text-green-800"
-            : "bg-red-200 text-red-800"
-            }`}
+          className={`p-3 rounded ${
+            toast.type === "success"
+              ? "bg-green-200 text-green-800"
+              : "bg-red-200 text-red-800"
+          }`}
         >
           {toast.message}
         </div>
@@ -342,33 +338,33 @@ export default function CriarDiarioDeObra() {
                 ))}
               </div>
               <div className="flex gap-3">
-              <Button
-              className="cursor-pointer"
-                type="button"
-                onClick={() => {
-                  append({
-                    descricao: "",
-                    idQuantitativa: "",
-                    quantidade: 0,
-                  });
-                }}
-              >
-                Adicionar item
-              </Button>
-              <DialogClose
-                type="submit"
-                disabled={!isFormValid || criarDiarioMutation.isPending}
-                className="cursor-pointer"
-              >
                 <Button
+                  className="cursor-pointer"
+                  type="button"
+                  onClick={() => {
+                    append({
+                      descricao: "",
+                      idQuantitativa: "",
+                      quantidade: 0,
+                    });
+                  }}
+                >
+                  Adicionar item
+                </Button>
+                <DialogClose
                   type="submit"
                   disabled={!isFormValid || criarDiarioMutation.isPending}
+                  className="cursor-pointer"
                 >
-                  {criarDiarioMutation.status === "pending"
-                    ? "Criando..."
-                    : "Criar"}
-                </Button>
-              </DialogClose>
+                  <Button
+                    type="submit"
+                    disabled={!isFormValid || criarDiarioMutation.isPending}
+                  >
+                    {criarDiarioMutation.status === "pending"
+                      ? "Criando..."
+                      : "Criar"}
+                  </Button>
+                </DialogClose>
               </div>
             </div>
           </div>

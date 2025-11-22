@@ -66,11 +66,7 @@ function Quantitativa({ itemVersionamento }: funcoesQuantitativa) {
     name: "itens",
   });
 
-  console.log(form.formState.errors);
-
   const onSubmit = async (data: Quantitativas) => {
-    console.log(data);
-
     try {
       await fetch(`${url}/quantitativa`, {
         method: "POST",
@@ -80,9 +76,7 @@ function Quantitativa({ itemVersionamento }: funcoesQuantitativa) {
         },
         body: JSON.stringify(data),
       });
-    } catch {
-      
-    }
+    } catch {}
   };
 
   // const { mutateAsync: updateVersionamento } = useMutation({
@@ -129,10 +123,7 @@ function Quantitativa({ itemVersionamento }: funcoesQuantitativa) {
                         <FormItem>
                           <FormLabel>Unidade</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="Unidade de medida"
-                              {...field}
-                            />
+                            <Input placeholder="Unidade de medida" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

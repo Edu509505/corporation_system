@@ -84,16 +84,18 @@ export const columns: ColumnDef<Faturamento>[] = [
   {
     id: "createdAt",
     filterFn: (row, columnId, filterValue) => {
-      if (!filterValue) return true
+      if (!filterValue) return true;
 
-      const rowDate = new Date(row.getValue(columnId))
-      return format(rowDate, "dd/MM/yyyy") === format(filterValue, "dd/MM/yyyy")
+      const rowDate = new Date(row.getValue(columnId));
+      return (
+        format(rowDate, "dd/MM/yyyy") === format(filterValue, "dd/MM/yyyy")
+      );
     },
     accessorKey: "createdAt",
     header: () => <>Emissão</>,
     cell: ({ row }) => {
       const tipo = row.getValue("createdAt");
-      return format(new Date(tipo as string), "dd/MM/yyyy")
+      return format(new Date(tipo as string), "dd/MM/yyyy");
     },
   },
   {
@@ -102,40 +104,57 @@ export const columns: ColumnDef<Faturamento>[] = [
     header: () => <>Vencimento</>,
     cell: ({ row }) => {
       const tipo = row.getValue("vencimento");
-      return format(new Date(tipo as string), "dd/MM/yyyy")
+      return format(new Date(tipo as string), "dd/MM/yyyy");
     },
   },
   {
     id: "pagamento",
     accessorKey: "pagamento",
     filterFn: (row, columnId, filterValue) => {
-      if (!filterValue || filterValue === "TODAS") return true
+      if (!filterValue || filterValue === "TODAS") return true;
 
-      const status = row.getValue(columnId) ?? "ABERTO"
-      const vencimento = new Date(row.original.vencimento as string)
+      const status = row.getValue(columnId) ?? "ABERTO";
+      const vencimento = new Date(row.original.vencimento as string);
 
       if (filterValue === "ATRASADA") {
-        return status === "ABERTO" && vencimento < new Date()
+        return status === "ABERTO" && vencimento < new Date();
       }
 
-      return status === filterValue
-
+      return status === filterValue;
     },
     header: () => <>Situação</>,
     cell: ({ row }) => {
       const pagamento = row.getValue("pagamento");
-      const data = row.original.vencimento
+      const data = row.original.vencimento;
 
-      console.log("CREATEDAT", data)
       if (pagamento === "ABERTO") {
         if (new Date() > new Date(data as string)) {
-          return <Badge className="text-orange-600 bg-orange-100 border border-orange-500"> <AlertCircleIcon /> Em Atraso </Badge>
+          return (
+            <Badge className="text-orange-600 bg-orange-100 border border-orange-500">
+              {" "}
+              <AlertCircleIcon /> Em Atraso{" "}
+            </Badge>
+          );
         }
-        return <Badge className="text-blue-600 bg-blue-100 border border-blue-500"><Timer /> Em aberto</Badge>
+        return (
+          <Badge className="text-blue-600 bg-blue-100 border border-blue-500">
+            <Timer /> Em aberto
+          </Badge>
+        );
       } else if (pagamento === "PAGA") {
-        return <Badge className="text-green-600 bg-green-100 border border-green-500"> <CircleCheck /> Paga </Badge>
+        return (
+          <Badge className="text-green-600 bg-green-100 border border-green-500">
+            {" "}
+            <CircleCheck /> Paga{" "}
+          </Badge>
+        );
       } else if (pagamento === "CANCELADA") {
-        return <Badge className="text-red-600 bg-red-100 border border-red-500"> <CircleX /> Cancelada </Badge>
+        return (
+          <Badge className="text-red-600 bg-red-100 border border-red-500">
+            {" "}
+            <CircleX /> Cancelada{" "}
+          </Badge>
+        );
       }
     },
   },
@@ -143,7 +162,6 @@ export const columns: ColumnDef<Faturamento>[] = [
     accessorKey: "valor",
     header: () => <>Valor</>,
     cell: ({ row }) => {
-      console.log(row.getValue('valor'));
       const valor = parseFloat(row.getValue("valor"));
       const formatted = new Intl.NumberFormat("PT-BR", {
         style: "currency",

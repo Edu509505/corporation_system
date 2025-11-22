@@ -56,8 +56,6 @@ function VisualizarDiarioDeObra(id: PropDiario) {
     },
   });
 
-  console.log(itensDiaDiario);
-
   return (
     <div className="w-full overflow-auto">
       <Table className="bg-white">

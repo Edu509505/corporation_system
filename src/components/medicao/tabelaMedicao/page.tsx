@@ -17,8 +17,6 @@ export default function PageTableMedicao() {
     },
   });
 
-  console.log(medicao);
-
   return (
     <div className="container mx-auto">
       <DataTableMedicao columns={columns} data={medicao ?? []} />

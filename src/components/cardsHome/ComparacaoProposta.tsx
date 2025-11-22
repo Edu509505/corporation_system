@@ -26,7 +26,6 @@ function CardComparacaoPropostasList() {
         throw new Error("Erro ao encontrar comparação de propostas");
 
       const data = await response.json();
-      console.log("estou aqui(data comparação)", data);
 
       return data as ComparacaoPropostasProps[];
     },

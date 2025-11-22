@@ -66,11 +66,11 @@ interface Cliente {
 
 function AddProposta() {
   const { data: clientes } = useSuspenseQuery({
-    queryKey: ["clientes", ],
+    queryKey: ["clientes"],
     queryFn: async () => {
       const response = await fetch(`${url}/clientes`, {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
       });
       if (!response.ok) throw new Error("Clientes não encontrados");
       const data = await response.json();
@@ -82,14 +82,16 @@ function AddProposta() {
     idCliente: z.string().min(1, "Selecione ao menos um cliente"),
     nomeDaProposta: z.string().min(1, "Escreva o nome da Proposta"),
     descricao: z.string().min(1, "Recomendado ter uma descrição"),
-    valorProposta: z.string().min(1, "Defina o valor da proposta")
-    .transform((val) => {
-      const clean = val.replace(/\D/g, '');
-      return parseFloat(clean) / 100;
-    }),
+    valorProposta: z
+      .string()
+      .min(1, "Defina o valor da proposta")
+      .transform((val) => {
+        const clean = val.replace(/\D/g, "");
+        return parseFloat(clean) / 100;
+      }),
     files: z
       .instanceof(FileList, {
-        error: "Arquivo Obrigatório"
+        error: "Arquivo Obrigatório",
       })
       .refine(
         (files) => files?.length >= 1,
@@ -100,10 +102,7 @@ function AddProposta() {
         "Arquivo deve ter até 50MB"
       )
       .refine(
-        (files) =>
-          ["application/pdf"].includes(
-            files?.[0]?.type
-          ),
+        (files) => ["application/pdf"].includes(files?.[0]?.type),
         "Tipo de arquivo inválido"
       ),
   });
@@ -115,27 +114,27 @@ function AddProposta() {
       nomeDaProposta: "",
       descricao: "",
       valorProposta: "" as any,
-      files: undefined
+      files: undefined,
     },
   });
 
   const [responseOk, setResponseOk] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [alertDialog, setAlertDialog] = useState<boolean>(false)
-
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [alertDialog, setAlertDialog] = useState<boolean>(false);
 
   const onSubmit = async (data: z.infer<typeof propostaSchema>) => {
     try {
-
-      setIsLoading(true)
+      setIsLoading(true);
 
       const form = new FormData();
 
       form.set("idCliente", data.idCliente);
       form.set("nomeDaProposta", data.nomeDaProposta);
       form.set("descricao", data.descricao);
-      form.set("valorProposta", (parseFloat(data.valorProposta.toString())*100).toString());
+      form.set(
+        "valorProposta",
+        (parseFloat(data.valorProposta.toString()) * 100).toString()
+      );
 
       for (let i = 0; i < data.files.length; i++) {
         form.append("files", data.files[i]);
@@ -153,8 +152,10 @@ function AddProposta() {
       }
       // const body = await response.json();
       setResponseOk(true);
-    } catch { } finally { setIsLoading(false), setAlertDialog(true) }
-
+    } catch {
+    } finally {
+      setIsLoading(false), setAlertDialog(true);
+    }
   };
 
   function CurrencyInput({ field }: { field: any }) {
@@ -163,20 +164,20 @@ function AddProposta() {
     useEffect(() => {
       const handleInput = (e: Event) => {
         const target = e.target as HTMLInputElement;
-        const raw = target.value.replace(/\D/g, '');
+        const raw = target.value.replace(/\D/g, "");
         const number = parseFloat(raw) / 100;
-        const formatted = number.toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL',
+        const formatted = number.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
         });
         target.value = formatted;
         field.onChange(formatted); // atualiza o valor no RHF
       };
 
       const input = inputRef.current;
-      input?.addEventListener('input', handleInput);
+      input?.addEventListener("input", handleInput);
 
-      return () => input?.removeEventListener('input', handleInput);
+      return () => input?.removeEventListener("input", handleInput);
     }, [field]);
 
     return (
@@ -188,7 +189,6 @@ function AddProposta() {
       />
     );
   }
-
 
   return (
     <div className="flex flex-col bg-background w-full gap-3 p-4">
@@ -256,9 +256,7 @@ function AddProposta() {
                   <FormControl>
                     <Input placeholder="Nome Da Proposta" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Insira o nome da proposta
-                  </FormDescription>
+                  <FormDescription>Insira o nome da proposta</FormDescription>
                 </FormItem>
               )}
             />
@@ -272,9 +270,7 @@ function AddProposta() {
                   <FormControl>
                     <Input placeholder="Descrição" {...field} />
                   </FormControl>
-                  <FormDescription>
-                    Insira a descrição.
-                  </FormDescription>
+                  <FormDescription>Insira a descrição.</FormDescription>
                 </FormItem>
               )}
             />
@@ -289,13 +285,10 @@ function AddProposta() {
                   <FormControl>
                     <CurrencyInput field={field} />
                   </FormControl>
-                  <FormDescription>
-                    Escreva um valor
-                  </FormDescription>
+                  <FormDescription>Escreva um valor</FormDescription>
                 </FormItem>
               )}
             />
-
 
             <FormField
               control={form.control}
@@ -311,7 +304,7 @@ function AddProposta() {
                         </EmptyMedia>
                         <EmptyTitle>Selecione um Arquivo</EmptyTitle>
                         <EmptyDescription>
-                          Escolha um aruivo de seu dispositivo para realizar o
+                          Escolha um arquivo de seu dispositivo para realizar o
                           Upload
                           <Input
                             className="cursor-pointer"
@@ -329,61 +322,61 @@ function AddProposta() {
               )}
             />
 
-            <AlertDialog
-              open={alertDialog}
-              defaultOpen={alertDialog}
-            >
+            <AlertDialog open={alertDialog} defaultOpen={alertDialog}>
               <AlertDialogTrigger>
                 <Button
                   type="submit"
                   className="mt-4 cursor-pointer"
                   variant="default"
                   disabled={isLoading}
-
                 >
-                  {isLoading ? <><Spinner /> Criar Proposta</> : <>Criar Proposta</>}
-
+                  {isLoading ? (
+                    <>
+                      <Spinner /> Criar Proposta
+                    </>
+                  ) : (
+                    <>Criar Proposta</>
+                  )}
                 </Button>
               </AlertDialogTrigger>
-              {responseOk ?
-                (
-
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="text-ring flex items-center gap-3">
-                        <CircleCheckBigIcon /> Contrato cadastrado com sucesso
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Seu contrato foi cadastrado e inserido no sistema
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <Link to="/propostas">
-                        <AlertDialogAction
-                          className="cursor-pointer">Continuar</AlertDialogAction>
-                      </Link>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-
-                ) : (
-
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className="text-destructive flex items-center gap-3">
-                        <CircleX /> Erro ao cadastrar proposta
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        A ação de cadastrar o proposta foi mal-sucedida
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel
-                        className="cursor-pointer"
-                        onClick={() => setAlertDialog(false)}
-                      >Voltar</AlertDialogCancel>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                )}
+              {responseOk ? (
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-ring flex items-center gap-3">
+                      <CircleCheckBigIcon /> Proposta cadastrada com sucesso
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Seu contrato foi cadastrado e inserido no sistema
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <Link to="/propostas">
+                      <AlertDialogAction className="cursor-pointer">
+                        Continuar
+                      </AlertDialogAction>
+                    </Link>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              ) : (
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-destructive flex items-center gap-3">
+                      <CircleX /> Erro ao cadastrar proposta
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      A ação de cadastrar o proposta foi mal-sucedida
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel
+                      className="cursor-pointer"
+                      onClick={() => setAlertDialog(false)}
+                    >
+                      Voltar
+                    </AlertDialogCancel>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              )}
             </AlertDialog>
           </form>
         </Form>
