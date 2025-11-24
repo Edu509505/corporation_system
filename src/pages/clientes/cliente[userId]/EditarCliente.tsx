@@ -126,8 +126,8 @@ function UpdateCliente() {
 
   const onSubmit = async (data: z.infer<typeof editarClienteSchema>) => {
     toast.promise(criarUsuario.mutateAsync(data), {
-      loading: "Cadastrando cliente...",
-      success: () => "Cliente cadastrado com sucesso!",
+      loading: "Editando cliente...",
+      success: () => "Cliente Editado com sucesso!",
       error: (err) => `Erro: ${(err as Error).message}`,
     });
     formCliente.reset();

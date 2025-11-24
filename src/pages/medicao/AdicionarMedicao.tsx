@@ -162,8 +162,8 @@ function AdicionarContrato() {
   //AQUI É FEITO O REGISTRO
   const onSubmit = async (data: z.infer<typeof medicaoSchema>) => {
     toast.promise(criarMedicao.mutateAsync(data), {
-      loading: "Cadastrando cliente...",
-      success: () => "Cliente cadastrado com sucesso!",
+      loading: "Cadastrando Medição...",
+      success: () => "Medição cadastrada com sucesso!",
       error: (err) => `Erro: ${(err as Error).message}`,
     });
     form.reset();
