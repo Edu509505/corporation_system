@@ -112,8 +112,8 @@ export function DataTableFaturamento<TData, TValue>({
           <Filter />
           <h1 className="font-bold">Filtros</h1>
         </div>
-        <div className="flex flex-wrap gap-3 py-3">
-          <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap gap-3 py-3 grow">
+          <div className="flex flex-col gap-3 grow">
             <Label>Número da Nota</Label>
             <Input
               placeholder="Número da Nota"
@@ -125,7 +125,7 @@ export function DataTableFaturamento<TData, TValue>({
               className="w-[150px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 grow">
             <Label>Empresa</Label>
 
             <Select
@@ -140,7 +140,7 @@ export function DataTableFaturamento<TData, TValue>({
                   ?.getFilterValue() as string) ?? ""
               }
             >
-              <SelectTrigger className="w-[300px]">
+              <SelectTrigger className="w-[300px] grow">
                 <SelectValue placeholder="Selecionar Proposta" />
               </SelectTrigger>
 
@@ -156,7 +156,7 @@ export function DataTableFaturamento<TData, TValue>({
               </SelectContent>
             </Select>
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 grow">
             <Label>Obra</Label>
 
             <Select
@@ -171,7 +171,7 @@ export function DataTableFaturamento<TData, TValue>({
                   ?.getFilterValue() as string) ?? ""
               }
             >
-              <SelectTrigger className="w-[300px]">
+              <SelectTrigger className="w-[300px] grow">
                 <SelectValue placeholder="Selecionar Proposta" />
               </SelectTrigger>
 
@@ -190,7 +190,7 @@ export function DataTableFaturamento<TData, TValue>({
               </SelectContent>
             </Select>
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 grow">
             <Label>Tipo</Label>
             <Select
               onValueChange={(event) =>
@@ -203,11 +203,11 @@ export function DataTableFaturamento<TData, TValue>({
                 (table.getColumn("tipo")?.getFilterValue() as string) ?? ""
               }
             >
-              <SelectTrigger className="w-[150px]">
+              <SelectTrigger className="w-[150px] grow">
                 <SelectValue placeholder="Selecionar tipo" />
               </SelectTrigger>
 
-              <SelectContent className="w-[150px]">
+              <SelectContent className="w-[150px] grow">
                 <SelectGroup>
                   <SelectLabel>Proposta</SelectLabel>
                   <SelectItem value="LOCACAO">Locação</SelectItem>
@@ -216,31 +216,7 @@ export function DataTableFaturamento<TData, TValue>({
               </SelectContent>
             </Select>
           </div>
-          <div className="flex flex-col gap-3">
-            
-
-            {/* <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-[200px] justify-start text-left font-normal"
-                >
-                  {selectedDate ? format(selectedDate, "dd/MM/yyyy") : "Selecionar Data"}
-                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  captionLayout="dropdown"
-                />
-              </PopoverContent>
-            </Popover> */}
-
-          </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 grow">
             <Label>Situação</Label>
             <Select
               onValueChange={(event) =>
@@ -269,32 +245,6 @@ export function DataTableFaturamento<TData, TValue>({
               </SelectContent>
             </Select>
           </div>
-          {/* <div className="flex flex-col gap-3">
-            <Label>Emissão</Label>
-            <Input
-              placeholder="Emissão"
-              type="date"
-              value={(table.getColumn("createdAt")?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn("createdAt")?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm no-calendar border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-
-          </div>
-          <div className="flex flex-col gap-3">
-            <Label>Vencimento</Label>
-            <Input
-              placeholder="Vencimento"
-              type="date"
-              value={(table.getColumn("vencimento")?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn("vencimento")?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm no-calendar"
-            />
-
-          </div> */}
         </div>
       </section>
       <div className="overflow-hidden rounded-md border">

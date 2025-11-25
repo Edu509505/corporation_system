@@ -38,7 +38,7 @@ interface Contratos {
   createdAt: string;
   clientesContratos: {
     id: number;
-    cliente: string;
+    name: string;
     cnpj: string;
     local: string;
   };
@@ -169,7 +169,7 @@ function GetInfoContratos() {
         <section className="w-[340px] bg-white rounded-2xl border-1 border-ring p-4 grow">
           <h1 className="text-2xl font-bold">Informações do Cliente</h1>
           <h1>
-            <strong>Cliente:</strong> {dadosCliente?.clientesContratos.cliente}
+            <strong>Cliente:</strong> {dadosCliente?.clientesContratos.name}
           </h1>
           <h1>
             <strong>CNPJ:</strong>{" "}
