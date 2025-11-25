@@ -14,8 +14,10 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "../ui/chart";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { url } from "@/url";
+import dayjs from "dayjs";
+import 'dayjs/locale/pt-br' 
 
 interface FaturamentoMesProps {
   mesReferencia: string; // Ex: "Nov/2025"
@@ -23,6 +25,7 @@ interface FaturamentoMesProps {
 }
 
 function GraficoFaturamentoDados() {
+  dayjs.locale('pt-br') 
   const { data } = useSuspenseQuery({
     queryKey: ["faturamentoTodosMeses"],
     queryFn: async () => {
@@ -66,12 +69,12 @@ function GraficoFaturamentoDados() {
               <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-mobile)"
+                  stopColor="var(--ring)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-mobile)"
+                  stopColor="var(--ring)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
@@ -82,19 +85,27 @@ function GraficoFaturamentoDados() {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              minTickGap={16}
+              minTickGap={8}
+              interval="preserveStartEnd"
+              padding={{ left: 20, right: 20 }}
+              tickFormatter={(value) => dayjs(value).format("MMM/YYYY")}
             />
+            {/* <YAxis
+              allowDataOverflow={true}
+              tickFormatter={(value) => new Intl.NumberFormat("PT-BR", 
+                {style: "currency", currency: "BRL"}).format(value)}
+            /> */}
             <ChartTooltip
               cursor={false}
               content={
                 <ChartTooltipContent
-                  labelFormatter={(value) => value}
-                  formatter={(value, name) => {
+                  labelFormatter={(value) => dayjs(value).format("MMM/YY")}
+                  formatter={(value) => {
                     const valorFormatado = new Intl.NumberFormat("pt-BR", {
                       style: "currency",
                       currency: "BRL",
                     }).format(Number(value ?? 0) / 100);
-                    return `${name}: ${valorFormatado}`;
+                    return `Valor: ${valorFormatado}`;
                   }}
                   indicator="dot"
                 />
@@ -102,10 +113,9 @@ function GraficoFaturamentoDados() {
             />
             <Area
               dataKey="totalPago"
-              type="natural"
+              type="monotone"
               fill="url(#fillMobile)"
-              stroke="var(--color-mobile)"
-              stackId="a"
+              stroke="var(--ring)"
             />
             <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>

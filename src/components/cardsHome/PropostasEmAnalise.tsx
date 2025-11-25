@@ -31,9 +31,9 @@ function CardPropostasEmAnaliseList() {
 
   return (
     <CardBase>
-      <div className="flex items-center gap-6">
+      <div className="flex items-center justify-center gap-6">
         <h1 className="text-6xl font-bold">{propostasTotalEmAnalise}</h1>
-        <div className="flex flex-col justify-center gap-2">
+        <div className="flex h-full flex-col items-center justify-center gap-2">
           <h2 className="text-2xl font-bold">Propostas em análise</h2>
         </div>
       </div>

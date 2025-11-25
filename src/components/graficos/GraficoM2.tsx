@@ -24,6 +24,7 @@ import dayjs from "dayjs";
 import { Skeleton } from "../ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
 import { url } from "@/url";
+import 'dayjs/locale/pt-br' 
 
 interface TodosOsItensDoDia {
   dataDia: string;
@@ -31,6 +32,7 @@ interface TodosOsItensDoDia {
 }
 
 function GraficoDados() {
+  dayjs.locale('pt-br') 
   const [timeRange, setTimeRange] = React.useState("90d");
 
   // Define o número de dias com base no filtro

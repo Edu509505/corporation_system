@@ -51,27 +51,27 @@ function CardListFaturamento() {
 
   const badgeClass =
     variacao === null
-      ? "text-muted-foreground border-muted-foreground"
+      ? "text-muted-foreground border-muted-foreground h-5 w-auto"
       : variacao > 0
-      ? "text-green-600 border-green-600"
+      ? "text-green-600 border-green-600 h-5 w-auto"
       : variacao < 0
-      ? "text-red-600 border-red-600"
-      : "text-black border-black";
+      ? "text-red-600 border-red-600 h-5 w-auto"
+      : "text-black border-black h-5 w-auto";
 
   const badgeIcon =
     variacao === null ? (
-      <Minus />
+      <Minus className="size-4"/>
     ) : variacao > 0 ? (
-      <TrendingUp />
+      <TrendingUp className="size-4"/>
     ) : variacao < 0 ? (
-      <TrendingDown />
+      <TrendingDown className="size-4"/>
     ) : (
-      <Minus />
+      <Minus className="size-4"/>
     );
 
   return (
     <CardBase>
-      <div className="flex justify-between gap-3">
+      <div className="flex w-full items-center justify-between">
         <h2 className="font-bold">Faturamento Mensal</h2>
 
         <Badge variant="outline" className={badgeClass}>
@@ -93,14 +93,12 @@ function CardListFaturamento() {
         )}
         {typeof variacao === "number" && variacao > 0 && (
           <span className="text-green-600">
-            O faturamento aumentou em {variacao.toFixed(2)}% em relação ao mês
-            anterior.
+            Aumento de {variacao.toFixed(2)}% em relação ao mês anterior.
           </span>
         )}
         {typeof variacao === "number" && variacao < 0 && (
           <span className="text-red-600">
-            O faturamento caiu {Math.abs(variacao).toFixed(2)}% em relação ao
-            mês anterior.
+            Queda de {Math.abs(variacao).toFixed(2)}% em relação ao mês anterior.
           </span>
         )}
         {variacao === 0 && (

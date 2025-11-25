@@ -8,7 +8,7 @@ type CardBaseProps = {
 
 export default function CardBase({ children, className = '' }: CardBaseProps) {
   return (
-    <div className={`bg-white shadow-md rounded-lg p-4 w-fit ${className}`}>
+    <div className={`bg-white shadow-md rounded-lg p-4 w-fit flex flex-col justify-center items-start ${className}`}>
       {children}
     </div>
   );
