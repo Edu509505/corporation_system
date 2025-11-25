@@ -24,7 +24,7 @@ function CardClient({
     <div>
       <div
         key={id}
-        className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 bg-white gap-3 "
+        className="w-3xs h-96 flex flex-col justify-between rounded-2xl border-[1px] p-6 bg-white gap-3"
       >
         <section className="flex flex-col items-center justify-between w-full gap-2">
           {status === "ATIVO" ? (

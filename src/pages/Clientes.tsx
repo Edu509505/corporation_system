@@ -24,7 +24,7 @@ export default function VerClientes() {
           </Button>
         </Link>
       </div>
-      <section className="w-full flex flex-wrap gap-3">
+      <section className="w-full flex flex-wrap justify-center gap-3">
         <ClientList/>
       </section>
     </div>

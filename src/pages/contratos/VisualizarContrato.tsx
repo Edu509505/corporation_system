@@ -157,7 +157,7 @@ function GetInfoContratos() {
   });
 
   return (
-    <div className="w-full flex flex-col flex-wrap gap-3 p-4 bg-background">
+    <div className="flex flex-col flex-wrap gap-3 p-4 bg-background">
       <Link to={"/contratos"}>
         <Button className="cursor-pointer">
           <ArrowLeftCircleIcon />
@@ -166,7 +166,7 @@ function GetInfoContratos() {
       </Link>
       <h1 className="text-2xl font-bold">Visualização do contrato</h1>
       <div className="flex gap-3 flex-wrap">
-        <section className="w-[340px] bg-white rounded-2xl border-1 border-ring p-4">
+        <section className="w-[340px] bg-white rounded-2xl border-1 border-ring p-4 grow">
           <h1 className="text-2xl font-bold">Informações do Cliente</h1>
           <h1>
             <strong>Cliente:</strong> {dadosCliente?.clientesContratos.cliente}
@@ -180,7 +180,7 @@ function GetInfoContratos() {
             {dadosCliente?.clientesContratos.local}
           </h1>
         </section>
-        <section className="w-[340px] bg-white rounded-2xl border-1 border-ring p-4">
+        <section className="w-[340px] bg-white rounded-2xl border-1 border-ring p-4 grow">
           <h1 className="text-2xl font-bold">Informações do Contrato</h1>
           <h1>
             <strong>Contrato: </strong>
@@ -195,7 +195,7 @@ function GetInfoContratos() {
               .join("/")}
           </h1>
         </section>
-        <section className="w-[340px] bg-white rounded-2xl border-1 border-ring p-4">
+        <section className="w-[340px] bg-white rounded-2xl border-1 border-ring p-4 grow">
           <h1 className="text-2xl font-bold">Proposta Referente ao contrato</h1>
           <h1>
             <strong>Proposta: </strong> {dadosCliente?.proposta.nomeDaProposta}
@@ -221,7 +221,7 @@ function GetInfoContratos() {
         </section>
       </div>
       <div className=" flex flex-wrap gap-3">
-        <div className="gap-3 flex flex-col bg-white border-1 border-ring p-4 rounded-2xl">
+        <div className="gap-3 flex flex-col bg-white border-1 border-ring p-4 rounded-2xl grow">
           <h1 className="text-2xl font-bold">Anexos da Proposta</h1>
           {anexoVersionamento === undefined ? (
             <span>Nenhum anexo encontrado.</span>
@@ -250,7 +250,7 @@ function GetInfoContratos() {
             </>
           )}
         </div>
-        <div className="gap-3 flex flex-col bg-white border-1 border-ring p-4 rounded-2xl">
+        <div className="gap-3 flex flex-col bg-white border-1 border-ring p-4 rounded-2xl grow">
           <h1 className="text-2xl font-bold">Anexos da Contrato</h1>
           {anexoContrato === undefined ? (
             <span>Nenhum anexo encontrado.</span>
@@ -280,15 +280,15 @@ function GetInfoContratos() {
           )}
         </div>
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="w-full flex flex-col gap-3 overflow-hidden">
         <h1 className="font-bold text-2xl">
           Quantitativas imposta na Proposta
         </h1>
         {quantitativa === undefined ? (
           <span>Nenhuma quantitativa foi encontrada</span>
         ) : (
-          <>
-            <Table className="rounded-2xl">
+          <div className="">
+            <Table>
               <TableHeader className="bg-gray-300">
                 <TableRow>
                   <TableHead>item:</TableHead>
@@ -316,7 +316,7 @@ function GetInfoContratos() {
                 ))}
               </TableBody>
             </Table>
-          </>
+          </div>
           //   quantitativa.map((item) => (
           //   <div key={item.id} className="flex flex-wrap gap-3 border-1 rounded-2xl border-ring p-3 bg-white">
           //     <h1 ><strong>item:</strong> {item.descricao}</h1>
