@@ -89,13 +89,13 @@ function VisualMedicao() {
       <main className="flex flex-col gap-3">
         <div className="flex gap-4 flex-wrap">
           <div className="flex flex-col gap-2">
-            <Label>Cliente</Label>
+            <Label>Empresa</Label>
             <div className="rounded-[0.5rem] border-1 border-gray-300 pl-2 pr-10 pt-1 pb-1 flex justify-start">
               <h1>{medicao.clienteMedicao.name}</h1>
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <Label>Proposta</Label>
+            <Label>Obra</Label>
             <div className="rounded-[0.5rem] border-1 border-gray-300 pl-2 pr-4 pt-1 pb-1 flex justify-start">
               <h1>{medicao.propostaMedicao.nomeDaProposta}</h1>
             </div>

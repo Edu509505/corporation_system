@@ -131,11 +131,11 @@ export function DataTableDiarioDeObra<TData, TValue>({
               }
             >
               <SelectTrigger className="w-[300px]">
-                <SelectValue placeholder="Selecionar Proposta" />
+                <SelectValue placeholder="Selecionar Empresa" />
               </SelectTrigger>
               <SelectContent className="w-[300px]">
                 <SelectGroup>
-                  <SelectLabel>Empresa</SelectLabel>
+                  <SelectLabel>Empresas</SelectLabel>
                   {clientes?.map((clientes) => (
                     <SelectItem value={clientes.name}>
                       {clientes.name}
@@ -161,11 +161,11 @@ export function DataTableDiarioDeObra<TData, TValue>({
               }
             >
               <SelectTrigger className="w-[300px]">
-                <SelectValue placeholder="Selecionar Proposta" />
+                <SelectValue placeholder="Selecionar Obra" />
               </SelectTrigger>
               <SelectContent className="w-[300px]">
                 <SelectGroup>
-                  <SelectLabel>Empresa</SelectLabel>
+                  <SelectLabel>Obras</SelectLabel>
                   {propostas?.map((propostas) => (
                     <SelectItem value={propostas.nomeDaProposta}>
                       {propostas.nomeDaProposta}

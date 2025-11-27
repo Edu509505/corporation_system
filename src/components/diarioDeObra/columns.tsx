@@ -69,7 +69,7 @@ export const columns: ColumnDef<DiarioDeObra>[] = [
   {
     id: "propostaDiario.cliente.name",
     accessorKey: "propostaDiario.cliente.name",
-    header: "Cliente",
+    header: "Empresa",
   },
   {
     id: "propostaDiario.nomeDaProposta",

@@ -76,7 +76,7 @@ export function DataTableMedicao<TData, TValue>({
             />
           </div>
           <div className="flex flex-col gap-3 py-4">
-            <Label>Cliente</Label>
+            <Label>Obra</Label>
             <Input
               placeholder="filtrar"
               value={

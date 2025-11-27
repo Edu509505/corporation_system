@@ -145,12 +145,12 @@ export function DataTableFaturamento<TData, TValue>({
               }
             >
               <SelectTrigger className="w-[300px] grow">
-                <SelectValue placeholder="Selecionar Proposta" />
+                <SelectValue placeholder="Selecionar Empresa" />
               </SelectTrigger>
 
               <SelectContent className="w-[300px]">
                 <SelectGroup>
-                  <SelectLabel>Empresa</SelectLabel>
+                  <SelectLabel>Empresas</SelectLabel>
                   {clientes?.map((clientes) => (
                     <SelectItem key={clientes.name} value={clientes.name}>
                       {clientes.name}
@@ -176,12 +176,12 @@ export function DataTableFaturamento<TData, TValue>({
               }
             >
               <SelectTrigger className="w-[300px] grow">
-                <SelectValue placeholder="Selecionar Proposta" />
+                <SelectValue placeholder="Selecionar Obra" />
               </SelectTrigger>
 
               <SelectContent className="w-[300px]">
                 <SelectGroup>
-                  <SelectLabel>Empresa</SelectLabel>
+                  <SelectLabel>Obras</SelectLabel>
                   {propostasAprovadas?.map((proposta) => (
                     <SelectItem
                       key={proposta.nomeDaProposta}
@@ -213,7 +213,7 @@ export function DataTableFaturamento<TData, TValue>({
 
               <SelectContent className="w-[150px] grow">
                 <SelectGroup>
-                  <SelectLabel>Proposta</SelectLabel>
+                  <SelectLabel>Tipos</SelectLabel>
                   <SelectItem value="LOCACAO">Locação</SelectItem>
                   <SelectItem value="SERVICO">Serviço</SelectItem>
                 </SelectGroup>

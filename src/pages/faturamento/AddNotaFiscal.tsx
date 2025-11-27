@@ -331,7 +331,7 @@ function AdicionarNotaFiscal() {
                 name="idProposta"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Proposta</FormLabel>
+                    <FormLabel>Obra</FormLabel>
                     <Select
                       onValueChange={(value) => {
                         field.onChange(value);
@@ -343,12 +343,12 @@ function AdicionarNotaFiscal() {
                     >
                       <FormControl>
                         <SelectTrigger className="w-[300px] bg-white">
-                          <SelectValue placeholder="Selecionar Proposta" />
+                          <SelectValue placeholder="Selecionar Obra" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="w-[300px]">
                         <SelectGroup>
-                          <SelectLabel>Proposta</SelectLabel>
+                          <SelectLabel>Obras</SelectLabel>
                           {propostasAprovadas?.map((proposta) => (
                             <SelectItem
                               key={proposta.id}
