@@ -13,6 +13,8 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { ArrowUpDown } from "lucide-react";
+import dayjs from "dayjs";
+import { parseISO } from "date-fns";
 
 export interface DiarioDeObra {
   createdAt: string;
@@ -61,7 +63,7 @@ export const columns: ColumnDef<DiarioDeObra>[] = [
     },
     cell: ({ row }) => {
       const data = row.getValue("dataDia");
-      return format(new Date(data as string).toISOString(), "dd/MM/yyyy");
+      return format(parseISO(data as string), "dd/MM/yyyy");
     },
   },
   {
@@ -89,7 +91,7 @@ export const columns: ColumnDef<DiarioDeObra>[] = [
             <DialogHeader>
               <DialogTitle>
                 Diário de Obra -{" "}
-                {format(new Date(row.original.dataDia), "dd/MM/yyyy")}
+                {format(parseISO(row.original.dataDia), "dd/MM/yyyy")}
               </DialogTitle>
               <DialogDescription>
                 Visualização do diário de Obra
