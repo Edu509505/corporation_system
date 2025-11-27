@@ -14,10 +14,10 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "../ui/chart";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { url } from "@/url";
 import dayjs from "dayjs";
-import 'dayjs/locale/pt-br' 
+import "dayjs/locale/pt-br";
 
 interface FaturamentoMesProps {
   mesReferencia: string; // Ex: "Nov/2025"
@@ -25,7 +25,7 @@ interface FaturamentoMesProps {
 }
 
 function GraficoFaturamentoDados() {
-  dayjs.locale('pt-br') 
+  dayjs.locale("pt-br");
   const { data } = useSuspenseQuery({
     queryKey: ["faturamentoTodosMeses"],
     queryFn: async () => {
@@ -42,6 +42,9 @@ function GraficoFaturamentoDados() {
       return data as FaturamentoMesProps[];
     },
   });
+
+  const maiorValor = Math.max(...data.map((val) => val.totalPago));
+  const menorValor = Math.min(...data.map((val) => val.totalPago));
 
   const chartData = data ?? [];
 
@@ -67,16 +70,8 @@ function GraficoFaturamentoDados() {
           <AreaChart data={chartData}>
             <defs>
               <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--ring)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--ring)"
-                  stopOpacity={0.1}
-                />
+                <stop offset="5%" stopColor="var(--ring)" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="var(--ring)" stopOpacity={0.1} />
               </linearGradient>
             </defs>
             <CartesianGrid vertical={false} />
@@ -90,11 +85,16 @@ function GraficoFaturamentoDados() {
               padding={{ left: 20, right: 20 }}
               tickFormatter={(value) => dayjs(value).format("MMM/YYYY")}
             />
-            {/* <YAxis
+            <YAxis
+              domain={[menorValor, maiorValor]}
               allowDataOverflow={true}
-              tickFormatter={(value) => new Intl.NumberFormat("PT-BR", 
-                {style: "currency", currency: "BRL"}).format(value)}
-            /> */}
+              tickFormatter={(value) =>
+                new Intl.NumberFormat("PT-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(value)
+              }
+            />
             <ChartTooltip
               cursor={false}
               content={

@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import { ArrowUpDown } from "lucide-react";
 
 export interface DiarioDeObra {
   createdAt: string;
@@ -46,10 +47,21 @@ export const columns: ColumnDef<DiarioDeObra>[] = [
   {
     id: "dataDia",
     accessorKey: "dataDia",
-    header: () => <>Data</>,
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="cursor-pointer"
+        >
+          Data
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
       const data = row.getValue("dataDia");
-      return format(new Date(data as string), "dd/MM/yyyy");
+      return format(new Date(data as string).toISOString(), "dd/MM/yyyy");
     },
   },
   {
@@ -91,7 +103,9 @@ export const columns: ColumnDef<DiarioDeObra>[] = [
                 : <><Button className="cursor-pointer">Editar</Button></>
               } */}
               <DialogClose asChild>
-                <Button variant="outline" className="cursor-pointer">Fechar</Button>
+                <Button variant="outline" className="cursor-pointer">
+                  Fechar
+                </Button>
               </DialogClose>
             </DialogFooter>
           </DialogContent>

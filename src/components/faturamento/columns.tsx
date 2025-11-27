@@ -2,7 +2,13 @@ import { Button } from "@/components/ui/button";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Link } from "react-router-dom";
 import { Badge } from "../ui/badge";
-import { AlertCircleIcon, CircleCheck, CircleX, Timer } from "lucide-react";
+import {
+  AlertCircleIcon,
+  ArrowUpDown,
+  CircleCheck,
+  CircleX,
+  Timer,
+} from "lucide-react";
 import { format } from "date-fns";
 
 export interface Faturamento {
@@ -88,14 +94,25 @@ export const columns: ColumnDef<Faturamento>[] = [
 
       const rowDate = new Date(row.getValue(columnId));
       return (
-        format(rowDate, "dd/MM/yyyy") === format(filterValue, "dd/MM/yyyy")
+        format(rowDate.toISOString(), "dd/MM/yyyy") ===
+        format(filterValue.toISOString(), "dd/MM/yyyy")
       );
     },
     accessorKey: "createdAt",
-    header: () => <>Emissão</>,
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Emissão
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
       const tipo = row.getValue("createdAt");
-      return format(new Date(tipo as string), "dd/MM/yyyy");
+      return format(new Date(tipo as string).toISOString(), "dd/MM/yyyy");
     },
   },
   {
@@ -104,7 +121,7 @@ export const columns: ColumnDef<Faturamento>[] = [
     header: () => <>Vencimento</>,
     cell: ({ row }) => {
       const tipo = row.getValue("vencimento");
-      return format(new Date(tipo as string), "dd/MM/yyyy");
+      return format(new Date(tipo as string).toISOString(), "dd/MM/yyyy");
     },
   },
   {

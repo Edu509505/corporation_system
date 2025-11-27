@@ -32,18 +32,32 @@ export const columns: ColumnDef<Contrato>[] = [
     header: "Contrato",
   },
   {
-     id: "status",
+    id: "status",
     accessorKey: "status",
-     header: () => <>Situação</>,
+    header: () => <>Situação</>,
     cell: ({ row }) => {
       const proposta = row.getValue("status");
 
       if (proposta === "EM_ANALISE") {
-        return <Badge className="text-blue-600 bg-blue-100 border border-blue-500"><Timer /> Em Análise</Badge>
+        return (
+          <Badge className="text-blue-600 bg-blue-100 border border-blue-500">
+            <Timer /> Em Análise
+          </Badge>
+        );
       } else if (proposta === "ATIVO") {
-        return <Badge className="text-green-600 bg-green-100 border border-green-500"> <CircleCheck /> Aprovada </Badge>
+        return (
+          <Badge className="text-green-600 bg-green-100 border border-green-500">
+            {" "}
+            <CircleCheck /> Aprovada{" "}
+          </Badge>
+        );
       } else if (proposta === "CANCELADA") {
-        return <Badge className="text-red-600 bg-red-100 border border-red-500"> <CircleX /> Cancelada </Badge>
+        return (
+          <Badge className="text-red-600 bg-red-100 border border-red-500">
+            {" "}
+            <CircleX /> Cancelada{" "}
+          </Badge>
+        );
       }
     },
   },
@@ -51,7 +65,10 @@ export const columns: ColumnDef<Contrato>[] = [
     accessorKey: "createdAt",
     header: () => <>Data</>,
     cell: ({ row }) => {
-      const formatted = format(new Date(row.getValue("createdAt")), "dd/MM/yyyy");
+      const formatted = format(
+        new Date(row.getValue("createdAt")).toISOString(),
+        "dd/MM/yyyy"
+      );
       return formatted;
     },
   },

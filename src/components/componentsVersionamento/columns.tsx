@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { TableCell } from "../ui/table";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import dayjs from "dayjs";
 
 export type Propostas = {
   id: number;
@@ -22,12 +23,12 @@ export type Propostas = {
 
 export const columns: ColumnDef<Propostas>[] = [
   {
-    id: 'id',
+    id: "id",
     accessorKey: "id",
     header: "Número",
   },
   {
-    id: 'cliente.name',
+    id: "cliente.name",
     accessorKey: "cliente.cliente",
     header: "Empresa",
     footer: ({ column }) => {
@@ -36,15 +37,15 @@ export const columns: ColumnDef<Propostas>[] = [
           <Label>Nome da empresa</Label>
           <Input
             placeholder="Empresas"
-            value={String(column.getFilterValue() ?? '')}
-            onChange={e => column.setFilterValue(e.target.value)}
+            value={String(column.getFilterValue() ?? "")}
+            onChange={(e) => column.setFilterValue(e.target.value)}
           />
         </>
-      )
+      );
     },
   },
   {
-    id: 'nomeDaProposta',
+    id: "nomeDaProposta",
     accessorKey: "nomeDaProposta",
     header: "Nome Da Proposta",
   },
@@ -64,10 +65,8 @@ export const columns: ColumnDef<Propostas>[] = [
     header: "Emissão",
     cell: ({ row }) => {
       const createdAt = row.getValue("createdAt") as string | null;
-      let data = createdAt
-        ? createdAt.split("T")[0].split("-").reverse().join("/")
-        : "";
-      return <div>{data}</div>;
+      let data = createdAt ? dayjs(createdAt).format("DD/MM/YYYY") : "";
+      return <div>{data.toISOString() as string}</div>;
     },
   },
   {
@@ -84,21 +83,18 @@ export const columns: ColumnDef<Propostas>[] = [
     },
   },
   {
-    id: 'acoes',
+    id: "acoes",
     header: () => <div className="text-center">Ações</div>,
     cell: ({ row }) => {
       return (
         <Link to={`/proposta/versionamento/${row.original.id}`}>
-          <TableCell
-            colSpan={columns.length}
-            className="flex justify-center"
-          >
+          <TableCell colSpan={columns.length} className="flex justify-center">
             <div className="flex justify-center w-24 p-2 rounded-full bg-blue-200 text-blue-900 hover:bg-blue-500 hover:text-white transition">
               <p>Visualizar</p>
             </div>
           </TableCell>
         </Link>
-      )
+      );
     },
-  }
+  },
 ];

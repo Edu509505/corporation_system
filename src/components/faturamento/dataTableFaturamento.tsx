@@ -7,6 +7,7 @@ import {
   type SortingState,
   type ColumnFiltersState,
   getFilteredRowModel,
+  getSortedRowModel,
 } from "@tanstack/react-table";
 
 import {
@@ -70,12 +71,12 @@ export function DataTableFaturamento<TData, TValue>({
     onSortingChange: setSorting,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnFiltersChange: setColumnFilters,
+    getSortedRowModel: getSortedRowModel(),
     state: {
       sorting,
       columnFilters,
     },
   });
-
 
   const { data: clientes } = useQuery({
     queryKey: ["clientes"],
@@ -103,8 +104,6 @@ export function DataTableFaturamento<TData, TValue>({
     },
   });
 
-
-
   return (
     <>
       <section className="flex flex-col">
@@ -118,9 +117,14 @@ export function DataTableFaturamento<TData, TValue>({
             <Input
               placeholder="Número da Nota"
               type="number"
-              value={(table.getColumn("numeroDaNota")?.getFilterValue() as string) ?? ""}
+              value={
+                (table.getColumn("numeroDaNota")?.getFilterValue() as string) ??
+                ""
+              }
               onChange={(event) =>
-                table.getColumn("numeroDaNota")?.setFilterValue(event.target.value)
+                table
+                  .getColumn("numeroDaNota")
+                  ?.setFilterValue(event.target.value)
               }
               className="w-[150px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
@@ -258,9 +262,9 @@ export function DataTableFaturamento<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   );
                 })}

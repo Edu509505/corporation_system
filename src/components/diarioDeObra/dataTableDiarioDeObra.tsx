@@ -7,6 +7,7 @@ import {
   type SortingState,
   type ColumnFiltersState,
   getFilteredRowModel,
+  getSortedRowModel,
 } from "@tanstack/react-table";
 
 import {
@@ -73,6 +74,7 @@ export function DataTableDiarioDeObra<TData, TValue>({
     onSortingChange: setSorting,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnFiltersChange: setColumnFilters,
+    getSortedRowModel: getSortedRowModel(),
     state: {
       sorting,
       columnFilters,

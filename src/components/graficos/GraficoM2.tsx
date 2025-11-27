@@ -24,7 +24,7 @@ import dayjs from "dayjs";
 import { Skeleton } from "../ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
 import { url } from "@/url";
-import 'dayjs/locale/pt-br' 
+import "dayjs/locale/pt-br";
 
 interface TodosOsItensDoDia {
   dataDia: string;
@@ -32,7 +32,7 @@ interface TodosOsItensDoDia {
 }
 
 function GraficoDados() {
-  dayjs.locale('pt-br') 
+  dayjs.locale("pt-br");
   const [timeRange, setTimeRange] = React.useState("90d");
 
   // Define o número de dias com base no filtro
@@ -57,6 +57,10 @@ function GraficoDados() {
       return data as TodosOsItensDoDia[];
     },
   });
+
+  const maiorValor = Math.max(...chartData.map((val) => val.total_m2));
+  const menorValor = Math.min(...chartData.map((val) => val.total_m2));
+
   const filteredData = chartData.filter((item) => {
     const date = dayjs(item.dataDia);
     const today = dayjs();
@@ -123,8 +127,11 @@ function GraficoDados() {
               tickFormatter={(value) => dayjs(value).format("DD/MM")}
             />
             <YAxis
-              domain={[100, 2500]} // ou [0, 600] se quiser fixo
+              domain={[menorValor, maiorValor]}
               allowDataOverflow={true}
+              tickFormatter={(val) =>
+                `${Intl.NumberFormat("PT-BR").format(val)}M²`
+              }
             />
 
             <ChartTooltip
