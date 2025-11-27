@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "../ui/table";
 import { MessageCircleWarningIcon } from "lucide-react";
+import { parseISO } from "date-fns";
 const url = import.meta.env.VITE_API_URL;
 
 // const formatDateOnly = (date: Date | null) =>
@@ -148,7 +149,9 @@ function PeriodoFechamentoIdMedicao({
             {periodo.map((value) =>
               value.itensDoDia.map((value2) => (
                 <TableRow key={value2.id}>
-                  <TableCell>{dayjs(value.dataDia).format("DD/MM")}</TableCell>
+                  <TableCell>
+                    {dayjs(parseISO(value.dataDia)).format("DD/MM")}
+                  </TableCell>
                   <TableCell>{value2.descricao}</TableCell>
                   <TableCell>
                     {

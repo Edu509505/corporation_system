@@ -12,7 +12,6 @@ import {
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-
 import {
   Table,
   TableBody,
@@ -56,7 +55,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useMutation, useQuery, useQueryErrorResetBoundary, useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryErrorResetBoundary,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import StatusDeAprovacao from "@/components/componentsVersionamento/StatusDeAprovaao";
 import InfoClientes from "@/components/componentsVersionamento/informacoesCliente";
 import {
@@ -71,7 +75,16 @@ import { ErrorBoundary } from "react-error-boundary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
 import PdfView from "@/components/pdfView";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -96,6 +109,7 @@ interface Propostas {
   nomeDaProposta: string;
   descricao: string;
   createdAt: string;
+  valorProposta: number;
   cliente: {
     name: string;
     cnpj: string;
@@ -114,6 +128,40 @@ interface Quantitativa {
 interface AnexoVersionamento {
   url: string;
   path: string;
+}
+
+let valorInicial = "0" as string;
+
+function CurrencyInput2({
+  onValueChange,
+}: {
+  onValueChange: (valor: number) => void;
+}) {
+  const [displayValue, setDisplayValue] = useState(`${valorInicial}`);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, "");
+    const number = parseFloat(raw) / 100;
+
+    const formatted = isNaN(number)
+      ? ""
+      : number.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        });
+
+    setDisplayValue(formatted); // 🔁 atualiza o input
+    onValueChange(isNaN(number) ? 0 : number); // 🔎 envia o número pro pai
+  };
+
+  return (
+    <Input
+      placeholder="R$ -"
+      value={displayValue}
+      onChange={handleChange}
+      name="currency"
+    />
+  );
 }
 
 function VersionamentoPage() {
@@ -140,39 +188,43 @@ function VersionamentoPage() {
 
   //ATUALIZA O STATUS DO VERSINAMENTO E JOGA PARA O BANCO
 
-  const { data: fetchAnexoVersionamento = [], refetch: refetchAnexoVersionamentos } = useQuery({
+  const {
+    data: fetchAnexoVersionamento = [],
+    refetch: refetchAnexoVersionamentos,
+  } = useQuery({
     queryKey: ["fetchAnexoVersionamento", idVersao],
     queryFn: async () => {
-      if (!idVersao) return [] // Retorna array vazio se idVersao for null
+      if (!idVersao) return []; // Retorna array vazio se idVersao for null
 
-      const response = await fetch(`${url}/versionamento/${idVersao}/anexos/urls`, {
-        method: "GET",
-        credentials: "include"
-      })
-      if (!response.ok) throw new Error("Não foi possível encontrar o anexo do Versionamento")
-      const data = await response.json()
+      const response = await fetch(
+        `${url}/versionamento/${idVersao}/anexos/urls`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      if (!response.ok)
+        throw new Error("Não foi possível encontrar o anexo do Versionamento");
+      const data = await response.json();
 
       // A API retorna { url: [...urls] }, então pegamos o array de urls
-      const urlArray = data.url || data.urls || data.anexos || []
+      const urlArray = data.url || data.urls || data.anexos || [];
 
       // Transformamos em array de objetos com a estrutura esperada
       const anexos = Array.isArray(urlArray)
         ? urlArray.map((urlString: string) => ({ url: urlString }))
-        : []
-      return anexos as AnexoVersionamento[]
+        : [];
+      return anexos as AnexoVersionamento[];
     },
-    enabled: !!idVersao // Só executa a query se idVersao existir
-  })
+    enabled: !!idVersao, // Só executa a query se idVersao existir
+  });
 
-  const {
-    data: proposta,
-    refetch: refetchProposta
-  } = useSuspenseQuery({
+  const { data: proposta, refetch: refetchProposta } = useSuspenseQuery({
     queryKey: ["proposta", id],
     queryFn: async () => {
       const response = await fetch(`${url}/proposta/${id}`, {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
       });
       if (!response.ok) throw new Error("Proposta não encontrada");
       const data = await response.json();
@@ -180,46 +232,51 @@ function VersionamentoPage() {
     },
   });
 
-  const {
-    data: versionamentos,
-    refetch: refetchVersionamentos,
-  } = useSuspenseQuery({
-    queryKey: ["versionamento", id],
-    queryFn: async () => {
-      const response = await fetch(`${url}/proposta/${id}/versionamentos`, {
-        method: "GET",
-        credentials: "include"
-      });
-      if (!response.ok) throw new Error("Versionamento Não encontrado");
-      const data = await response.json();
-      return data as Versionamento[];
-    },
-  });
+  const [valorProposta, setValorProposta] = useState<number>(0);
+
+  console.log(proposta.valorProposta);
+  valorInicial = Intl.NumberFormat("PT-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(proposta.valorProposta / 100);
+
+  const { data: versionamentos, refetch: refetchVersionamentos } =
+    useSuspenseQuery({
+      queryKey: ["versionamento", id],
+      queryFn: async () => {
+        const response = await fetch(`${url}/proposta/${id}/versionamentos`, {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!response.ok) throw new Error("Versionamento Não encontrado");
+        const data = await response.json();
+        return data as Versionamento[];
+      },
+    });
 
   const { data: quantitativa, refetch: refetchQuantitativa } = useQuery({
     queryKey: ["quantitativas", proposta?.id],
     queryFn: async () => {
-      const response = await fetch(
-        `${url}/quantitativa/${proposta?.id}`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`${url}/quantitativa/${proposta?.id}`, {
+        method: "GET",
+        credentials: "include",
+      });
       if (!response.ok) throw new Error("Versionamento não quantitativa");
       const data = await response.json();
-      return data as Quantitativa[]
+      return data as Quantitativa[];
     },
     // O método .some retorna um valor booleano se a condição for verdadeira hehehe
-    enabled: versionamentos.some((val) => val.status === "APROVADA" ? true : false)
+    enabled: versionamentos.some((val) =>
+      val.status === "APROVADA" ? true : false
+    ),
   });
 
   async function refetchAll() {
-    await refetchQuantitativa()
-    await refetchVersionamentos()
-    await refetchProposta()
-    await refetchAnexoVersionamentos()
-    return
+    await refetchQuantitativa();
+    await refetchVersionamentos();
+    await refetchProposta();
+    await refetchAnexoVersionamentos();
+    return;
   }
 
   const { mutateAsync: updateVersionamento } = useMutation({
@@ -242,7 +299,7 @@ function VersionamentoPage() {
   const novoVersionamentoSchema = z.object({
     files: z
       .instanceof(FileList, {
-        error: 'Selecione um Arquivo'
+        error: "Selecione um Arquivo",
       })
       .refine(
         (files) => files?.length >= 1,
@@ -253,21 +310,37 @@ function VersionamentoPage() {
         "Arquivo deve ter até 50MB"
       )
       .refine(
-        (files) =>
-          ["application/pdf"].includes(
-            files?.[0]?.type
-          ),
+        (files) => ["application/pdf"].includes(files?.[0]?.type),
         "Tipo de arquivo inválido"
-      )
-  })
-  const formNovoVersionamento = useForm<z.infer<typeof novoVersionamentoSchema>>({
+      ),
+  });
+  const formNovoVersionamento = useForm<
+    z.infer<typeof novoVersionamentoSchema>
+  >({
     resolver: zodResolver(novoVersionamentoSchema),
     defaultValues: {
-      files: undefined
-    }
-  })
+      files: undefined,
+    },
+  });
 
-  const onSubmitNovoVersionamento = async (data: z.infer<typeof novoVersionamentoSchema>) => {
+  const { mutateAsync: updateValorProposta } = useMutation({
+    mutationKey: ["updateValorProposta"],
+    mutationFn: async (novoValor: number) => {
+      const response = await fetch(`${url}/updateProposta/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ valorProposta: novoValor * 100 }),
+      });
+
+      if (!response.ok) throw new Error("Versionamento não encontrado");
+      return response.json();
+    },
+  });
+
+  const onSubmitNovoVersionamento = async (
+    data: z.infer<typeof novoVersionamentoSchema>
+  ) => {
     try {
       setIsLoadingRefetch(true);
       const form = new FormData();
@@ -281,21 +354,26 @@ function VersionamentoPage() {
         credentials: "include",
         body: form,
       });
+
       if (!response.ok) {
-        // Aqui você lida com o erro de forma clara
         const errorText = await response.text();
         throw new Error(`Erro ${response.status}: ${errorText}`);
       }
-      // const body = await response.json();
+
+      await updateValorProposta(valorProposta);
+
       setOpenNovoVersionamento(false);
       refetchVersionamentos();
-    } catch { } finally { setIsLoadingRefetch(false); }
-
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoadingRefetch(false);
+    }
   };
 
   const [openDialog] = useState(false);
   const [open, setOpen] = useState(false);
-  const [openNovoVersionamento, setOpenNovoVersionamento] = useState(false)
+  const [openNovoVersionamento, setOpenNovoVersionamento] = useState(false);
 
   //FORM DA QUATITATIVA
 
@@ -303,12 +381,14 @@ function VersionamentoPage() {
     idVersionamento: z.number(),
     descricao: z.string().min(2, "Nome obrigatório"),
     unidadeDeMedida: z.string().min(1, "Unidade obrigatória"),
-    quantidade: z.string().refine((val) => val.replace(',', '.')),
-    valorUnitario: z.string().min(1, "Defina o valor da proposta")
+    quantidade: z.string().refine((val) => val.replace(",", ".")),
+    valorUnitario: z
+      .string()
+      .min(1, "Defina o valor da proposta")
       .transform((val) => {
-        const clean = val.replace(/\D/g, '');
+        const clean = val.replace(/\D/g, "");
         return parseFloat(clean) / 100;
-      })
+      }),
   });
 
   const formSchema = z.object({
@@ -380,20 +460,20 @@ function VersionamentoPage() {
     useEffect(() => {
       const handleInput = (e: Event) => {
         const target = e.target as HTMLInputElement;
-        const raw = target.value.replace(/\D/g, '');
+        const raw = target.value.replace(/\D/g, "");
         const number = parseFloat(raw) / 100;
-        const formatted = number.toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL',
+        const formatted = number.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
         });
         target.value = formatted;
         field.onChange(formatted); // atualiza o valor no RHF
       };
 
       const input = inputRef.current;
-      input?.addEventListener('input', handleInput);
+      input?.addEventListener("input", handleInput);
 
-      return () => input?.removeEventListener('input', handleInput);
+      return () => input?.removeEventListener("input", handleInput);
     }, [field]);
 
     return (
@@ -417,6 +497,7 @@ function VersionamentoPage() {
       {proposta && (
         <InfoClientes
           nomeDaProposta={proposta.nomeDaProposta}
+          valorProposta={proposta.valorProposta}
           createdAt={proposta.createdAt}
           cliente={proposta.cliente.name}
           cnpjCliente={proposta.cliente.cnpj}
@@ -473,11 +554,16 @@ function VersionamentoPage() {
                         {/* <DialogDescription className=" flex flex-col w-full items-center justify-start gap-3">
                         </DialogDescription> */}
                         <div className="flex gap-3 flex-wrap">
-
                           {(() => {
-                            const pdfAnexos = (fetchAnexoVersionamento || []).filter((anexo) => {
+                            const pdfAnexos = (
+                              fetchAnexoVersionamento || []
+                            ).filter((anexo) => {
                               // const extFromPath = anexo?.path?.split(".").pop()?.toLowerCase();
-                              const extFromUrl = anexo?.url?.split(".").pop()?.split("?")[0]?.toLowerCase();
+                              const extFromUrl = anexo?.url
+                                ?.split(".")
+                                .pop()
+                                ?.split("?")[0]
+                                ?.toLowerCase();
                               return extFromUrl === "pdf";
                             });
 
@@ -497,11 +583,18 @@ function VersionamentoPage() {
 
                                   <div className="flex flex-col items-center gap-3 flex-1 mx-4">
                                     <div className="w-full h-[500px] bg-white rounded overflow-hidden shadow-sm">
-                                      <PdfView url={fetchAnexoVersionamento[currentImageIndex]?.url} />
+                                      <PdfView
+                                        url={
+                                          fetchAnexoVersionamento[
+                                            currentImageIndex
+                                          ]?.url
+                                        }
+                                      />
                                     </div>
 
                                     <span className="text-sm font-semibold text-gray-600">
-                                      {currentImageIndex + 1} de {pdfAnexos.length}
+                                      {currentImageIndex + 1} de{" "}
+                                      {pdfAnexos.length}
                                     </span>
                                   </div>
 
@@ -518,7 +611,11 @@ function VersionamentoPage() {
                                     <button
                                       key={idx}
                                       onClick={() => setCurrentImageIndex(idx)}
-                                      className={`h-2 rounded-full transition-all ${idx === currentImageIndex ? "w-6 bg-blue-500" : "w-2 bg-gray-300"}`}
+                                      className={`h-2 rounded-full transition-all ${
+                                        idx === currentImageIndex
+                                          ? "w-6 bg-blue-500"
+                                          : "w-2 bg-gray-300"
+                                      }`}
                                     />
                                   ))}
                                 </div>
@@ -547,7 +644,8 @@ function VersionamentoPage() {
                                     A proposta foi recusada?
                                   </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Uma vez recusada não será possível aprovar novamente
+                                    Uma vez recusada não será possível aprovar
+                                    novamente
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
@@ -567,7 +665,14 @@ function VersionamentoPage() {
                                     }}
                                     disabled={isLoadingRefetch}
                                   >
-                                    {isLoadingRefetch ? <> <Spinner /> Continuar</> : <>Continuar</>}
+                                    {isLoadingRefetch ? (
+                                      <>
+                                        {" "}
+                                        <Spinner /> Continuar
+                                      </>
+                                    ) : (
+                                      <>Continuar</>
+                                    )}
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
@@ -611,17 +716,15 @@ function VersionamentoPage() {
                                         Aprovar
                                       </Button>
                                     </DialogTrigger>
-                                    <DialogContent className="sm:max-w-[70%] [&>button]:hidden flex flex-col gap-3"
-
-                                    >
+                                    <DialogContent className="sm:max-w-[70%] [&>button]:hidden flex flex-col gap-3">
                                       <DialogHeader>
                                         <DialogTitle>
                                           Adicionar quantitativa
                                         </DialogTitle>
                                         <DialogDescription>
-                                          Para prosseguir, é necessário adicionar
-                                          a quantitativa dessa proposta, item,
-                                          unidade e preço
+                                          Para prosseguir, é necessário
+                                          adicionar a quantitativa dessa
+                                          proposta, item, unidade e preço
                                         </DialogDescription>
                                       </DialogHeader>
                                       <Form {...form}>
@@ -643,23 +746,49 @@ function VersionamentoPage() {
                                                       name={`itens.${index}.descricao`}
                                                       render={({ field }) => (
                                                         <FormItem>
-                                                          <FormLabel>Item</FormLabel>
+                                                          <FormLabel>
+                                                            Item
+                                                          </FormLabel>
                                                           <Select
                                                             value={field.value}
-                                                            onValueChange={field.onChange}
+                                                            onValueChange={
+                                                              field.onChange
+                                                            }
                                                           >
                                                             <FormControl>
-                                                              <SelectTrigger className="w-[180px] cursor-pointer" >
+                                                              <SelectTrigger className="w-[180px] cursor-pointer">
                                                                 <SelectValue placeholder="Selecione o Item" />
                                                               </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
                                                               <SelectGroup>
-                                                                <SelectLabel>Itens</SelectLabel>
-                                                                <SelectItem className="cursor-pointer" value="Retroescavadeira">Retroescavadeira</SelectItem>
-                                                                <SelectItem className="cursor-pointer" value="Rolocompactador">Rolocompactador</SelectItem>
-                                                                <SelectItem className="cursor-pointer" value="Calçamento">Calçamento</SelectItem>
-                                                                <SelectItem className="cursor-pointer" value="Homem Hora">Homem Hora</SelectItem>
+                                                                <SelectLabel>
+                                                                  Itens
+                                                                </SelectLabel>
+                                                                <SelectItem
+                                                                  className="cursor-pointer"
+                                                                  value="Retroescavadeira"
+                                                                >
+                                                                  Retroescavadeira
+                                                                </SelectItem>
+                                                                <SelectItem
+                                                                  className="cursor-pointer"
+                                                                  value="Rolocompactador"
+                                                                >
+                                                                  Rolocompactador
+                                                                </SelectItem>
+                                                                <SelectItem
+                                                                  className="cursor-pointer"
+                                                                  value="Calçamento"
+                                                                >
+                                                                  Calçamento
+                                                                </SelectItem>
+                                                                <SelectItem
+                                                                  className="cursor-pointer"
+                                                                  value="Homem Hora"
+                                                                >
+                                                                  Homem Hora
+                                                                </SelectItem>
                                                               </SelectGroup>
                                                             </SelectContent>
                                                             <FormMessage />
@@ -672,24 +801,55 @@ function VersionamentoPage() {
                                                       name={`itens.${index}.unidadeDeMedida`}
                                                       render={({ field }) => (
                                                         <FormItem>
-                                                          <FormLabel>Unidade</FormLabel>
+                                                          <FormLabel>
+                                                            Unidade
+                                                          </FormLabel>
                                                           <Select
                                                             value={field.value}
-                                                            onValueChange={field.onChange}
+                                                            onValueChange={
+                                                              field.onChange
+                                                            }
                                                           >
                                                             <FormControl>
-                                                              <SelectTrigger className="w-[180px] cursor-pointer" >
+                                                              <SelectTrigger className="w-[180px] cursor-pointer">
                                                                 <SelectValue placeholder="Selecione o Item" />
                                                               </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
                                                               <SelectGroup>
-                                                                <SelectLabel>Itens</SelectLabel>
-                                                                <SelectItem className="cursor-pointer" value="M²">M²</SelectItem>
-                                                                <SelectItem className="cursor-pointer" value="M³">M³</SelectItem>
-                                                                <SelectItem className="cursor-pointer" value="Hora">Hora</SelectItem>
-                                                                <SelectItem className="cursor-pointer" value="Diária">Diária</SelectItem>
-                                                                <SelectItem className="cursor-pointer" value="Kg">Kg</SelectItem>
+                                                                <SelectLabel>
+                                                                  Itens
+                                                                </SelectLabel>
+                                                                <SelectItem
+                                                                  className="cursor-pointer"
+                                                                  value="M²"
+                                                                >
+                                                                  M²
+                                                                </SelectItem>
+                                                                <SelectItem
+                                                                  className="cursor-pointer"
+                                                                  value="M³"
+                                                                >
+                                                                  M³
+                                                                </SelectItem>
+                                                                <SelectItem
+                                                                  className="cursor-pointer"
+                                                                  value="Hora"
+                                                                >
+                                                                  Hora
+                                                                </SelectItem>
+                                                                <SelectItem
+                                                                  className="cursor-pointer"
+                                                                  value="Diária"
+                                                                >
+                                                                  Diária
+                                                                </SelectItem>
+                                                                <SelectItem
+                                                                  className="cursor-pointer"
+                                                                  value="Kg"
+                                                                >
+                                                                  Kg
+                                                                </SelectItem>
                                                               </SelectGroup>
                                                             </SelectContent>
                                                             <FormMessage />
@@ -724,10 +884,14 @@ function VersionamentoPage() {
                                                       name={`itens.${index}.valorUnitario`}
                                                       render={({ field }) => (
                                                         <FormItem>
-                                                          <FormLabel>Valor</FormLabel>
+                                                          <FormLabel>
+                                                            Valor
+                                                          </FormLabel>
                                                           <FormMessage />
                                                           <FormControl>
-                                                            <CurrencyInput field={field} />
+                                                            <CurrencyInput
+                                                              field={field}
+                                                            />
                                                           </FormControl>
                                                         </FormItem>
                                                       )}
@@ -762,13 +926,28 @@ function VersionamentoPage() {
                                                     })
                                                   }
                                                 >
-                                                  {isLoadingRefetch ? <><Spinner className="size-3" /> Adicionar item</> : <>Adicionar item</>}
-
+                                                  {isLoadingRefetch ? (
+                                                    <>
+                                                      <Spinner className="size-3" />{" "}
+                                                      Adicionar item
+                                                    </>
+                                                  ) : (
+                                                    <>Adicionar item</>
+                                                  )}
                                                 </Button>
                                               </div>
                                             </div>
                                           </div>
-                                          <DialogFooter className="flex gap-3">
+                                          <DialogFooter className="flex gap-3 justify-center items-end">
+                                            <div className="w-full flex flex-col gap-3">
+                                              <Label>
+                                                Atribuir um novo valor a
+                                                proposta
+                                              </Label>
+                                              <CurrencyInput2
+                                                onValueChange={setValorProposta}
+                                              />
+                                            </div>
                                             <DialogClose>
                                               <Button
                                                 variant="outline"
@@ -782,8 +961,20 @@ function VersionamentoPage() {
                                               className="cursor-pointer"
                                               type="submit"
                                               disabled={isLoadingRefetch}
+                                              onClick={() => {
+                                                updateValorProposta(
+                                                  valorProposta
+                                                );
+                                              }}
                                             >
-                                              {isLoadingRefetch ? <><Spinner className="size-3" />Carregando... </> : "Definir Quantitativa"}
+                                              {isLoadingRefetch ? (
+                                                <>
+                                                  <Spinner className="size-3" />
+                                                  Carregando...{" "}
+                                                </>
+                                              ) : (
+                                                "Definir Quantitativa"
+                                              )}
                                             </Button>
                                           </DialogFooter>
                                         </form>
@@ -815,7 +1006,10 @@ function VersionamentoPage() {
                 <div className="flex items-center justify-between">
                   Ações
                   <div>
-                    <Dialog open={openNovoVersionamento} onOpenChange={setOpenNovoVersionamento}>
+                    <Dialog
+                      open={openNovoVersionamento}
+                      onOpenChange={setOpenNovoVersionamento}
+                    >
                       <DialogTrigger asChild>
                         <Button
                           variant="outline"
@@ -823,7 +1017,6 @@ function VersionamentoPage() {
                           disabled={versionamentos?.some(
                             (item) => item.status === "APROVADA"
                           )}
-
                         >
                           <CirclePlus />
                           Criar Novo Versionamento
@@ -836,9 +1029,10 @@ function VersionamentoPage() {
                           </DialogTitle>
                           <DialogDescription className="">
                             <Form {...formNovoVersionamento}>
-
                               <form
-                                onSubmit={formNovoVersionamento.handleSubmit(onSubmitNovoVersionamento)}
+                                onSubmit={formNovoVersionamento.handleSubmit(
+                                  onSubmitNovoVersionamento
+                                )}
                                 className="flex flex-col gap-4"
                               >
                                 <FormField
@@ -853,16 +1047,20 @@ function VersionamentoPage() {
                                             <EmptyMedia variant="icon">
                                               <Paperclip />
                                             </EmptyMedia>
-                                            <EmptyTitle>Selecione um Arquivo</EmptyTitle>
+                                            <EmptyTitle>
+                                              Selecione um Arquivo
+                                            </EmptyTitle>
                                             <EmptyDescription>
-                                              Escolha um arquivo de seu dispositivo para realizar o
-                                              Upload
+                                              Escolha um arquivo de seu
+                                              dispositivo para realizar o Upload
                                               <Input
                                                 className="cursor-pointer"
                                                 type="file"
                                                 multiple
                                                 accept=".pdf"
-                                                onChange={(e) => field.onChange(e.target.files)}
+                                                onChange={(e) =>
+                                                  field.onChange(e.target.files)
+                                                }
                                               />
                                             </EmptyDescription>
                                           </EmptyHeader>
@@ -870,7 +1068,16 @@ function VersionamentoPage() {
                                             className="cursor-pointer"
                                             type="submit"
                                             disabled={isLoadingRefetch}
-                                          >{isLoadingRefetch ? <><Spinner className="size-3" />Criando... </> : <>Criar</>}</Button>
+                                          >
+                                            {isLoadingRefetch ? (
+                                              <>
+                                                <Spinner className="size-3" />
+                                                Criando...{" "}
+                                              </>
+                                            ) : (
+                                              <>Criar</>
+                                            )}
+                                          </Button>
                                         </Empty>
                                       </FormControl>
                                       <FormMessage />
@@ -908,13 +1115,14 @@ function VersionamentoPage() {
               <TableBody>
                 {quantitativa.map((item) => (
                   <TableRow>
-                    <TableCell > {item.descricao}</TableCell>
-                    <TableCell > {formatToNumber(item.quantidade)}</TableCell>
-                    <TableCell > {item.unidadeDeMedida}</TableCell>
-                    <TableCell >{formatToBRL(item.valorUnitario/100)}</TableCell>
+                    <TableCell> {item.descricao}</TableCell>
+                    <TableCell> {formatToNumber(item.quantidade)}</TableCell>
+                    <TableCell> {item.unidadeDeMedida}</TableCell>
+                    <TableCell>
+                      {formatToBRL(item.valorUnitario / 100)}
+                    </TableCell>
                   </TableRow>
-                ))
-                }
+                ))}
               </TableBody>
             </Table>
           </>
@@ -984,6 +1192,3 @@ function Versionamento() {
 }
 
 export default Versionamento;
-
-
-

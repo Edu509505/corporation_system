@@ -16,7 +16,7 @@ import { Link, useParams } from "react-router";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
 import { Label } from "@/components/ui/label";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import PeriodoFechamentoIdMedicao from "@/components/medicao/periodoFechamentoIdMedicao";
 import { Badge } from "@/components/ui/badge";
 
@@ -137,21 +137,21 @@ function VisualMedicao() {
           <div className="flex flex-col gap-2">
             <Label>Data Inicial</Label>
             <div className="rounded-[0.5rem] border-1 border-gray-300 pl-2 pr-2 pt-1 pb-1 flex gap-3 justify-start items-center">
-              <h1>{format(new Date(medicao.periodoInicial), "dd/MM/yyyy")}</h1>
+              <h1>{format(parseISO(medicao.periodoInicial), "dd/MM/yyyy")}</h1>
               <Calendar className="size-4" />
             </div>
           </div>
           <div className="flex flex-col gap-2">
             <Label>Data Final</Label>
             <div className="rounded-[0.5rem] border-1 border-gray-300 pl-2 pr-2 pt-1 pb-1 flex gap-3 justify-start items-center">
-              <h1>{format(new Date(medicao.periodoFinal), "dd/MM/yyyy")}</h1>
+              <h1>{format(parseISO(medicao.periodoFinal), "dd/MM/yyyy")}</h1>
               <Calendar className="size-4" />
             </div>
           </div>
         </section>
         <PeriodoFechamentoIdMedicao
-          dataInicial={format(new Date(medicao.periodoInicial), "yyyy-MM-dd")}
-          dataFinal={format(new Date(medicao.periodoFinal), "yyyy-MM-dd")}
+          dataInicial={format(parseISO(medicao.periodoInicial), "yyyy-MM-dd")}
+          dataFinal={format(parseISO(medicao.periodoFinal), "yyyy-MM-dd")}
           idProposta={medicao.idProposta}
           idMedicao={medicao.id}
         />
