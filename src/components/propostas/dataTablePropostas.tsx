@@ -142,11 +142,11 @@ export function DataTableProposta<TData, TValue>({
               }
             >
               <SelectTrigger className="w-[300px]">
-                <SelectValue placeholder="Selecionar Proposta" />
+                <SelectValue placeholder="Selecionar Empresa" />
               </SelectTrigger>
               <SelectContent className="w-[300px]">
                 <SelectGroup>
-                  <SelectLabel>Empresa</SelectLabel>
+                  <SelectLabel>Empresas</SelectLabel>
                   {clientes?.map((clientes) => (
                     <SelectItem value={clientes.name}>
                       {clientes.name}
@@ -157,7 +157,7 @@ export function DataTableProposta<TData, TValue>({
             </Select>
           </div>
           <div className="flex flex-col gap-3">
-            <Label>Empresa</Label>
+            <Label>Proposta</Label>
 
             <Select
               onValueChange={(event) =>
@@ -176,7 +176,7 @@ export function DataTableProposta<TData, TValue>({
               </SelectTrigger>
               <SelectContent className="w-[300px]">
                 <SelectGroup>
-                  <SelectLabel>Empresa</SelectLabel>
+                  <SelectLabel>Propostas</SelectLabel>
                   {propostas?.map((propostas) => (
                     <SelectItem value={propostas.nomeDaProposta}>
                       {propostas.nomeDaProposta}

@@ -203,19 +203,19 @@ export default function CriarDiarioDeObra() {
             name="idProposta"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Proposta</FormLabel>
+                <FormLabel>Obra</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger className="w-auto cursor-pointer">
-                      <SelectValue placeholder="Selecionar proposta" />
+                      <SelectValue placeholder="Selecionar Obra" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="w-[300px]">
                     <SelectGroup>
-                      <SelectLabel>Proposta</SelectLabel>
+                      <SelectLabel>Obras</SelectLabel>
                       {propostasAprovadas?.map((propostas) => (
                         <SelectItem
                           key={propostas.id}
