@@ -66,7 +66,7 @@ export const columns: ColumnDef<Propostas>[] = [
     cell: ({ row }) => {
       const createdAt = row.getValue("createdAt") as string | null;
       let data = createdAt ? dayjs(createdAt).format("DD/MM/YYYY") : "";
-      return <div>{data.toISOString() as string}</div>;
+      return <div>{data as string}</div>;
     },
   },
   {
